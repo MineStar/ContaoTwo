@@ -62,6 +62,10 @@ public class Core extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        // SAVE STATISTICS
+        if (this.databaseManager.hasConnection())
+            this.statisticManager.saveAllStatistics();
+
         // PRINT INFO
         ConsoleUtils.printInfo(pluginName, "Disabled v" + this.getDescription().getVersion() + "!");
     }
@@ -92,8 +96,16 @@ public class Core extends JavaPlugin {
         // REGISTER EVENTS
         this.registerEvents();
 
+        // START THREADS
+        this.startThreads();
+
         // PRINT INFO
         ConsoleUtils.printInfo(pluginName, "Enabled v" + this.getDescription().getVersion() + "!");
+    }
+
+    private void startThreads() {
+        if (this.databaseManager.hasConnection())
+            Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(this, this.statisticManager, 20 * 60, 20 * 60);
     }
 
     private void createSettings() {
