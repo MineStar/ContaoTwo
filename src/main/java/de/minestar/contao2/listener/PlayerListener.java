@@ -15,18 +15,21 @@ import de.minestar.contao2.manager.DatabaseManager;
 import de.minestar.contao2.manager.PlayerManager;
 import de.minestar.contao2.manager.StatisticManager;
 import de.minestar.contao2.units.ContaoGroup;
+import de.minestar.contao2.units.Settings;
 import de.minestar.core.MinestarCore;
 import de.minestar.core.units.MinestarPlayer;
 
 public class PlayerListener implements Listener {
+    private Settings settings;
     private PlayerManager playerManager;
     private DatabaseManager databaseManager;
     private StatisticManager statisticManager;
 
-    public PlayerListener(PlayerManager playerManager, DatabaseManager databaseManager, StatisticManager statisticManager) {
+    public PlayerListener(PlayerManager playerManager, DatabaseManager databaseManager, StatisticManager statisticManager, Settings settings) {
         this.playerManager = playerManager;
         this.databaseManager = databaseManager;
         this.statisticManager = statisticManager;
+        this.settings = settings;
     }
 
     @EventHandler(priority = EventPriority.LOW)
@@ -47,13 +50,13 @@ public class PlayerListener implements Listener {
         if (thisPlayer.getGroup().equalsIgnoreCase(ContaoGroup.ADMIN.getName()))
             return;
 
-        // PERFORM CONTAOCHECKs
+        // PERFORM CONTAOCHECK
         this.databaseManager.performContaoCheck(thisPlayer.getPlayerName(), thisPlayer.getGroup());
 
         // PERFORM CHECK FOR FREE SPACE
         if (thisPlayer.getGroup().equalsIgnoreCase(ContaoGroup.FREE.getName())) {
             if (this.playerManager.getFreeSlots() < 1) {
-                event.setKickMessage("Derzeit sind alle FreeUser-Slots belegt!");
+                event.setKickMessage(this.settings.getNoFreeSlotsMSG());
                 event.setResult(PlayerPreLoginEvent.Result.KICK_OTHER);
             }
         }

@@ -13,19 +13,21 @@ import org.bukkit.entity.Player;
 import com.bukkit.gemo.utils.UtilPermissions;
 
 import de.minestar.contao2.units.ContaoGroup;
+import de.minestar.contao2.units.Settings;
 import de.minestar.core.MinestarCore;
 import de.minestar.core.units.MinestarPlayer;
 import de.minestar.minestarlibrary.utils.PlayerUtils;
 
 public class PlayerManager {
 
+    private Settings settings;
+
     private HashMap<ContaoGroup, String> onlineList;
     private HashMap<ContaoGroup, HashSet<String>> groupMap;
     private ConcurrentHashMap<String, ContaoGroup> playerMap;
 
-    private int maxFreeSlots = 6;
-
-    public PlayerManager() {
+    public PlayerManager(Settings settings) {
+        this.settings = settings;
         this.onlineList = new HashMap<ContaoGroup, String>();
         this.groupMap = new HashMap<ContaoGroup, HashSet<String>>();
         this.playerMap = new ConcurrentHashMap<String, ContaoGroup>();
@@ -177,6 +179,6 @@ public class PlayerManager {
     }
 
     public int getFreeSlots() {
-        return this.maxFreeSlots - this.groupMap.get(ContaoGroup.FREE).size();
+        return this.settings.getFreeSlots() - this.groupMap.get(ContaoGroup.FREE).size();
     }
 }

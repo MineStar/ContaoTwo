@@ -10,6 +10,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import de.minestar.contao2.commands.list.cmdList;
+import de.minestar.contao2.commands.ppay.cmdPPay;
+import de.minestar.contao2.commands.ppay.cmdSet;
 import de.minestar.contao2.commands.user.cmdAddProbeTime;
 import de.minestar.contao2.commands.user.cmdAddWarning;
 import de.minestar.contao2.commands.user.cmdAdmin;
@@ -26,6 +28,7 @@ import de.minestar.contao2.listener.PlayerListener;
 import de.minestar.contao2.manager.DatabaseManager;
 import de.minestar.contao2.manager.PlayerManager;
 import de.minestar.contao2.manager.StatisticManager;
+import de.minestar.contao2.units.Settings;
 import de.minestar.minestarlibrary.commands.AbstractCommand;
 import de.minestar.minestarlibrary.commands.CommandList;
 import de.minestar.minestarlibrary.utils.ConsoleUtils;
@@ -48,6 +51,11 @@ public class Core extends JavaPlugin {
     private DatabaseManager databaseManager;
 
     /**
+     * Settings
+     */
+    private Settings settings;
+
+    /**
      * Listener
      */
     private PlayerListener connectionListener;
@@ -63,6 +71,9 @@ public class Core extends JavaPlugin {
         // INIT DATAFOLDER
         Core.dataFolder = this.getDataFolder();
         Core.dataFolder.mkdirs();
+
+        // CREATE SETTINGS
+        this.createSettings();
 
         // CREATE MANAGER
         this.createManager();
@@ -85,15 +96,19 @@ public class Core extends JavaPlugin {
         ConsoleUtils.printInfo(pluginName, "Enabled v" + this.getDescription().getVersion() + "!");
     }
 
+    private void createSettings() {
+        this.settings = new Settings(Core.dataFolder);
+    }
+
     private void createManager() {
         this.databaseManager = new DatabaseManager(Core.pluginName, Core.dataFolder);
-        this.playerManager = new PlayerManager();
+        this.playerManager = new PlayerManager(this.settings);
         this.statisticManager = new StatisticManager(this.databaseManager);
         this.databaseManager.initManager(this.playerManager, this.statisticManager);
     }
 
     private void createListener() {
-        this.connectionListener = new PlayerListener(this.playerManager, this.databaseManager, this.statisticManager);
+        this.connectionListener = new PlayerListener(this.playerManager, this.databaseManager, this.statisticManager, this.settings);
     }
 
     private void createCommands() {
@@ -118,6 +133,10 @@ public class Core extends JavaPlugin {
                     new cmdRemoveWarning("rwarn",   "<ingamename> <warningIndex>" , "contao.rights.rwarn",      this.databaseManager),
                     new cmdX            ("x",       "<ingamename>",                 "contao.rights.x",          this.playerManager)
                 ),
+                
+                new cmdPPay      ("/ppay", "", "contao.ppay",
+                    new cmdSet          ("set",     "<Option> <Number>",            "contao.ppay",              this.settings)
+                )
         };
         //@formatter:on
         this.commandList = new CommandList(commands);
