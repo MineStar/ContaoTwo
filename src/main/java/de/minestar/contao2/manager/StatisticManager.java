@@ -45,7 +45,12 @@ public class StatisticManager implements Runnable {
 
     public Statistic getPlayersStatistic(String playerName) {
         playerName = playerName.toLowerCase();
-        return statistics.get(playerName);
+        Statistic thisStatistic = statistics.get(playerName);
+        if (thisStatistic == null) {
+            thisStatistic = new Statistic(0, 0);
+            this.statistics.put(playerName, thisStatistic);
+        }
+        return thisStatistic;
     }
 
     private void loadAllStatistics() {
