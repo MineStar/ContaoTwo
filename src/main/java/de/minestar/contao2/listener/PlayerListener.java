@@ -36,8 +36,10 @@ public class PlayerListener implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         this.playerManager.updatePlayer(event.getPlayer());
         this.playerManager.updateOnlineLists();
-        this.playerManager.printOnlineList(event.getPlayer());
-        this.statisticManager.printStatistics(event.getPlayer());
+        if (this.settings.isShowWelcomeMSG()) {
+            this.playerManager.printOnlineList(event.getPlayer());
+            this.statisticManager.printStatistics(event.getPlayer());
+        }
         this.statisticManager.printWarnings(event.getPlayer());
     }
 
