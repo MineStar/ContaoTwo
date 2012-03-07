@@ -1,5 +1,7 @@
 package de.minestar.contao2.listener;
 
+import java.util.HashMap;
+
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -18,6 +20,7 @@ import de.minestar.contao2.units.ContaoGroup;
 import de.minestar.contao2.units.Settings;
 import de.minestar.core.MinestarCore;
 import de.minestar.core.units.MinestarPlayer;
+import de.minestar.minestarlibrary.utils.PlayerUtils;
 
 public class PlayerListener implements Listener {
     private Settings settings;
@@ -25,11 +28,14 @@ public class PlayerListener implements Listener {
     private DatabaseManager databaseManager;
     private StatisticManager statisticManager;
 
+    private HashMap<String, ContaoGroup> oldGroups;
+
     public PlayerListener(PlayerManager playerManager, DatabaseManager databaseManager, StatisticManager statisticManager, Settings settings) {
         this.playerManager = playerManager;
         this.databaseManager = databaseManager;
         this.statisticManager = statisticManager;
         this.settings = settings;
+        this.oldGroups = new HashMap<String, ContaoGroup>();
     }
 
     @EventHandler(priority = EventPriority.LOW)
@@ -41,6 +47,23 @@ public class PlayerListener implements Listener {
             this.statisticManager.printStatistics(event.getPlayer());
         }
         this.statisticManager.printWarnings(event.getPlayer());
+
+        // GET MINESTAR-PLAYER
+        MinestarPlayer thisPlayer = MinestarCore.getPlayer(event.getPlayer().getName());
+
+        // PRINT INFO, IF GROUPS ARE DIFFERENT
+        ContaoGroup oldGroup = this.oldGroups.get(event.getPlayer().getName());
+        ContaoGroup currentGroup = ContaoGroup.getGroup(thisPlayer.getGroup());
+
+        if (!currentGroup.equals(oldGroup)) {
+            if (currentGroup.isGroupHigher(oldGroup)) {
+                // UPDGRADE
+                PlayerUtils.sendMessage(event.getPlayer(), ChatColor.GREEN, "Du wurdest automatisch folgender Gruppe zugewiesen: " + currentGroup.name() + " (vorherige Gruppe: " + oldGroup.name() + ")");
+            } else {
+                // DOWNGRADE
+                PlayerUtils.sendMessage(event.getPlayer(), ChatColor.RED, "Du wurdest automatisch folgender Gruppe zugewiesen: " + currentGroup.name() + " (vorherige Gruppe: " + oldGroup.name() + ")");
+            }
+        }
     }
 
     @EventHandler(priority = EventPriority.LOW)
@@ -51,6 +74,9 @@ public class PlayerListener implements Listener {
         // IGNORE ADMINS
         if (thisPlayer.getGroup().equalsIgnoreCase(ContaoGroup.ADMIN.getName()))
             return;
+
+        // SAVE OLD GROUP
+        this.oldGroups.put(event.getName(), ContaoGroup.getGroup(thisPlayer.getGroup()));
 
         // PERFORM CONTAOCHECK
         this.databaseManager.performContaoCheck(thisPlayer.getPlayerName(), thisPlayer.getGroup());
@@ -63,7 +89,6 @@ public class PlayerListener implements Listener {
             }
         }
     }
-
     @EventHandler(priority = EventPriority.LOW)
     public void onPlayerQuit(PlayerQuitEvent event) {
         this.onPlayerDisconnect(event.getPlayer());
