@@ -1,5 +1,10 @@
 package de.minestar.contao2.manager;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -9,13 +14,16 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
+import org.json.simple.JSONObject;
 
 import com.bukkit.gemo.utils.UtilPermissions;
 
+import de.minestar.contao2.core.Core;
 import de.minestar.contao2.units.ContaoGroup;
 import de.minestar.contao2.units.Settings;
 import de.minestar.core.MinestarCore;
 import de.minestar.core.units.MinestarPlayer;
+import de.minestar.minestarlibrary.utils.ConsoleUtils;
 import de.minestar.minestarlibrary.utils.PlayerUtils;
 
 public class PlayerManager {
@@ -107,6 +115,7 @@ public class PlayerManager {
                 thisString = thisString.substring(0, thisString.length() - 2);
             this.onlineList.put(entry.getKey(), thisString);
         }
+        this.saveJSON();
     }
 
     private void addPlayer(String playerName) {
@@ -180,5 +189,34 @@ public class PlayerManager {
 
     public int getFreeSlots() {
         return this.settings.getFreeSlots() - this.groupMap.get(ContaoGroup.FREE).size();
+    }
+
+    @SuppressWarnings("unchecked")
+    /**
+     * Store all online player in a JSON file, so we can display it on the website
+     */
+    private void saveJSON() {
+        JSONObject json = new JSONObject();
+        json.put("ConnectedUsers", Bukkit.getOnlinePlayers().length);
+        json.put("ConnectedDefaultUsers", this.groupMap.get(ContaoGroup.DEFAULT).size() + this.groupMap.get(ContaoGroup.X).size());
+        json.put("ConnectedProbeUsers", this.groupMap.get(ContaoGroup.PROBE).size());
+        json.put("ConnectedFreeUsers", this.groupMap.get(ContaoGroup.FREE).size());
+        json.put("ConnectedPayUsers", this.groupMap.get(ContaoGroup.PAY).size());
+        json.put("ConnectedAdmins", this.groupMap.get(ContaoGroup.ADMIN).size());
+        json.put("FreeUserSlots", this.settings.getFreeSlots());
+        json.put("MaxPublicSlots", this.settings.getMaxSlots());
+        json.put("TotalSlots", Bukkit.getMaxPlayers());
+
+        try {
+            File f = new File(this.settings.getJSONFilePath());
+            if (!f.exists())
+                f.createNewFile();
+            Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(f), "UTF8"));
+            writer.write(json.toJSONString());
+            writer.flush();
+            writer.close();
+        } catch (Exception e) {
+            ConsoleUtils.printException(e, Core.pluginName, "Can't save the JSON file!");
+        }
     }
 }
