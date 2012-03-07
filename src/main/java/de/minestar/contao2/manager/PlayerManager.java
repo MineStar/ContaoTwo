@@ -23,6 +23,7 @@ import de.minestar.contao2.units.ContaoGroup;
 import de.minestar.contao2.units.Settings;
 import de.minestar.core.MinestarCore;
 import de.minestar.core.units.MinestarPlayer;
+import de.minestar.events.PlayerChangedGroupEvent;
 import de.minestar.minestarlibrary.utils.ConsoleUtils;
 import de.minestar.minestarlibrary.utils.PlayerUtils;
 
@@ -94,12 +95,19 @@ public class PlayerManager {
     }
 
     public String updateGroupManagerGroup(String playerName, String groupName) {
+        String oldGroupName = MinestarCore.getPlayer(playerName).getGroup();
+        // FINALLY CHANGE THE GROUP
         String newGroup = MinestarCore.getPlayer(playerName).setGroup(groupName);
         this.updatePlayer(playerName);
         this.updateOnlineLists();
+
+        // CALL PlayerChangedGroupEvent-EVENT
+        if (!newGroup.equalsIgnoreCase(oldGroupName)) {
+            PlayerChangedGroupEvent event = new PlayerChangedGroupEvent(playerName, oldGroupName, newGroup);
+            Bukkit.getServer().getPluginManager().callEvent(event);
+        }
         return newGroup;
     }
-
     private void printSingleGroup(ContaoGroup group, ConsoleCommandSender sender) {
         sender.sendMessage(group.name() + " ( " + this.groupMap.get(group).size() + " ) : " + this.onlineList.get(group));
     }
@@ -131,10 +139,12 @@ public class PlayerManager {
     }
 
     public void removePlayer(String playerName) {
+        // GET MINESTARPLAYER
+        MinestarPlayer thisPlayer = MinestarCore.getPlayer(playerName);
+
         // REMOVE PLAYER FROM THE GROUPMAP
-        ContaoGroup thisGroup = this.playerMap.get(playerName);
-        if (thisGroup != null)
-            this.groupMap.get(thisGroup).remove(playerName);
+        ContaoGroup thisGroup = ContaoGroup.getGroup(thisPlayer.getGroup());
+        this.groupMap.get(thisGroup).remove(playerName);
 
         // REMOVE PLAYER FROM THE PLAYERMAP
         this.playerMap.remove(playerName);

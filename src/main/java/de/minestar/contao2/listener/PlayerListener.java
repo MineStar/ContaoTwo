@@ -55,6 +55,10 @@ public class PlayerListener implements Listener {
         ContaoGroup oldGroup = this.oldGroups.get(event.getPlayer().getName());
         ContaoGroup currentGroup = ContaoGroup.getGroup(thisPlayer.getGroup());
 
+        // IGNORE ADMINS
+        if (currentGroup.equals(ContaoGroup.ADMIN))
+            return;
+
         if (!currentGroup.equals(oldGroup)) {
             if (currentGroup.isGroupHigher(oldGroup)) {
                 // UPDGRADE
