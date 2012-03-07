@@ -20,6 +20,7 @@ import de.minestar.contao2.units.ContaoGroup;
 import de.minestar.contao2.units.Settings;
 import de.minestar.core.MinestarCore;
 import de.minestar.core.units.MinestarPlayer;
+import de.minestar.events.PlayerChangedGroupEvent;
 import de.minestar.minestarlibrary.utils.PlayerUtils;
 
 public class PlayerListener implements Listener {
@@ -146,5 +147,10 @@ public class PlayerListener implements Listener {
 
         event.setFormat("%2$s");
         event.setMessage(col + player.getDisplayName() + ChatColor.WHITE + ": " + message);
+    }
+
+    @EventHandler
+    public void onPlayerChangedGroup(PlayerChangedGroupEvent event) {
+        this.playerManager.movePlayer(event);
     }
 }

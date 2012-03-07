@@ -150,6 +150,14 @@ public class PlayerManager {
         this.playerMap.remove(playerName);
     }
 
+    public void movePlayer(PlayerChangedGroupEvent event) {
+        ContaoGroup oldGroup = ContaoGroup.getGroup(event.getOldGroupName());
+        ContaoGroup newGroup = ContaoGroup.getGroup(event.getNewGroupName());
+        this.groupMap.get(oldGroup).remove(event.getPlayerName());
+        this.groupMap.get(newGroup).add(event.getPlayerName());
+        this.playerMap.put(event.getPlayerName(), newGroup);
+    }
+
     public ContaoGroup getGroup(Player player) {
         return this.getGroup(player.getName());
     }
