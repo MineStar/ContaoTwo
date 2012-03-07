@@ -50,7 +50,7 @@ public enum ContaoGroup {
 
     public boolean isGroupHigher(ContaoGroup otherGroup) {
         if (otherGroup == null)
-            return true;
+            return false;
         return this.level > otherGroup.getLevel();
     }
 }
