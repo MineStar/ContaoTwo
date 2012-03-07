@@ -89,6 +89,7 @@ public class PlayerListener implements Listener {
             }
         }
     }
+
     @EventHandler(priority = EventPriority.LOW)
     public void onPlayerQuit(PlayerQuitEvent event) {
         this.onPlayerDisconnect(event.getPlayer());
