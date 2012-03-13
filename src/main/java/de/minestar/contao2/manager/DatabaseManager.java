@@ -502,16 +502,16 @@ public class DatabaseManager extends AbstractDatabaseHandler {
         if (contaoGroup == null) {
             // NO CONTAOUSER FOUND = RETURN
             return;
-
         }
 
         // CONTAO GROUP DIFFERS = SET MC GROUP TO CONTAO GROUP
         if (!contaoGroup.equalsIgnoreCase(group)) {
+            String oldGroup = group;
             group = playerManager.updateGroupManagerGroup(playerName, contaoGroup);
             // ContaoPL.queuedMessages.put(playerName, ChatColor.GOLD +
             // "Du wurdest automatisch folgender Gruppe zugewiesen: " +
             // contaoGroup + "!");
-            ConsoleUtils.printWarning(Core.pluginName, "Player '" + playerName + "'(MCNick is '" + user.getNickname() + "' ) has a different contao( " + contaoGroup + " ) and groupmanager( " + group + " )-group!");
+            ConsoleUtils.printWarning(Core.pluginName, "Player '" + playerName + "'(MCNick is '" + user.getNickname() + "' ) has a different contao( " + contaoGroup + " ) and groupmanager( " + oldGroup + " )-group!");
         }
 
         // Check if paytime is expired
