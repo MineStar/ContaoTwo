@@ -90,6 +90,7 @@ public class PlayerManager {
     }
 
     public void printOnlineList(Player player) {
+        PlayerUtils.sendBlankMessage(player, ChatColor.GOLD + "" + Bukkit.getOnlinePlayers().length + " / " + Bukkit.getMaxPlayers());
         this.printSingleGroup(ChatColor.RED, ContaoGroup.ADMIN, player);
         this.printSingleGroup(ChatColor.AQUA, ContaoGroup.PAY, player);
         this.printSingleGroup(ChatColor.GREEN, ContaoGroup.FREE, player);
@@ -104,6 +105,7 @@ public class PlayerManager {
     }
 
     public void printOnlineList(ConsoleCommandSender sender) {
+        sender.sendMessage(Bukkit.getOnlinePlayers().length + " / " + Bukkit.getMaxPlayers());
         this.printSingleGroup(ContaoGroup.ADMIN, sender);
         this.printSingleGroup(ContaoGroup.PAY, sender);
         this.printSingleGroup(ContaoGroup.FREE, sender);
