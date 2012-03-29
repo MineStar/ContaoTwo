@@ -12,23 +12,23 @@
 		</dependency>
 		<dependency>
 			<groupId>de.minestar</groupId>
-			<artifactId>minestarlibrary</artifactId>
-			<version>1.6</version>
-		</dependency>
-		<dependency>
-			<groupId>de.minestar</groupId>
 			<artifactId>GroupManager</artifactId>
 			<version>1</version>
 		</dependency>
 		<dependency>
 			<groupId>de.minestar</groupId>
 			<artifactId>MinestarCore</artifactId>
-			<version>1.5</version>
+			<version>1.6.4</version>
 		</dependency>
 		<dependency>
 			<groupId>de.minestar</groupId>
 			<artifactId>FalseBookCore</artifactId>
 			<version>0.92.3alpha</version>
+		</dependency>
+		<dependency>
+			<groupId>de.minestar</groupId>
+			<artifactId>minestarlibrary</artifactId>
+			<version>1.6.3</version>
 		</dependency>
 	</dependencies>
 	<build>
