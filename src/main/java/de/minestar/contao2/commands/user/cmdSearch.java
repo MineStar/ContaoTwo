@@ -36,7 +36,7 @@ public class cmdSearch extends AbstractCommand {
     private DatabaseManager databaseManager;
 
     public cmdSearch(String syntax, String arguments, String node, DatabaseManager databaseManager) {
-        super(Core.pluginName, syntax, arguments, node);
+        super(Core.NAME, syntax, arguments, node);
         this.description = "Zeige alle Contao-IDs mit folgendem Namensteil";
         this.databaseManager = databaseManager;
     }

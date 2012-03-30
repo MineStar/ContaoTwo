@@ -28,7 +28,7 @@ import de.minestar.minestarlibrary.commands.AbstractSuperCommand;
 public class cmdPPay extends AbstractSuperCommand {
 
     public cmdPPay(String syntax, String arguments, String node, AbstractCommand... subCommands) {
-        super(Core.pluginName, syntax, arguments, node, false, subCommands);
+        super(Core.NAME, syntax, arguments, node, false, subCommands);
         this.description = "PPay Kommandos";
     }
 

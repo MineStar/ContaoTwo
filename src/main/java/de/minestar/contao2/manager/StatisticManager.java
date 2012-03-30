@@ -108,7 +108,7 @@ public class StatisticManager implements Runnable {
         PlayerWarnings thisWarnings = this.getWarnings(player.getName());
         if (thisWarnings != null && thisWarnings.getWarnings().size() > 0) {
             ChatUtils.writeMessage(player, "");
-            ChatUtils.writeColoredMessage(player, Core.pluginName, ChatColor.RED, "Du hast " + thisWarnings.getWarnings().size() + " Verwarnung" + (thisWarnings.getWarnings().size() > 1 ? "en" : "") + "!");
+            ChatUtils.writeColoredMessage(player, Core.NAME, ChatColor.RED, "Du hast " + thisWarnings.getWarnings().size() + " Verwarnung" + (thisWarnings.getWarnings().size() > 1 ? "en" : "") + "!");
             for (MCWarning warning : thisWarnings.getWarnings()) {
                 ChatUtils.writeMessage(player, warning.toString());
             }

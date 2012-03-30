@@ -32,7 +32,7 @@ public class cmdSet extends AbstractCommand {
     private Settings setting;
 
     public cmdSet(String syntax, String arguments, String node, Settings setting) {
-        super(Core.pluginName, syntax, arguments, node);
+        super(Core.NAME, syntax, arguments, node);
         this.setting = setting;
     }
 

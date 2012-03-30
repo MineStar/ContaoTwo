@@ -37,7 +37,7 @@ public class cmdPay extends AbstractCommand {
     private DatabaseManager databaseManager;
 
     public cmdPay(String syntax, String arguments, String node, PlayerManager playerManager, DatabaseManager dbHandler) {
-        super(Core.pluginName, syntax, arguments, node);
+        super(Core.NAME, syntax, arguments, node);
         this.description = "Payuser hinzufügen";
         this.playerManager = playerManager;
         this.databaseManager = dbHandler;

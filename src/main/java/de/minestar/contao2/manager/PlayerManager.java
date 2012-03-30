@@ -254,7 +254,7 @@ public class PlayerManager {
             writer.flush();
             writer.close();
         } catch (Exception e) {
-            ConsoleUtils.printException(e, Core.pluginName, "Can't save the JSON file!");
+            ConsoleUtils.printException(e, Core.NAME, "Can't save the JSON file!");
         }
     }
 }

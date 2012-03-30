@@ -22,10 +22,8 @@ import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
-import org.bukkit.Bukkit;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
-import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.plugin.PluginManager;
+import org.bukkit.scheduler.BukkitScheduler;
 
 import de.minestar.contao2.commands.list.cmdList;
 import de.minestar.contao2.commands.ppay.cmdPPay;
@@ -49,145 +47,117 @@ import de.minestar.contao2.manager.DatabaseManager;
 import de.minestar.contao2.manager.PlayerManager;
 import de.minestar.contao2.manager.StatisticManager;
 import de.minestar.contao2.units.Settings;
-import de.minestar.minestarlibrary.commands.AbstractCommand;
+import de.minestar.minestarlibrary.AbstractCore;
 import de.minestar.minestarlibrary.commands.CommandList;
-import de.minestar.minestarlibrary.utils.ConsoleUtils;
 
-public class Core extends JavaPlugin {
+public class Core extends AbstractCore {
 
-    public static File dataFolder;
-    public static String pluginName = "Contao";
+    public static final String NAME = "ContaoTwo";
 
-    /**
-     * Commands
-     */
-    private CommandList commandList;
+    public Core() {
+        super(NAME);
+    }
 
-    /**
-     * Manager
-     */
+    /** Manager */
     private PlayerManager playerManager;
     private StatisticManager statisticManager;
     private DatabaseManager databaseManager;
 
-    /**
-     * Settings
-     */
+    /** Settings */
     private Settings settings;
 
-    /**
-     * Listener
-     */
+    /** Listener */
     private PlayerListener connectionListener;
     private StatisticListener blockListener;
     private FakePlayerListener fakePlayerListener;
 
     @Override
-    public void onDisable() {
-        // SAVE STATISTICS
-        if (this.databaseManager.hasConnection())
-            this.statisticManager.saveAllStatistics();
+    protected boolean loadingConfigs(File dataFolder) {
 
-        // PRINT INFO
-        ConsoleUtils.printInfo(pluginName, "Disabled v" + this.getDescription().getVersion() + "!");
+        this.settings = new Settings(dataFolder);
+
+        return true;
     }
 
     @Override
-    public void onEnable() {
-        // INIT DATAFOLDER
-        Core.dataFolder = this.getDataFolder();
-        Core.dataFolder.mkdirs();
+    protected boolean createManager() {
 
-        // CREATE SETTINGS
-        this.createSettings();
-
-        // CREATE MANAGER
-        this.createManager();
-
-        // WE NEED A CONNECTION
-        if (!this.databaseManager.hasConnection()) {
-            ConsoleUtils.printError(Core.pluginName, "Can't reach database! Plugin is disabled!");
-            this.setEnabled(false);
-            return;
-        }
-
-        // CREATE LISTENER, COMMANDS
-        this.createListener();
-        this.createCommands();
-
-        // REGISTER EVENTS
-        this.registerEvents();
-
-        // START THREADS
-        this.startThreads();
-
-        // PRINT INFO
-        ConsoleUtils.printInfo(pluginName, "Enabled v" + this.getDescription().getVersion() + "!");
-    }
-
-    private void startThreads() {
-        if (this.databaseManager.hasConnection())
-            Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(this, this.statisticManager, 20 * 60, 20 * 60);
-    }
-
-    private void createSettings() {
-        this.settings = new Settings(Core.dataFolder);
-    }
-
-    private void createManager() {
-        this.databaseManager = new DatabaseManager(Core.pluginName, Core.dataFolder);
+        this.databaseManager = new DatabaseManager(NAME, getDataFolder());
         this.playerManager = new PlayerManager(this.settings);
         this.statisticManager = new StatisticManager(this.databaseManager);
         this.databaseManager.initManager(this.playerManager, this.statisticManager);
-    }
 
-    private void createListener() {
-        this.connectionListener = new PlayerListener(this.playerManager, this.databaseManager, this.statisticManager, this.settings);
-        this.blockListener = new StatisticListener(this.statisticManager);
-        this.fakePlayerListener = new FakePlayerListener(this.playerManager);
-    }
-
-    private void createCommands() {
-        //@formatter:off
-        AbstractCommand[] commands = new AbstractCommand[] {
-                new cmdList("/who", "[PlayerName]", "", this.playerManager),
-                new cmdList("/list", "[PlayerName]", "", this.playerManager),
-                new cmdList("/online", "[PlayerName]", "", this.playerManager),
-                
-                new cmdStatus   ("/stats", "", "", this.databaseManager, this.statisticManager),
-
-                new cmdUser     ("/user", "", "",
-                    new cmdAdmin        ("admin",   "<ingamename> <dd.mm.yyyy>",    "contao.rights.admin",      this.playerManager, this.databaseManager),
-                    new cmdDefault      ("default", "<ingamename>",                 "contao.rights.default",    this.playerManager),
-                    new cmdFree         ("free",    "<ingamename>",                 "contao.rights.free",       this.playerManager, this.databaseManager),
-                    new cmdPay          ("pay",     "<ingamename> <dd.mm.yyyy>",    "contao.rights.pay",        this.playerManager, this.databaseManager),
-                    new cmdProbe        ("probe",   "<ingamename> <contao-id>",     "contao.rights.probe",      this.playerManager, this.databaseManager),
-                    new cmdAddProbeTime ("probeadd","<PlayerName> <Days>",          "contao.rights.probeadd",   this.databaseManager),
-                    new cmdSearch       ("search",  "<homepagename>",               "contao.rights.search",     this.databaseManager),
-                    new cmdStatus       ("status",  "",                             "",                         this.databaseManager, this.statisticManager),
-                    new cmdAddWarning   ("awarn",   "<ingamename> <text>",          "contao.rights.awarn" ,     this.databaseManager),
-                    new cmdRemoveWarning("rwarn",   "<ingamename> <warningIndex>" , "contao.rights.rwarn",      this.databaseManager),
-                    new cmdX            ("x",       "<ingamename>",                 "contao.rights.x",          this.playerManager)
-                ),
-                
-                new cmdPPay      ("/ppay", "", "contao.ppay",
-                    new cmdSet          ("set",     "<Option> <Number>",            "contao.ppay",              this.settings)
-                )
-        };
-        //@formatter:on
-        this.commandList = new CommandList(commands);
-    }
-
-    private void registerEvents() {
-        Bukkit.getPluginManager().registerEvents(this.connectionListener, this);
-        Bukkit.getPluginManager().registerEvents(this.blockListener, this);
-        Bukkit.getPluginManager().registerEvents(this.fakePlayerListener, this);
+        return true;
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (this.commandList != null)
-            this.commandList.handleCommand(sender, label, args);
+    protected boolean createListener() {
+
+        this.connectionListener = new PlayerListener(this.playerManager, this.databaseManager, this.statisticManager, this.settings);
+        this.blockListener = new StatisticListener(this.statisticManager);
+        this.fakePlayerListener = new FakePlayerListener(this.playerManager);
+
+        return true;
+    }
+
+    @Override
+    protected boolean registerEvents(PluginManager pm) {
+
+        pm.registerEvents(this.connectionListener, this);
+        pm.registerEvents(this.blockListener, this);
+        pm.registerEvents(this.fakePlayerListener, this);
+
+        return true;
+    }
+
+    @Override
+    protected boolean startThreads(BukkitScheduler scheduler) {
+
+        scheduler.scheduleSyncRepeatingTask(this, this.statisticManager, 20 * 60, 20 * 60);
+
+        return true;
+    }
+
+    @Override
+    protected boolean createCommands() {
+        //@formatter:off
+        this.cmdList = new CommandList(NAME,
+                new cmdList             ("/who",        "[PlayerName]",                 "",                         this.playerManager),
+                new cmdList             ("/list",       "[PlayerName]",                 "",                         this.playerManager),
+                new cmdList             ("/online",     "[PlayerName]",                 "",                         this.playerManager),
+                
+                new cmdStatus           ("/stats",      "",                             "",                         this.databaseManager, this.statisticManager),
+
+                new cmdUser         ("/user", "", "",
+                    new cmdAdmin        ("admin",       "<ingamename> <dd.mm.yyyy>",    "contao.rights.admin",      this.playerManager, this.databaseManager),
+                    new cmdDefault      ("default",     "<ingamename>",                 "contao.rights.default",    this.playerManager),
+                    new cmdFree         ("free",        "<ingamename>",                 "contao.rights.free",       this.playerManager, this.databaseManager),
+                    new cmdPay          ("pay",         "<ingamename> <dd.mm.yyyy>",    "contao.rights.pay",        this.playerManager, this.databaseManager),
+                    new cmdProbe        ("probe",       "<ingamename> <contao-id>",     "contao.rights.probe",      this.playerManager, this.databaseManager),
+                    new cmdAddProbeTime ("probeadd",    "<PlayerName> <Days>",          "contao.rights.probeadd",   this.databaseManager),
+                    new cmdSearch       ("search",      "<homepagename>",               "contao.rights.search",     this.databaseManager),
+                    new cmdStatus       ("status",      "",                             "",                         this.databaseManager, this.statisticManager),
+                    new cmdAddWarning   ("awarn",       "<ingamename> <text>",          "contao.rights.awarn" ,     this.databaseManager),
+                    new cmdRemoveWarning("rwarn",       "<ingamename> <warningIndex>" , "contao.rights.rwarn",      this.databaseManager),
+                    new cmdX            ("x",           "<ingamename>",                 "contao.rights.x",          this.playerManager)
+                ),
+                
+                new cmdPPay         ("/ppay", "", "contao.ppay",
+                    new cmdSet          ("set",     "<Option> <Number>",            "contao.ppay",              this.settings)
+                )
+        );
+        //@formatter:on
+
+        return true;
+    }
+
+    @Override
+    protected boolean commonDisable() {
+        if (databaseManager != null) {
+            statisticManager.saveAllStatistics();
+            databaseManager.closeConnection();
+        }
+
         return true;
     }
 

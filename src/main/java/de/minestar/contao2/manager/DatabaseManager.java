@@ -76,31 +76,31 @@ public class DatabaseManager extends AbstractDatabaseHandler {
 
     private PreparedStatement canBeFree;
 
-    public DatabaseManager(String pluginName, File dataFolder) {
-        super(pluginName, dataFolder);
+    public DatabaseManager(String NAME, File dataFolder) {
+        super(NAME, dataFolder);
     }
 
     @Override
-    protected DatabaseConnection createConnection(String pluginName, File dataFolder) throws Exception {
+    protected DatabaseConnection createConnection(String NAME, File dataFolder) throws Exception {
 
         File configFile = new File(dataFolder, "sqlconfig.yml");
         if (!configFile.exists()) {
-            DatabaseUtils.createDatabaseConfig(DatabaseType.MySQL, configFile, pluginName);
+            DatabaseUtils.createDatabaseConfig(DatabaseType.MySQL, configFile, NAME);
             return null;
         }
         YamlConfiguration config = new YamlConfiguration();
         config.load(configFile);
 
-        return new DatabaseConnection(pluginName, config.getString("Host"), config.getString("Port"), config.getString("Database"), config.getString("User"), config.getString("Password"));
+        return new DatabaseConnection(NAME, config.getString("Host"), config.getString("Port"), config.getString("Database"), config.getString("User"), config.getString("Password"));
     }
 
     @Override
-    protected void createStructure(String pluginName, Connection con) throws Exception {
+    protected void createStructure(String NAME, Connection con) throws Exception {
         // Do nothing - structure is given
     }
 
     @Override
-    protected void createStatements(String pluginName, Connection con) throws Exception {
+    protected void createStatements(String NAME, Connection con) throws Exception {
 
         insertMCPay = con.prepareStatement("INSERT INTO mc_pay (contao_user_id, minecraft_nick, expire_date, admin_nick, startDate, probeEndDate) VALUES (?,?,STR_TO_DATE(?,'%d.%m.%Y'),?, NOW(), ADDDATE(NOW(), INTERVAL 14 DAY))");
 
@@ -160,7 +160,7 @@ public class DatabaseManager extends AbstractDatabaseHandler {
             insertMCPay.setString(4, modPlayer);
             insertMCPay.executeUpdate();
         } catch (Exception e) {
-            ConsoleUtils.printException(e, Core.pluginName, "Can't insert data in the mc_pay table! PlayerName=" + playerName + ",ContaoID=" + contaoID + ",ExpDate=" + expDate + ",modPlayer=" + modPlayer);
+            ConsoleUtils.printException(e, Core.NAME, "Can't insert data in the mc_pay table! PlayerName=" + playerName + ",ContaoID=" + contaoID + ",ExpDate=" + expDate + ",modPlayer=" + modPlayer);
         }
     }
 
@@ -173,7 +173,7 @@ public class DatabaseManager extends AbstractDatabaseHandler {
             updateExpireDate.setInt(2, contaoID);
             updateExpireDate.executeUpdate();
         } catch (Exception e) {
-            ConsoleUtils.printException(e, Core.pluginName, "Can't update expire date! Date=" + date + ",ContaoID=" + contaoID);
+            ConsoleUtils.printException(e, Core.NAME, "Can't update expire date! Date=" + date + ",ContaoID=" + contaoID);
         }
     }
 
@@ -186,7 +186,7 @@ public class DatabaseManager extends AbstractDatabaseHandler {
             updateGroup.setInt(2, contaoID);
             updateGroup.executeUpdate();
         } catch (Exception e) {
-            ConsoleUtils.printException(e, Core.pluginName, "Can't update Contao Member Group! GroupManagerGroup=" + group.getName() + ",ContaoGroupString=" + group.getContaoString() + ",ContaoID=" + contaoID);
+            ConsoleUtils.printException(e, Core.NAME, "Can't update Contao Member Group! GroupManagerGroup=" + group.getName() + ",ContaoGroupString=" + group.getContaoString() + ",ContaoID=" + contaoID);
         }
     }
 
@@ -201,7 +201,7 @@ public class DatabaseManager extends AbstractDatabaseHandler {
             if (result.next())
                 return new MCUser(result.getString(1), result.getInt(2), result.getString(3));
         } catch (Exception e) {
-            ConsoleUtils.printException(e, Core.pluginName, "Can't select MCUser from mc_pay by name! PlayerName=" + player);
+            ConsoleUtils.printException(e, Core.NAME, "Can't select MCUser from mc_pay by name! PlayerName=" + player);
         }
 
         return null;
@@ -218,7 +218,7 @@ public class DatabaseManager extends AbstractDatabaseHandler {
             if (result.next())
                 return new MCUser(result.getString(1), result.getInt(2), result.getString(3));
         } catch (Exception e) {
-            ConsoleUtils.printException(e, Core.pluginName, "Can't select MCUser from mc_pay by id! ContaoID=" + id);
+            ConsoleUtils.printException(e, Core.NAME, "Can't select MCUser from mc_pay by id! ContaoID=" + id);
         }
 
         return null;
@@ -233,7 +233,7 @@ public class DatabaseManager extends AbstractDatabaseHandler {
             ResultSet result = checkAccount.executeQuery();
             return result.next() && !result.getBoolean("disable");
         } catch (Exception e) {
-            ConsoleUtils.printException(e, Core.pluginName, "Can't check whether ContaoAccount is active! ContaoID=" + id);
+            ConsoleUtils.printException(e, Core.NAME, "Can't check whether ContaoAccount is active! ContaoID=" + id);
         }
 
         return false;
@@ -258,7 +258,7 @@ public class DatabaseManager extends AbstractDatabaseHandler {
                 return getMCGroupName(group);
             }
         } catch (Exception e) {
-            ConsoleUtils.printException(e, Core.pluginName, "Can't get ContaoGroupName from tl_member! ContaoID=" + id);
+            ConsoleUtils.printException(e, Core.NAME, "Can't get ContaoGroupName from tl_member! ContaoID=" + id);
         }
 
         return null;
@@ -292,7 +292,7 @@ public class DatabaseManager extends AbstractDatabaseHandler {
                 list.put(result.getInt("id"), result.getString("username"));
 
         } catch (Exception e) {
-            ConsoleUtils.printException(e, Core.pluginName, "Can't get ContaoID from tl_member! Username=" + username);
+            ConsoleUtils.printException(e, Core.NAME, "Can't get ContaoID from tl_member! Username=" + username);
         }
 
         return list;
@@ -306,7 +306,7 @@ public class DatabaseManager extends AbstractDatabaseHandler {
             checkContaoId.setInt(1, id);
             return checkContaoId.executeQuery().next();
         } catch (Exception e) {
-            ConsoleUtils.printException(e, Core.pluginName, "Can't check wether contaoID is existing! ContaoID=" + id);
+            ConsoleUtils.printException(e, Core.NAME, "Can't check wether contaoID is existing! ContaoID=" + id);
         }
 
         return false;
@@ -320,7 +320,7 @@ public class DatabaseManager extends AbstractDatabaseHandler {
             checkMCNick.setString(1, name);
             return checkMCNick.executeQuery().next();
         } catch (Exception e) {
-            ConsoleUtils.printException(e, Core.pluginName, "Can't check whether playerName is in mc_pay! Name=" + name);
+            ConsoleUtils.printException(e, Core.NAME, "Can't check whether playerName is in mc_pay! Name=" + name);
         }
 
         return false;
@@ -339,7 +339,7 @@ public class DatabaseManager extends AbstractDatabaseHandler {
             } else
                 return null;
         } catch (Exception e) {
-            ConsoleUtils.printException(e, Core.pluginName, "Can't select dates from mc_pay! PlayerName=" + playerName);
+            ConsoleUtils.printException(e, Core.NAME, "Can't select dates from mc_pay! PlayerName=" + playerName);
         }
 
         return null;
@@ -354,7 +354,7 @@ public class DatabaseManager extends AbstractDatabaseHandler {
             addProbeDate.setString(2, playerName);
             return addProbeDate.executeUpdate() == 1;
         } catch (Exception e) {
-            ConsoleUtils.printException(e, Core.pluginName, "Can't update probeEndDate in mc_pay! PlayerName=" + playerName + ",Days=" + days);
+            ConsoleUtils.printException(e, Core.NAME, "Can't update probeEndDate in mc_pay! PlayerName=" + playerName + ",Days=" + days);
         }
 
         return false;
@@ -367,7 +367,7 @@ public class DatabaseManager extends AbstractDatabaseHandler {
             deleteProbeStatus.setString(1, playerName);
             deleteProbeStatus.executeUpdate();
         } catch (Exception e) {
-            ConsoleUtils.printException(e, Core.pluginName, "Can't delete probe status by setting probeEndDate to NULL! PlayerName=" + playerName);
+            ConsoleUtils.printException(e, Core.NAME, "Can't delete probe status by setting probeEndDate to NULL! PlayerName=" + playerName);
         }
     }
 
@@ -379,7 +379,7 @@ public class DatabaseManager extends AbstractDatabaseHandler {
             isProbeMember.setString(1, playerName);
             return !isProbeMember.executeQuery().next();
         } catch (Exception e) {
-            ConsoleUtils.printException(e, Core.pluginName, "Can't check whether player is probe member! PlayerName=" + playerName);
+            ConsoleUtils.printException(e, Core.NAME, "Can't check whether player is probe member! PlayerName=" + playerName);
         }
 
         return false;
@@ -393,7 +393,7 @@ public class DatabaseManager extends AbstractDatabaseHandler {
             isInProbation.setString(1, playerName);
             return isInProbation.executeQuery().next();
         } catch (Exception e) {
-            ConsoleUtils.printException(e, Core.pluginName, "Can't check whether player is in probation time! PlayerName=" + playerName);
+            ConsoleUtils.printException(e, Core.NAME, "Can't check whether player is in probation time! PlayerName=" + playerName);
         }
         return false;
     }
@@ -406,7 +406,7 @@ public class DatabaseManager extends AbstractDatabaseHandler {
             convertFreeToProbe.setString(1, playerName);
             return convertFreeToProbe.executeUpdate() == 1;
         } catch (Exception e) {
-            ConsoleUtils.printException(e, Core.pluginName, "Can't degrade a free user to probe user! PlayerName=" + playerName);
+            ConsoleUtils.printException(e, Core.NAME, "Can't degrade a free user to probe user! PlayerName=" + playerName);
         }
 
         return false;
@@ -427,7 +427,7 @@ public class DatabaseManager extends AbstractDatabaseHandler {
             addWarning.setString(3, adminName);
             return addWarning.executeUpdate() == 1;
         } catch (Exception e) {
-            ConsoleUtils.printException(e, Core.pluginName, "Can't add a warning to a player! PlayerName=" + playerName + ",adminName=" + adminName + ",text=" + reason);
+            ConsoleUtils.printException(e, Core.NAME, "Can't add a warning to a player! PlayerName=" + playerName + ",adminName=" + adminName + ",text=" + reason);
         }
 
         return false;
@@ -439,7 +439,7 @@ public class DatabaseManager extends AbstractDatabaseHandler {
             deleteWarning.setString(2, date);
             return deleteWarning.executeUpdate() == 1;
         } catch (Exception e) {
-            ConsoleUtils.printException(e, Core.pluginName, "Can't remove a warning from mc_pay! PlayerName=" + playerName + ",WarningDate=" + date);
+            ConsoleUtils.printException(e, Core.NAME, "Can't remove a warning from mc_pay! PlayerName=" + playerName + ",WarningDate=" + date);
         }
         return false;
     }
@@ -485,7 +485,7 @@ public class DatabaseManager extends AbstractDatabaseHandler {
             saveStatistics.setString(3, playerName);
             saveStatistics.executeUpdate();
         } catch (Exception e) {
-            ConsoleUtils.printException(e, Core.pluginName, "Can't store statistics to database! PlayerName=" + playerName + ",totalPlaced=" + totalPlaced + ",totalBreak=" + totalBreak);
+            ConsoleUtils.printException(e, Core.NAME, "Can't store statistics to database! PlayerName=" + playerName + ",totalPlaced=" + totalPlaced + ",totalBreak=" + totalBreak);
         }
     }
 
@@ -511,7 +511,7 @@ public class DatabaseManager extends AbstractDatabaseHandler {
             // ContaoPL.queuedMessages.put(playerName, ChatColor.GOLD +
             // "Du wurdest automatisch folgender Gruppe zugewiesen: " +
             // contaoGroup + "!");
-            ConsoleUtils.printWarning(Core.pluginName, "Player '" + playerName + "'(MCNick is '" + user.getNickname() + "' ) has a different contao( " + contaoGroup + " ) and groupmanager( " + oldGroup + " )-group!");
+            ConsoleUtils.printWarning(Core.NAME, "Player '" + playerName + "'(MCNick is '" + user.getNickname() + "' ) has a different contao( " + contaoGroup + " ) and groupmanager( " + oldGroup + " )-group!");
         }
 
         // Check if paytime is expired
@@ -544,12 +544,12 @@ public class DatabaseManager extends AbstractDatabaseHandler {
 
             setExpDateInMCTable("11.11.1111", user.getContaoID());
             updateContaoGroup(ContaoGroup.FREE, user.getContaoID());
-            ConsoleUtils.printInfo(Core.pluginName, "Player '" + playerName + "'s Payaccount has expired! Moving to free member!");
+            ConsoleUtils.printInfo(Core.NAME, "Player '" + playerName + "'s Payaccount has expired! Moving to free member!");
             // QUEUE MESSAGE TO SEND IT WHEN PLAYER HAS LOGGED IN
             // ContaoPL.queuedMessages.put(playerName, ChatColor.RED +
             // "Dein Account wurde automatisch auf einen Free-Account zurückgestuft!");
         } catch (ParseException e) {
-            ConsoleUtils.printException(e, Core.pluginName, "Can't parse expire date! PlayerName=" + playerName + ",Date=" + user.getExpDate());
+            ConsoleUtils.printException(e, Core.NAME, "Can't parse expire date! PlayerName=" + playerName + ",Date=" + user.getExpDate());
         }
     }
 
@@ -580,7 +580,7 @@ public class DatabaseManager extends AbstractDatabaseHandler {
             // ContaoPL.queuedMessages.put(playerName, ChatColor.GREEN +
             // "Du wurdest automatisch auf einen FreeUser hochgestuft!");
         } catch (Exception e) {
-            ConsoleUtils.printException(e, Core.pluginName, "Can't check probe user whether he can be a free member! PlayerName=" + playerName);
+            ConsoleUtils.printException(e, Core.NAME, "Can't check probe user whether he can be a free member! PlayerName=" + playerName);
         }
     }
 

@@ -34,7 +34,7 @@ public class cmdX extends AbstractCommand {
     private PlayerManager playerManager;
 
     public cmdX(String syntax, String arguments, String node, PlayerManager playerManager) {
-        super(Core.pluginName, syntax, arguments, node);
+        super(Core.NAME, syntax, arguments, node);
         this.description = "X-User hinzufügen";
         this.playerManager = playerManager;
     }

@@ -45,7 +45,7 @@ public class Settings {
         try {
             loadSettings(dataFolder);
         } catch (Exception e) {
-            ConsoleUtils.printException(e, Core.pluginName, "Can't load settings from config file!");
+            ConsoleUtils.printException(e, Core.NAME, "Can't load settings from config file!");
         }
     }
 
@@ -56,7 +56,7 @@ public class Settings {
             temp.createNewFile();
             config.load(temp);
             createDefaultConfiguration(config);
-            ConsoleUtils.printInfo(Core.pluginName, "Cannot find config.yml in Plugin folder, plugin is creating a default one");
+            ConsoleUtils.printInfo(Core.NAME, "Cannot find config.yml in Plugin folder, plugin is creating a default one");
             config.save(temp);
         }
         config.load(temp);
@@ -97,7 +97,7 @@ public class Settings {
         try {
             config.save(configFile);
         } catch (Exception e) {
-            ConsoleUtils.printException(e, Core.pluginName, "Can't save public slots to config!");
+            ConsoleUtils.printException(e, Core.NAME, "Can't save public slots to config!");
         }
     }
 
@@ -111,7 +111,7 @@ public class Settings {
         try {
             config.save(configFile);
         } catch (Exception e) {
-            ConsoleUtils.printException(e, Core.pluginName, "Can't save max slots to config!");
+            ConsoleUtils.printException(e, Core.NAME, "Can't save max slots to config!");
         }
     }
     public boolean isShowWelcomeMSG() {

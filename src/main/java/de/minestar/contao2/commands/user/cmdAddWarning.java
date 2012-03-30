@@ -34,7 +34,7 @@ public class cmdAddWarning extends AbstractExtendedCommand {
     private DatabaseManager databaseManager;
 
     public cmdAddWarning(String syntax, String arguments, String node, DatabaseManager databaseManager) {
-        super(Core.pluginName, syntax, arguments, node);
+        super(Core.NAME, syntax, arguments, node);
         this.databaseManager = databaseManager;
         this.description = "Verwarnt den angegebenden Spieler";
     }
