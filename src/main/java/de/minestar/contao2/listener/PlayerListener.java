@@ -118,15 +118,6 @@ public class PlayerListener implements Listener {
         this.onPlayerDisconnect(event.getPlayer());
     }
 
-    @EventHandler(priority = EventPriority.LOW)
-    public void onPlayerKick(PlayerKickEvent event) {
-        // EVENT IS CANCELLED? => RETURN
-        if (event.isCancelled())
-            return;
-
-        this.onPlayerDisconnect(event.getPlayer());
-    }
-
     private void onPlayerDisconnect(Player player) {
         this.playerManager.removePlayer(player.getName());
         this.playerManager.updateOnlineLists();

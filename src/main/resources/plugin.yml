@@ -1,7 +1,7 @@
 name: ContaoTwo
 main: de.minestar.contao2.core.Core
 version: ${pom.version}
-depend: [GroupManager, MinestarCore]
+depend: [GroupManager, MinestarCore, MineStarLibrary]
 commands:
   user:
     description: Contao related commands
