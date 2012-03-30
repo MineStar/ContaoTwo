@@ -25,6 +25,8 @@ import org.bukkit.entity.Player;
 import de.minestar.contao2.core.Core;
 import de.minestar.contao2.manager.PlayerManager;
 import de.minestar.contao2.units.ContaoGroup;
+import de.minestar.core.MinestarCore;
+import de.minestar.core.units.MinestarPlayer;
 import de.minestar.minestarlibrary.commands.AbstractCommand;
 import de.minestar.minestarlibrary.utils.ChatUtils;
 import de.minestar.minestarlibrary.utils.PlayerUtils;
@@ -57,6 +59,11 @@ public class cmdDefault extends AbstractCommand {
             ChatUtils.writeError(sender, pluginName, "Es existiert kein User mit dem Namen '" + args[0] + "'!");
             return;
         }
+
+        // Remove information about the x-user
+        MinestarPlayer mPlayer = MinestarCore.getPlayer(ingameName);
+        mPlayer.removeValue("contao.xreason", String.class);
+        mPlayer.removeValue("contao.xadmin", String.class);
 
         ChatUtils.writeSuccess(sender, pluginName, "Spieler '" + ingameName + "' ist nun in Gruppe 'Default'!");
         // UPDATE GROUPMANAGER-GROUP

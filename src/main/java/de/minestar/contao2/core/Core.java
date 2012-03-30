@@ -139,7 +139,7 @@ public class Core extends AbstractCore {
                     new cmdStatus       ("status",      "",                             "",                         this.databaseManager, this.statisticManager),
                     new cmdAddWarning   ("awarn",       "<ingamename> <text>",          "contao.rights.awarn" ,     this.databaseManager),
                     new cmdRemoveWarning("rwarn",       "<ingamename> <warningIndex>" , "contao.rights.rwarn",      this.databaseManager),
-                    new cmdX            ("x",           "<ingamename>",                 "contao.rights.x",          this.playerManager)
+                    new cmdX            ("x",           "<ingamename> <reason>",        "contao.rights.x",          this.playerManager)
                 ),
                 
                 new cmdPPay         ("/ppay", "", "contao.ppay",

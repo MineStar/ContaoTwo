@@ -25,11 +25,13 @@ import org.bukkit.entity.Player;
 import de.minestar.contao2.core.Core;
 import de.minestar.contao2.manager.PlayerManager;
 import de.minestar.contao2.units.ContaoGroup;
-import de.minestar.minestarlibrary.commands.AbstractCommand;
+import de.minestar.core.MinestarCore;
+import de.minestar.core.units.MinestarPlayer;
+import de.minestar.minestarlibrary.commands.AbstractExtendedCommand;
 import de.minestar.minestarlibrary.utils.ChatUtils;
 import de.minestar.minestarlibrary.utils.PlayerUtils;
 
-public class cmdX extends AbstractCommand {
+public class cmdX extends AbstractExtendedCommand {
 
     private PlayerManager playerManager;
 
@@ -57,6 +59,11 @@ public class cmdX extends AbstractCommand {
             ChatUtils.writeError(sender, pluginName, "Spieler '" + args[0] + "' existiert nicht!");
             return;
         }
+
+        // Store information why he is x user and who has x used him
+        MinestarPlayer mPlayer = MinestarCore.getPlayer(ingameName);
+        mPlayer.setString("contao.xreason", ChatUtils.getMessage(args, 1));
+        mPlayer.setString("contao.xadmin", sender.getName());
 
         ChatUtils.writeSuccess(sender, pluginName, "Spieler '" + ingameName + "' ist nun in Gruppe 'X'!");
         this.playerManager.updateGroupManagerGroup(ingameName, ContaoGroup.X.name());

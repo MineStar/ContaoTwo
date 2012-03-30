@@ -32,6 +32,8 @@ import de.minestar.contao2.units.MCUser;
 import de.minestar.contao2.units.MCWarning;
 import de.minestar.contao2.units.PlayerWarnings;
 import de.minestar.contao2.units.Statistic;
+import de.minestar.core.MinestarCore;
+import de.minestar.core.units.MinestarPlayer;
 import de.minestar.minestarlibrary.commands.AbstractExtendedCommand;
 import de.minestar.minestarlibrary.utils.ChatUtils;
 import de.minestar.minestarlibrary.utils.ConsoleUtils;
@@ -79,6 +81,7 @@ public class cmdStatus extends AbstractExtendedCommand {
         printAccountDates(sender, targetName);
         printWarnings(sender, targetName);
         printStatistics(sender, targetName);
+        printXReason(sender, targetName);
     }
 
     private void printGroup(CommandSender caller, String playerName, int contaoID) {
@@ -127,6 +130,16 @@ public class cmdStatus extends AbstractExtendedCommand {
         else {
             ChatUtils.writeColoredMessage(sender, ChatColor.BLUE, "Bloecke zerstoert: " + stats.getTotalBreak());
             ChatUtils.writeColoredMessage(sender, ChatColor.BLUE, "Bloecke gesetzt  : " + stats.getTotalPlaced());
+        }
+    }
+
+    private void printXReason(CommandSender sender, String targetName) {
+
+        MinestarPlayer mPlayer = MinestarCore.getPlayer(targetName);
+        String xReason = mPlayer.getString("contao.xreason");
+        if (xReason != null) {
+            ChatUtils.writeInfo(sender, "X-User Grund: " + xReason);
+            ChatUtils.writeInfo(sender, "X-User Admin: " + mPlayer.getString("contao.xadmin"));
         }
     }
 }
