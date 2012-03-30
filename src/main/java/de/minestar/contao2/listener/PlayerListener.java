@@ -27,7 +27,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
@@ -37,6 +36,7 @@ import de.minestar.contao2.manager.StatisticManager;
 import de.minestar.contao2.units.ContaoGroup;
 import de.minestar.contao2.units.Settings;
 import de.minestar.core.MinestarCore;
+import de.minestar.core.units.MinestarGroup;
 import de.minestar.core.units.MinestarPlayer;
 import de.minestar.events.PlayerChangedGroupEvent;
 import de.minestar.minestarlibrary.utils.PlayerUtils;
@@ -95,7 +95,7 @@ public class PlayerListener implements Listener {
         MinestarPlayer thisPlayer = MinestarCore.getPlayer(event.getName());
 
         // IGNORE ADMINS
-        if (thisPlayer.getGroup().equalsIgnoreCase(ContaoGroup.ADMIN.getName()))
+        if (thisPlayer.getMinestarGroup().equals(MinestarGroup.ADMIN))
             return;
 
         // SAVE OLD GROUP
@@ -130,8 +130,16 @@ public class PlayerListener implements Listener {
         if (event.isCancelled())
             return;
 
+        event.setFormat("%2$s");
+
         Player player = event.getPlayer();
-        String message = event.getMessage();
+        Boolean isHidden = MinestarCore.getPlayer(player).getBoolean("adminstuff.hide");
+
+        // Hidden player are talking like ghosts...
+        if (isHidden != null && isHidden) {
+            event.setMessage(ChatColor.ITALIC + event.getMessage());
+            return;
+        }
 
         ChatColor col = ChatColor.GRAY;
 
@@ -154,10 +162,8 @@ public class PlayerListener implements Listener {
                 break;
         }
 
-        event.setFormat("%2$s");
-        event.setMessage(col + player.getDisplayName() + ChatColor.WHITE + ": " + message);
+        event.setMessage(col + player.getDisplayName() + ChatColor.WHITE + ": " + event.getMessage());
     }
-
     @EventHandler
     public void onPlayerChangedGroup(PlayerChangedGroupEvent event) {
         this.playerManager.movePlayer(event);

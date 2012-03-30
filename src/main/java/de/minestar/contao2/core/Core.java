@@ -42,8 +42,9 @@ import de.minestar.contao2.commands.user.cmdSearch;
 import de.minestar.contao2.commands.user.cmdStatus;
 import de.minestar.contao2.commands.user.cmdUser;
 import de.minestar.contao2.commands.user.cmdX;
-import de.minestar.contao2.listener.StatisticListener;
+import de.minestar.contao2.listener.FakePlayerListener;
 import de.minestar.contao2.listener.PlayerListener;
+import de.minestar.contao2.listener.StatisticListener;
 import de.minestar.contao2.manager.DatabaseManager;
 import de.minestar.contao2.manager.PlayerManager;
 import de.minestar.contao2.manager.StatisticManager;
@@ -79,6 +80,7 @@ public class Core extends JavaPlugin {
      */
     private PlayerListener connectionListener;
     private StatisticListener blockListener;
+    private FakePlayerListener fakePlayerListener;
 
     @Override
     public void onDisable() {
@@ -142,6 +144,7 @@ public class Core extends JavaPlugin {
     private void createListener() {
         this.connectionListener = new PlayerListener(this.playerManager, this.databaseManager, this.statisticManager, this.settings);
         this.blockListener = new StatisticListener(this.statisticManager);
+        this.fakePlayerListener = new FakePlayerListener(this.playerManager);
     }
 
     private void createCommands() {
@@ -178,6 +181,7 @@ public class Core extends JavaPlugin {
     private void registerEvents() {
         Bukkit.getPluginManager().registerEvents(this.connectionListener, this);
         Bukkit.getPluginManager().registerEvents(this.blockListener, this);
+        Bukkit.getPluginManager().registerEvents(this.fakePlayerListener, this);
     }
 
     @Override
