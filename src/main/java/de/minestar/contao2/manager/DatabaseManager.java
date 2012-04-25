@@ -130,7 +130,7 @@ public class DatabaseManager extends AbstractDatabaseHandler {
 
         addProbeDate = con.prepareStatement("UPDATE mc_pay SET probeEndDate = ADDDATE(probeEndDate, INTERVAL ? DAY) WHERE minecraft_nick = ?");
 
-        addWarning = con.prepareStatement("INSERT INTO mc_warning (mc_pay_id,reason,date,adminnickname) VALUES ((SELECT id FROM mc_pay WHERE minecraft_nick = ?), ?, NOW(), ?)");
+        addWarning = con.prepareStatement("INSERT INTO mc_warning (mc_pay_id,reason,date,adminnickname) VALUES ((SELECT id FROM mc_pay WHERE minecraft_nick = ?), ?, STR_TO_DATE(?,'%d.%m.%Y %H:%i:%s'), ?)");
 
         selectAllWarnings = con.prepareStatement("SELECT minecraft_nick, mc_warning.reason, DATE_FORMAT(date, '%d.%m.%Y %H:%i:%s'),adminnickname FROM mc_warning,mc_pay WHERE mc_warning.mc_pay_id = mc_pay.id ORDER BY minecraft_nick,mc_warning.date");
 
@@ -416,7 +416,8 @@ public class DatabaseManager extends AbstractDatabaseHandler {
 
     public boolean addWarning(String playerName, String reason, String adminName) {
 
-        sManager.addWarning(playerName, new MCWarning(reason, dateFormat.format(new Date()), adminName));
+        String date = dateFormat.format(new Date());
+        sManager.addWarning(playerName, new MCWarning(reason, date, adminName));
 
         // INSERT INTO mc_warning (mc_pay_id,reason,date,adminnickname) VALUES
         // ((SELECT id
@@ -424,7 +425,8 @@ public class DatabaseManager extends AbstractDatabaseHandler {
         try {
             addWarning.setString(1, playerName);
             addWarning.setString(2, reason);
-            addWarning.setString(3, adminName);
+            addWarning.setString(3, date);
+            addWarning.setString(4, adminName);
             return addWarning.executeUpdate() == 1;
         } catch (Exception e) {
             ConsoleUtils.printException(e, Core.NAME, "Can't add a warning to a player! PlayerName=" + playerName + ",adminName=" + adminName + ",text=" + reason);
