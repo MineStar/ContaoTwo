@@ -51,11 +51,7 @@ public class cmdList extends AbstractExtendedCommand {
 
     private void displayList(String[] args, CommandSender sender) {
         if (args.length == 0) {
-            if (sender instanceof Player) {
-                this.playerManager.printOnlineList((Player) sender);
-            } else {
-                this.playerManager.printOnlineList((ConsoleCommandSender) sender);
-            }
+            this.playerManager.printOnlineList(sender);
         } else if (args.length == 1)
             displayAccountName(sender, args[0]);
         else

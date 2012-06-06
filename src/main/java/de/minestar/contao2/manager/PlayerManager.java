@@ -30,7 +30,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.json.simple.JSONObject;
 
@@ -42,8 +42,8 @@ import de.minestar.contao2.units.Settings;
 import de.minestar.core.MinestarCore;
 import de.minestar.core.units.MinestarPlayer;
 import de.minestar.events.PlayerChangedGroupEvent;
+import de.minestar.minestarlibrary.utils.ChatUtils;
 import de.minestar.minestarlibrary.utils.ConsoleUtils;
-import de.minestar.minestarlibrary.utils.PlayerUtils;
 
 public class PlayerManager {
     private HashMap<ContaoGroup, String> onlineList;
@@ -86,29 +86,21 @@ public class PlayerManager {
         this.updatePlayer(player.getName());
     }
 
-    public void printOnlineList(Player player) {
-        PlayerUtils.sendBlankMessage(player, ChatColor.GOLD + "" + Bukkit.getOnlinePlayers().length + " / " + Bukkit.getMaxPlayers());
-        this.printSingleGroup(ChatColor.RED, ContaoGroup.ADMIN, player);
-        this.printSingleGroup(ChatColor.AQUA, ContaoGroup.PAY, player);
-        this.printSingleGroup(ChatColor.GREEN, ContaoGroup.FREE, player);
-        this.printSingleGroup(ChatColor.DARK_PURPLE, ContaoGroup.PROBE, player);
-        this.printSingleGroup(ChatColor.GRAY, ContaoGroup.DEFAULT, player);
-        this.printSingleGroup(ChatColor.DARK_GRAY, ContaoGroup.X, player);
+    public void printOnlineList(CommandSender sender) {
+        // WRITE HEAD
+        ChatUtils.writeMessage(sender, ChatColor.GOLD + "" + Bukkit.getOnlinePlayers().length + " / " + Bukkit.getMaxPlayers());
+        // WRITE GROUPS
+        this.printSingleGroup(ChatColor.RED, ContaoGroup.ADMIN, sender);
+        this.printSingleGroup(ChatColor.AQUA, ContaoGroup.PAY, sender);
+        this.printSingleGroup(ChatColor.GREEN, ContaoGroup.FREE, sender);
+        this.printSingleGroup(ChatColor.DARK_PURPLE, ContaoGroup.PROBE, sender);
+        this.printSingleGroup(ChatColor.GRAY, ContaoGroup.DEFAULT, sender);
+        this.printSingleGroup(ChatColor.DARK_GRAY, ContaoGroup.X, sender);
     }
 
-    private void printSingleGroup(ChatColor color, ContaoGroup group, Player player) {
+    private void printSingleGroup(ChatColor color, ContaoGroup group, CommandSender sender) {
         if (this.groupMap.get(group).size() > 0)
-            PlayerUtils.sendBlankMessage(player, color + group.name() + " ( " + this.groupMap.get(group).size() + " ) : " + this.onlineList.get(group));
-    }
-
-    public void printOnlineList(ConsoleCommandSender sender) {
-        sender.sendMessage(Bukkit.getOnlinePlayers().length + " / " + Bukkit.getMaxPlayers());
-        this.printSingleGroup(ContaoGroup.ADMIN, sender);
-        this.printSingleGroup(ContaoGroup.PAY, sender);
-        this.printSingleGroup(ContaoGroup.FREE, sender);
-        this.printSingleGroup(ContaoGroup.PROBE, sender);
-        this.printSingleGroup(ContaoGroup.DEFAULT, sender);
-        this.printSingleGroup(ContaoGroup.X, sender);
+            ChatUtils.writeMessage(sender, color + group.name() + " ( " + this.groupMap.get(group).size() + " ) : " + this.onlineList.get(group));
     }
 
     public String updateGroupManagerGroup(String playerName, String groupName) {
@@ -125,20 +117,19 @@ public class PlayerManager {
         }
         return newGroup;
     }
-    private void printSingleGroup(ContaoGroup group, ConsoleCommandSender sender) {
-        sender.sendMessage(group.name() + " ( " + this.groupMap.get(group).size() + " ) : " + this.onlineList.get(group));
-    }
 
     public void updateOnlineLists() {
+        StringBuilder sBuilder = new StringBuilder();
         for (Map.Entry<ContaoGroup, HashSet<String>> entry : this.groupMap.entrySet()) {
-            String thisString = "";
+            sBuilder.setLength(0);
             for (String thisPlayer : entry.getValue()) {
-                thisString += thisPlayer;
-                thisString += ", ";
+                sBuilder.append(thisPlayer);
+                sBuilder.append(", ");
             }
-            if (thisString.length() > 2)
-                thisString = thisString.substring(0, thisString.length() - 2);
-            this.onlineList.put(entry.getKey(), thisString);
+            if (sBuilder.length() > 2)
+                sBuilder.delete(sBuilder.length() - 2, sBuilder.length());
+
+            this.onlineList.put(entry.getKey(), sBuilder.toString());
         }
         this.saveJSON();
     }
