@@ -41,7 +41,7 @@ import de.minestar.contao2.units.ContaoGroup;
 import de.minestar.contao2.units.Settings;
 import de.minestar.core.MinestarCore;
 import de.minestar.core.units.MinestarPlayer;
-import de.minestar.events.PlayerChangedGroupEvent;
+import de.minestar.minestarlibrary.events.PlayerChangedGroupEvent;
 import de.minestar.minestarlibrary.utils.ChatUtils;
 import de.minestar.minestarlibrary.utils.ConsoleUtils;
 
