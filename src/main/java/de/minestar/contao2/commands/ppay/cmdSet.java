@@ -29,11 +29,8 @@ import de.minestar.minestarlibrary.utils.ChatUtils;
 
 public class cmdSet extends AbstractCommand {
 
-    private Settings setting;
-
-    public cmdSet(String syntax, String arguments, String node, Settings setting) {
+    public cmdSet(String syntax, String arguments, String node) {
         super(Core.NAME, syntax, arguments, node);
-        this.setting = setting;
     }
 
     @Override
@@ -55,10 +52,10 @@ public class cmdSet extends AbstractCommand {
         int slots = Integer.parseInt(args[1]);
 
         if (option.equalsIgnoreCase("freeslots")) {
-            setting.setFreeSlots(slots);
+            Settings.setFreeSlots(slots);
             ChatUtils.writeSuccess(sender, pluginName, "FreeUser-Slots set to " + slots);
         } else if (option.equalsIgnoreCase("maxSlots")) {
-            setting.setMaxSlots(slots);
+            Settings.setMaxSlots(slots);
             ChatUtils.writeSuccess(sender, pluginName, "PublicSlots set to " + slots);
         } else
             ChatUtils.writeError(sender, pluginName, "Use for option 'freeslots' or 'maxSlots'");

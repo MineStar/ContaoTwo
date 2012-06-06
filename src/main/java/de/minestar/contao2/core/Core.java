@@ -63,9 +63,6 @@ public class Core extends AbstractCore {
     private StatisticManager statisticManager;
     private DatabaseManager databaseManager;
 
-    /** Settings */
-    private Settings settings;
-
     /** Listener */
     private PlayerListener connectionListener;
     private StatisticListener blockListener;
@@ -73,17 +70,14 @@ public class Core extends AbstractCore {
 
     @Override
     protected boolean loadingConfigs(File dataFolder) {
-
-        this.settings = new Settings(dataFolder);
-
-        return true;
+        return Settings.init(dataFolder);
     }
 
     @Override
     protected boolean createManager() {
 
         this.databaseManager = new DatabaseManager(NAME, getDataFolder());
-        this.playerManager = new PlayerManager(this.settings);
+        this.playerManager = new PlayerManager();
         this.statisticManager = new StatisticManager(this.databaseManager);
         this.databaseManager.initManager(this.playerManager, this.statisticManager);
 
@@ -93,7 +87,7 @@ public class Core extends AbstractCore {
     @Override
     protected boolean createListener() {
 
-        this.connectionListener = new PlayerListener(this.playerManager, this.databaseManager, this.statisticManager, this.settings);
+        this.connectionListener = new PlayerListener(this.playerManager, this.databaseManager, this.statisticManager);
         this.blockListener = new StatisticListener(this.statisticManager);
         this.fakePlayerListener = new FakePlayerListener(this.playerManager);
 
@@ -143,14 +137,13 @@ public class Core extends AbstractCore {
                 ),
                 
                 new cmdPPay         ("/ppay", "", "contao.ppay",
-                    new cmdSet          ("set",     "<Option> <Number>",            "contao.ppay",              this.settings)
+                    new cmdSet          ("set",     "<Option> <Number>",            "contao.ppay")
                 )
         );
         //@formatter:on
 
         return true;
     }
-
     @Override
     protected boolean commonDisable() {
         if (databaseManager != null) {

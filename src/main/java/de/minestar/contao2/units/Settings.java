@@ -20,79 +20,81 @@ package de.minestar.contao2.units;
 
 import java.io.File;
 
-import org.bukkit.configuration.file.YamlConfiguration;
-
 import de.minestar.contao2.core.Core;
+import de.minestar.minestarlibrary.config.MinestarConfig;
 import de.minestar.minestarlibrary.utils.ConsoleUtils;
 
 public class Settings {
 
-    private int maxFreeSlots;
-    private int maxSlots;
+    private static int freeSlots;
+    private static int maxSlots;
 
-    private boolean showWelcomeMSG;
+    private static boolean showWelcomeMsg;
 
-    private String serverFullMSG;
-    private String disconnectedMSG;
-    private String noFreeSlotsMSG;
-    private String motd;
+    private static String serverFullMsg;
+    private static String kickedForPayMsg;
+    private static String noFreeSlotsMsg;
+    private static String motd;
 
-    private String jsonFilePath;
-    private YamlConfiguration config;
-    private File configFile;
+    private static String jsonFilePath;
 
-    public Settings(File dataFolder) {
+    private static MinestarConfig config;
+    private static File configFile;
+
+    private Settings() {
+
+    }
+
+    public static boolean init(File dataFolder) {
+        configFile = new File(dataFolder, "config.yml");
         try {
-            loadSettings(dataFolder);
+            if (configFile.exists())
+                config = new MinestarConfig(dataFolder);
+            else
+                config = MinestarConfig.copyDefault(Settings.class.getResourceAsStream("/config.yml"), configFile);
+
+            loadValues();
+            return true;
+
         } catch (Exception e) {
-            ConsoleUtils.printException(e, Core.NAME, "Can't load settings from config file!");
+            ConsoleUtils.printException(e, Core.NAME, "Can't load the settings from " + configFile);
+            return false;
         }
     }
 
-    private void loadSettings(File dataFolder) throws Exception {
-        File temp = new File(dataFolder, "config.yml");
-        YamlConfiguration config = new YamlConfiguration();
-        if (!temp.exists()) {
-            temp.createNewFile();
-            config.load(temp);
-            createDefaultConfiguration(config);
-            ConsoleUtils.printInfo(Core.NAME, "Cannot find config.yml in Plugin folder, plugin is creating a default one");
-            config.save(temp);
-        }
-        config.load(temp);
+    private static void loadValues() {
 
-        maxSlots = config.getInt("maxSlots", 45);
-        maxFreeSlots = config.getInt("publicSlots", 6);
-        showWelcomeMSG = config.getBoolean("ShowWelcomeMSG", true);
-        serverFullMSG = config.getString("ServerFullMSG");
-        disconnectedMSG = config.getString("DisconnectedMSG");
-        noFreeSlotsMSG = config.getString("NoFreeSlotsMSG");
+        // HOW MANY PLAYER CAN JOIN THE SERVER
+        maxSlots = config.getInt("maxSlots");
+
+        // HOW MANY FREE USER CAN JOIN THE SERVER
+        freeSlots = config.getInt("publicSlots");
+
+        // SHALL WE DISPLAY THE WELCOM MESSAGE WHEN A PLAYER JOINED
+        showWelcomeMsg = config.getBoolean("ShowWelcomeMSG");
+
+        // MESSAGE SEND TO PLAYER WHEN SERVER IS FULL
+        serverFullMsg = config.getString("ServerFullMSG");
+
+        // MESSAGE SEND TO PLAYER WHEN A USER WAS KICKE FOR PAYUSER
+        kickedForPayMsg = config.getString("DisconnectedMSG");
+
+        // MESSAGE SEND TO FREE PLAYER WHEN THERE IS NO FREE SLOT AVAILABLE
+        noFreeSlotsMsg = config.getString("NoFreeSlotsMSG");
+
+        // THE MESSAGE OF THE DAY
         motd = config.getString("MOTD");
 
+        // THE PATH WHERE THE JSON FILE SHOULD SAVED
         jsonFilePath = config.getString("userStatsFile");
-        this.config = config;
-        this.configFile = temp;
     }
 
-    private void createDefaultConfiguration(YamlConfiguration config) throws Exception {
-
-        config.set("maxSlots", 45);
-        config.set("publicSlots", 6);
-        config.set("ShowWelcomeMSG", true);
-        config.set("ServerFullMSG", "Server ist voll!");
-        config.set("DisconnectedMSG", "Ein PayUser hat deinen Platz bekommen, tut uns leid...");
-        config.set("NoFreeSlotsMSG", "Alle FreeUserSlots sind belegt.");
-        config.set("MOTD", "Wilkommen auf Minestar.");
-
-        config.set("userStatsFile", "userstats.json");
+    public static int getFreeSlots() {
+        return freeSlots;
     }
 
-    public int getFreeSlots() {
-        return maxFreeSlots;
-    }
-
-    public void setFreeSlots(int freeSlots) {
-        this.maxFreeSlots = freeSlots;
+    public static void setFreeSlots(int freeSlots) {
+        Settings.freeSlots = freeSlots;
         config.set("publicSlots", freeSlots);
         try {
             config.save(configFile);
@@ -101,40 +103,41 @@ public class Settings {
         }
     }
 
-    public int getMaxSlots() {
+    public static int getMaxSlots() {
         return maxSlots;
     }
 
-    public void setMaxSlots(int maxSlots) {
-        this.maxSlots = maxSlots;
+    public static void setMaxSlots(int maxSlots) {
+        Settings.maxSlots = maxSlots;
         config.set("maxSlots", maxSlots);
         try {
             config.save(configFile);
         } catch (Exception e) {
-            ConsoleUtils.printException(e, Core.NAME, "Can't save max slots to config!");
+            ConsoleUtils.printException(e, Core.NAME, "Can't save max slots to the config!");
         }
     }
-    public boolean isShowWelcomeMSG() {
-        return showWelcomeMSG;
+
+    public static boolean showWelcomeMsg() {
+        return showWelcomeMsg;
     }
 
-    public String getServerFullMSG() {
-        return serverFullMSG;
+    public static String getServerFullMsg() {
+        return serverFullMsg;
     }
 
-    public String getDisconnectedMSG() {
-        return disconnectedMSG;
+    public static String getKickedForPayMsg() {
+        return kickedForPayMsg;
     }
 
-    public String getNoFreeSlotsMSG() {
-        return noFreeSlotsMSG;
+    public static String getNoFreeSlotsMsg() {
+        return noFreeSlotsMsg;
     }
 
-    public String getMotd() {
+    public static String getMOTD() {
         return motd;
     }
 
-    public String getJSONFilePath() {
+    public static String getJSONFilePath() {
         return jsonFilePath;
     }
 }

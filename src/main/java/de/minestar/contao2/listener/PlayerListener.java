@@ -42,18 +42,18 @@ import de.minestar.events.PlayerChangedGroupEvent;
 import de.minestar.minestarlibrary.utils.PlayerUtils;
 
 public class PlayerListener implements Listener {
-    private Settings settings;
+
     private PlayerManager playerManager;
     private DatabaseManager databaseManager;
     private StatisticManager statisticManager;
 
     private HashMap<String, ContaoGroup> oldGroups;
 
-    public PlayerListener(PlayerManager playerManager, DatabaseManager databaseManager, StatisticManager statisticManager, Settings settings) {
+    public PlayerListener(PlayerManager playerManager, DatabaseManager databaseManager, StatisticManager statisticManager) {
         this.playerManager = playerManager;
         this.databaseManager = databaseManager;
         this.statisticManager = statisticManager;
-        this.settings = settings;
+
         this.oldGroups = new HashMap<String, ContaoGroup>();
     }
 
@@ -61,7 +61,7 @@ public class PlayerListener implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         this.playerManager.updatePlayer(event.getPlayer());
         this.playerManager.updateOnlineLists();
-        if (this.settings.isShowWelcomeMSG()) {
+        if (Settings.showWelcomeMsg()) {
             this.playerManager.printOnlineList(event.getPlayer());
             this.statisticManager.printStatistics(event.getPlayer());
         }
@@ -107,7 +107,7 @@ public class PlayerListener implements Listener {
         // PERFORM CHECK FOR FREE SPACE
         if (thisPlayer.getGroup().equalsIgnoreCase(ContaoGroup.FREE.getName())) {
             if (this.playerManager.getFreeSlots() < 1) {
-                event.setKickMessage(this.settings.getNoFreeSlotsMSG());
+                event.setKickMessage(Settings.getNoFreeSlotsMsg());
                 event.setResult(PlayerPreLoginEvent.Result.KICK_OTHER);
             }
         }
@@ -148,6 +148,8 @@ public class PlayerListener implements Listener {
             case ADMIN :
                 col = ChatColor.RED;
                 break;
+            case MOD :
+
             case PAY :
                 col = ChatColor.AQUA;
                 break;
@@ -158,7 +160,7 @@ public class PlayerListener implements Listener {
                 col = ChatColor.DARK_PURPLE;
                 break;
             case X :
-                col = ChatColor.DARK_GRAY;
+                col = ChatColor.GRAY;
                 break;
         }
 

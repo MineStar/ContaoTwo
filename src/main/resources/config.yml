@@ -1,0 +1,8 @@
+maxSlosts: 1337
+publicSlots: 6
+ShowWelcomeMSG: true
+ServerFullMSG: Server ist voll :(
+DisconnectedMSG: Ein PayUser hat deinen Platz bekommen, tut uns leid...
+NoFreeSlotsMSG: Derzeit sind alle Free-Slots belegt.
+userStatsFile: userstats.json
+MOTD: Wilkommen auf Minestar :)

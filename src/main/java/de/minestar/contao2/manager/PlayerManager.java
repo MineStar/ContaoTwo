@@ -46,15 +46,12 @@ import de.minestar.minestarlibrary.utils.ConsoleUtils;
 import de.minestar.minestarlibrary.utils.PlayerUtils;
 
 public class PlayerManager {
-
-    private Settings settings;
-
     private HashMap<ContaoGroup, String> onlineList;
     private HashMap<ContaoGroup, HashSet<String>> groupMap;
     private ConcurrentHashMap<String, ContaoGroup> playerMap;
 
-    public PlayerManager(Settings settings) {
-        this.settings = settings;
+    public PlayerManager() {
+
         this.onlineList = new HashMap<ContaoGroup, String>();
         this.groupMap = new HashMap<ContaoGroup, HashSet<String>>();
         this.playerMap = new ConcurrentHashMap<String, ContaoGroup>();
@@ -226,7 +223,7 @@ public class PlayerManager {
     }
 
     public int getFreeSlots() {
-        return this.settings.getFreeSlots() - this.groupMap.get(ContaoGroup.FREE).size();
+        return Settings.getFreeSlots() - this.groupMap.get(ContaoGroup.FREE).size();
     }
 
     @SuppressWarnings("unchecked")
@@ -235,18 +232,21 @@ public class PlayerManager {
      */
     private void saveJSON() {
         JSONObject json = new JSONObject();
+        // FILL JSON FILE WITH DATA
+
         json.put("ConnectedUsers", Bukkit.getOnlinePlayers().length);
         json.put("ConnectedDefaultUsers", this.groupMap.get(ContaoGroup.DEFAULT).size() + this.groupMap.get(ContaoGroup.X).size());
         json.put("ConnectedProbeUsers", this.groupMap.get(ContaoGroup.PROBE).size());
         json.put("ConnectedFreeUsers", this.groupMap.get(ContaoGroup.FREE).size());
         json.put("ConnectedPayUsers", this.groupMap.get(ContaoGroup.PAY).size());
         json.put("ConnectedAdmins", this.groupMap.get(ContaoGroup.ADMIN).size());
-        json.put("FreeUserSlots", this.settings.getFreeSlots());
-        json.put("MaxPublicSlots", this.settings.getMaxSlots());
+        json.put("FreeUserSlots", Settings.getFreeSlots());
+        json.put("MaxPublicSlots", Settings.getMaxSlots());
         json.put("TotalSlots", Bukkit.getMaxPlayers());
 
+        // WRITE JSON FILE
         try {
-            File f = new File(this.settings.getJSONFilePath());
+            File f = new File(Settings.getJSONFilePath());
             if (!f.exists())
                 f.createNewFile();
             Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(f), "UTF8"));
