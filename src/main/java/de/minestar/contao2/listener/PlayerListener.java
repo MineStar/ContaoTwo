@@ -146,21 +146,22 @@ public class PlayerListener implements Listener {
         ContaoGroup group = this.playerManager.getGroup(player);
         switch (group) {
             case ADMIN :
-                col = ChatColor.RED;
+                col = Settings.getAdminColor();
                 break;
             case MOD :
-
+                col = Settings.getModColor();
+                break;
             case PAY :
-                col = ChatColor.AQUA;
+                col = Settings.getPayColor();
                 break;
             case FREE :
-                col = ChatColor.GREEN;
+                col = Settings.getFreeColor();
                 break;
             case PROBE :
-                col = ChatColor.DARK_PURPLE;
+                col = Settings.getProbeColor();
                 break;
             case X :
-                col = ChatColor.GRAY;
+                col = Settings.getXColor();
                 break;
         }
 

@@ -70,7 +70,7 @@ public class Core extends AbstractCore {
 
     @Override
     protected boolean loadingConfigs(File dataFolder) {
-        return Settings.init(dataFolder);
+        return Settings.init(dataFolder, NAME, this.getDescription().getVersion());
     }
 
     @Override

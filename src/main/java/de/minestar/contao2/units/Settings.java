@@ -20,11 +20,15 @@ package de.minestar.contao2.units;
 
 import java.io.File;
 
+import org.bukkit.ChatColor;
+
 import de.minestar.contao2.core.Core;
 import de.minestar.minestarlibrary.config.MinestarConfig;
 import de.minestar.minestarlibrary.utils.ConsoleUtils;
 
 public class Settings {
+
+    /* VALUES */
 
     private static int freeSlots;
     private static int maxSlots;
@@ -38,6 +42,18 @@ public class Settings {
 
     private static String jsonFilePath;
 
+    private static ChatColor adminColor;
+    private static ChatColor modColor;
+    private static ChatColor payColor;
+    private static ChatColor freeColor;
+    private static ChatColor probeColor;
+    private static ChatColor defaultColor;
+    private static ChatColor xColor;
+
+    private static String modPrefix;
+
+    /* USED FOR SETTING */
+
     private static MinestarConfig config;
     private static File configFile;
 
@@ -45,11 +61,13 @@ public class Settings {
 
     }
 
-    public static boolean init(File dataFolder) {
+    public static boolean init(File dataFolder, String pluginName, String pluginVersion) {
         configFile = new File(dataFolder, "config.yml");
         try {
+            // LOAD EXISTING CONFIG FILE
             if (configFile.exists())
-                config = new MinestarConfig(dataFolder);
+                config = new MinestarConfig(dataFolder, pluginName, pluginVersion);
+            // CREATE A DEFAUL ONE
             else
                 config = MinestarConfig.copyDefault(Settings.class.getResourceAsStream("/config.yml"), configFile);
 
@@ -65,28 +83,44 @@ public class Settings {
     private static void loadValues() {
 
         // HOW MANY PLAYER CAN JOIN THE SERVER
-        maxSlots = config.getInt("maxSlots");
+        maxSlots = config.getInt("slots.maxSlots");
 
         // HOW MANY FREE USER CAN JOIN THE SERVER
-        freeSlots = config.getInt("publicSlots");
+        freeSlots = config.getInt("slots.publicSlots");
 
         // SHALL WE DISPLAY THE WELCOM MESSAGE WHEN A PLAYER JOINED
-        showWelcomeMsg = config.getBoolean("ShowWelcomeMSG");
+        showWelcomeMsg = config.getBoolean("messages.showWelcomeMSG");
 
         // MESSAGE SEND TO PLAYER WHEN SERVER IS FULL
-        serverFullMsg = config.getString("ServerFullMSG");
+        serverFullMsg = config.getString("messages.serverFullMSG");
 
         // MESSAGE SEND TO PLAYER WHEN A USER WAS KICKE FOR PAYUSER
-        kickedForPayMsg = config.getString("DisconnectedMSG");
+        kickedForPayMsg = config.getString("messages.disconnectedMSG");
 
         // MESSAGE SEND TO FREE PLAYER WHEN THERE IS NO FREE SLOT AVAILABLE
-        noFreeSlotsMsg = config.getString("NoFreeSlotsMSG");
+        noFreeSlotsMsg = config.getString("messages.moFreeSlotsMSG");
 
         // THE MESSAGE OF THE DAY
-        motd = config.getString("MOTD");
+        motd = config.getString("messages.MOTD");
 
         // THE PATH WHERE THE JSON FILE SHOULD SAVED
-        jsonFilePath = config.getString("userStatsFile");
+        jsonFilePath = config.getString("common.userStatsFile");
+
+        /* COLORS */
+
+        adminColor = ChatColor.getByChar(config.getString("colors.admin"));
+
+        modColor = ChatColor.getByChar(config.getString("colors.mod"));
+
+        payColor = ChatColor.getByChar(config.getString("colors.pay"));
+
+        freeColor = ChatColor.getByChar(config.getString("colors.free"));
+
+        probeColor = ChatColor.getByChar(config.getString("colors.probe"));
+
+        defaultColor = ChatColor.getByChar(config.getString("colors.default"));
+
+        xColor = ChatColor.getByChar(config.getString("colors.x"));
     }
 
     public static int getFreeSlots() {
@@ -140,4 +174,38 @@ public class Settings {
     public static String getJSONFilePath() {
         return jsonFilePath;
     }
+
+    /* COLORS */
+    public static ChatColor getAdminColor() {
+        return adminColor;
+    }
+
+    public static ChatColor getModColor() {
+        return modColor;
+    }
+
+    public static ChatColor getPayColor() {
+        return payColor;
+    }
+
+    public static ChatColor getFreeColor() {
+        return freeColor;
+    }
+
+    public static ChatColor getProbeColor() {
+        return probeColor;
+    }
+
+    public static ChatColor getDefaultColor() {
+        return defaultColor;
+    }
+
+    public static ChatColor getXColor() {
+        return xColor;
+    }
+
+    public static String getModPrefix() {
+        return modPrefix;
+    }
+
 }

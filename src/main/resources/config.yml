@@ -1,8 +1,38 @@
-maxSlosts: 1337
-publicSlots: 6
-ShowWelcomeMSG: true
-ServerFullMSG: Server ist voll :(
-DisconnectedMSG: Ein PayUser hat deinen Platz bekommen, tut uns leid...
-NoFreeSlotsMSG: Derzeit sind alle Free-Slots belegt.
-userStatsFile: userstats.json
-MOTD: Wilkommen auf Minestar :)
+VERSION: ${pom.version}
+slots:
+    maxSlosts: 1337
+    publicSlots: 6
+messages:
+    showWelcomeMSG: true
+    serverFullMSG: Server ist voll :(
+    disconnectedMSG: Ein PayUser hat deinen Platz bekommen, tut uns leid...
+    noFreeSlotsMSG: Derzeit sind alle Free-Slots belegt
+    MOTD: Wilkommen auf Minestar :)
+
+# Possible color codes are: 
+# 0 = Black
+# 1 = Dark Blue
+# 2 = Dark Green
+# 3 = Dark Aqua
+# 4 = Dark Red
+# 5 = Dark Purple
+# 6 = Gold
+# 7 = Gray
+# 8 = Dark Gray
+# 9 = Blue
+# a = Green
+# b = Aqua
+# c = Red
+# d = Light Purple
+# e = Yellow
+# f = White
+colors:
+    admin: 'c'
+    mod: '6'
+    pay: 'b'
+    free: 'a'
+    probe: '5'
+    default: '7'
+    x: '7'
+common:
+    userStatsFile: userstats.json

@@ -90,12 +90,14 @@ public class PlayerManager {
         // WRITE HEAD
         ChatUtils.writeMessage(sender, ChatColor.GOLD + "" + Bukkit.getOnlinePlayers().length + " / " + Bukkit.getMaxPlayers());
         // WRITE GROUPS
-        this.printSingleGroup(ChatColor.RED, ContaoGroup.ADMIN, sender);
-        this.printSingleGroup(ChatColor.AQUA, ContaoGroup.PAY, sender);
-        this.printSingleGroup(ChatColor.GREEN, ContaoGroup.FREE, sender);
-        this.printSingleGroup(ChatColor.DARK_PURPLE, ContaoGroup.PROBE, sender);
-        this.printSingleGroup(ChatColor.GRAY, ContaoGroup.DEFAULT, sender);
-        this.printSingleGroup(ChatColor.DARK_GRAY, ContaoGroup.X, sender);
+        this.printSingleGroup(Settings.getAdminColor(), ContaoGroup.ADMIN, sender);
+        // TODO: Implement other things for mod
+        this.printSingleGroup(Settings.getModColor(), ContaoGroup.MOD, sender);
+        this.printSingleGroup(Settings.getPayColor(), ContaoGroup.PAY, sender);
+        this.printSingleGroup(Settings.getFreeColor(), ContaoGroup.FREE, sender);
+        this.printSingleGroup(Settings.getProbeColor(), ContaoGroup.PROBE, sender);
+        this.printSingleGroup(Settings.getDefaultColor(), ContaoGroup.DEFAULT, sender);
+        this.printSingleGroup(Settings.getXColor(), ContaoGroup.X, sender);
     }
 
     private void printSingleGroup(ChatColor color, ContaoGroup group, CommandSender sender) {

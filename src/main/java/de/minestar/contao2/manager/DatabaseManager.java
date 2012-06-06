@@ -510,9 +510,6 @@ public class DatabaseManager extends AbstractDatabaseHandler {
         if (!contaoGroup.equalsIgnoreCase(group)) {
             String oldGroup = group;
             group = playerManager.updateGroupManagerGroup(playerName, contaoGroup);
-            // ContaoPL.queuedMessages.put(playerName, ChatColor.GOLD +
-            // "Du wurdest automatisch folgender Gruppe zugewiesen: " +
-            // contaoGroup + "!");
             ConsoleUtils.printWarning(Core.NAME, "Player '" + playerName + "'(MCNick is '" + user.getNickname() + "' ) has a different contao( " + contaoGroup + " ) and groupmanager( " + oldGroup + " )-group!");
         }
 
@@ -547,9 +544,6 @@ public class DatabaseManager extends AbstractDatabaseHandler {
             setExpDateInMCTable("11.11.1111", user.getContaoID());
             updateContaoGroup(ContaoGroup.FREE, user.getContaoID());
             ConsoleUtils.printInfo(Core.NAME, "Player '" + playerName + "'s Payaccount has expired! Moving to free member!");
-            // QUEUE MESSAGE TO SEND IT WHEN PLAYER HAS LOGGED IN
-            // ContaoPL.queuedMessages.put(playerName, ChatColor.RED +
-            // "Dein Account wurde automatisch auf einen Free-Account zurückgestuft!");
         } catch (ParseException e) {
             ConsoleUtils.printException(e, Core.NAME, "Can't parse expire date! PlayerName=" + playerName + ",Date=" + user.getExpDate());
         }
@@ -577,10 +571,6 @@ public class DatabaseManager extends AbstractDatabaseHandler {
             // ProbeUser did enough to be a free user
             playerManager.updateGroupManagerGroup(playerName, ContaoGroup.FREE.getName());
             updateContaoGroup(ContaoGroup.FREE, user.getContaoID());
-
-            // QUEUE MESSAGE TO SEND IT WHEN PLAYER HAS LOGGED IN
-            // ContaoPL.queuedMessages.put(playerName, ChatColor.GREEN +
-            // "Du wurdest automatisch auf einen FreeUser hochgestuft!");
         } catch (Exception e) {
             ConsoleUtils.printException(e, Core.NAME, "Can't check probe user whether he can be a free member! PlayerName=" + playerName);
         }
