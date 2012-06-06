@@ -51,6 +51,7 @@ public class Settings {
     private static ChatColor xColor;
 
     private static String modPrefix;
+    private static ChatColor modPrefixColor;
 
     /* USED FOR SETTING */
 
@@ -106,8 +107,7 @@ public class Settings {
         // THE PATH WHERE THE JSON FILE SHOULD SAVED
         jsonFilePath = config.getString("common.userStatsFile");
 
-        /* COLORS */
-
+        /* GROUP COLORS */
         adminColor = ChatColor.getByChar(config.getString("colors.admin"));
 
         modColor = ChatColor.getByChar(config.getString("colors.mod"));
@@ -121,6 +121,10 @@ public class Settings {
         defaultColor = ChatColor.getByChar(config.getString("colors.default"));
 
         xColor = ChatColor.getByChar(config.getString("colors.x"));
+
+        /* MOD PREFIX */
+        modPrefix = config.getString("mod.prefix");
+        modPrefixColor = ChatColor.getByChar(config.getString("mod.prefixColor"));
     }
 
     public static int getFreeSlots() {
@@ -175,7 +179,7 @@ public class Settings {
         return jsonFilePath;
     }
 
-    /* COLORS */
+    /* GROUP COLORS */
     public static ChatColor getAdminColor() {
         return adminColor;
     }
@@ -204,8 +208,13 @@ public class Settings {
         return xColor;
     }
 
+    /* MOD PREFIX */
     public static String getModPrefix() {
         return modPrefix;
+    }
+
+    public static ChatColor getModPrefixColor() {
+        return modPrefixColor;
     }
 
 }

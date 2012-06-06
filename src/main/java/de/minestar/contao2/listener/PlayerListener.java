@@ -142,6 +142,8 @@ public class PlayerListener implements Listener {
         }
 
         ChatColor col = ChatColor.GRAY;
+        ChatColor prefixColor = ChatColor.WHITE;
+        String prefix = "";
 
         ContaoGroup group = this.playerManager.getGroup(player);
         switch (group) {
@@ -150,6 +152,8 @@ public class PlayerListener implements Listener {
                 break;
             case MOD :
                 col = Settings.getModColor();
+                prefix = Settings.getModPrefix();
+                prefixColor = Settings.getModPrefixColor();
                 break;
             case PAY :
                 col = Settings.getPayColor();
@@ -165,7 +169,7 @@ public class PlayerListener implements Listener {
                 break;
         }
 
-        event.setMessage(col + player.getDisplayName() + ChatColor.WHITE + ": " + event.getMessage());
+        event.setMessage(prefixColor + prefix + col + player.getDisplayName() + ChatColor.WHITE + ": " + event.getMessage());
     }
     @EventHandler
     public void onPlayerChangedGroup(PlayerChangedGroupEvent event) {
