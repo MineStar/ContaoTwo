@@ -39,6 +39,7 @@ import de.minestar.contao2.commands.user.cmdProbe;
 import de.minestar.contao2.commands.user.cmdRemoveWarning;
 import de.minestar.contao2.commands.user.cmdSearch;
 import de.minestar.contao2.commands.user.cmdStatus;
+import de.minestar.contao2.commands.user.cmdUnMod;
 import de.minestar.contao2.commands.user.cmdUser;
 import de.minestar.contao2.commands.user.cmdX;
 import de.minestar.contao2.listener.FakePlayerListener;
@@ -135,7 +136,8 @@ public class Core extends AbstractCore {
                     new cmdAddWarning   ("awarn",       "<ingamename> <text>",          "contao.rights.awarn" ,     this.databaseManager),
                     new cmdRemoveWarning("rwarn",       "<ingamename> <warningIndex>" , "contao.rights.rwarn",      this.databaseManager),
                     new cmdX            ("x",           "<ingamename> <reason>",        "contao.rights.x",          this.playerManager),
-                    new cmdMod          ("mod",         "<ingamename>",                 "contao.rights.mod",        this.playerManager)         
+                    new cmdMod          ("mod",         "<ingamename>",                 "contao.rights.mod",        this.playerManager),
+                    new cmdUnMod        ("unmod",       "<ingamename>",                 "contao.rights.unmod",      this.playerManager)
                 ),
                 
                 new cmdPPay         ("/ppay", "", "contao.ppay",

@@ -18,6 +18,7 @@
 
 package de.minestar.contao2.commands.user;
 
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
@@ -29,26 +30,26 @@ import de.minestar.minestarlibrary.commands.AbstractCommand;
 import de.minestar.minestarlibrary.utils.ChatUtils;
 import de.minestar.minestarlibrary.utils.PlayerUtils;
 
-public class cmdMod extends AbstractCommand {
+public class cmdUnMod extends AbstractCommand {
 
     private PlayerManager pManager;
 
-    public cmdMod(String syntax, String arguments, String node, PlayerManager pManager) {
+    public cmdUnMod(String syntax, String arguments, String node, PlayerManager pManager) {
         super(Core.NAME, syntax, arguments, node);
         this.pManager = pManager;
     }
 
     @Override
     public void execute(String[] args, Player player) {
-        modPlayer(args[0], player);
+        unmodPlayer(args[0], player);
     }
 
     @Override
     public void execute(String[] args, ConsoleCommandSender console) {
-        modPlayer(args[0], console);
+        unmodPlayer(args[0], console);
     }
 
-    private void modPlayer(String playerName, CommandSender sender) {
+    private void unmodPlayer(String playerName, CommandSender sender) {
 
         // SEARCH FOR PLAYER
         String correctPlayerName = PlayerUtils.getCorrectPlayerName(playerName);
@@ -57,14 +58,16 @@ public class cmdMod extends AbstractCommand {
             return;
         }
         // UPDATE GROUP
-        pManager.updateGroupManagerGroup(correctPlayerName, ContaoGroup.MOD.getName());
+        pManager.updateGroupManagerGroup(correctPlayerName, ContaoGroup.PAY.getName());
 
         // SEND MESSAGE TO COMMAND CALLER
-        ChatUtils.writeSuccess(sender, pluginName, "Der Spieler '" + correctPlayerName + "' ist nun Moderator");
+        ChatUtils.writeSuccess(sender, pluginName, "Der Spieler '" + correctPlayerName + "' ist kein Moderator mehr und nun Payuser!");
 
         // TRY TO SEND MESSAGE TO PLAYER(NEEDN'T BE ONLINE!)
         Player p = PlayerUtils.getOnlinePlayer(playerName);
         if (p != null)
-            PlayerUtils.sendSuccess(p, "Du bist nun Moderator :)");
+            PlayerUtils.sendMessage(p, ChatColor.RED, "Du bist nun nicht mehr länger Moderator");
+
     }
+
 }
