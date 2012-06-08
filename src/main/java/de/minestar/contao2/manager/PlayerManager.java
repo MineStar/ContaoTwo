@@ -92,7 +92,6 @@ public class PlayerManager {
         // WRITE GROUPS
         this.printSingleGroup(Settings.getAdminColor(), ContaoGroup.ADMIN, sender);
         // TODO: Implement other things for mod
-        this.printSingleGroup(Settings.getModColor(), ContaoGroup.MOD, sender);
         this.printSingleGroup(Settings.getPayColor(), ContaoGroup.PAY, sender);
         this.printSingleGroup(Settings.getFreeColor(), ContaoGroup.FREE, sender);
         this.printSingleGroup(Settings.getProbeColor(), ContaoGroup.PROBE, sender);
