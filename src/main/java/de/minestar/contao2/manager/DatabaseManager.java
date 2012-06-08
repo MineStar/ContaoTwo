@@ -539,7 +539,7 @@ public class DatabaseManager extends AbstractDatabaseHandler {
                 return;
 
             // MOVE PAY TO FREE
-            playerManager.updateGroupManagerGroup(playerName, ContaoGroup.FREE.getName());
+            playerManager.updateGroupManagerGroup(playerName, ContaoGroup.FREE);
 
             setExpDateInMCTable("11.11.1111", user.getContaoID());
             updateContaoGroup(ContaoGroup.FREE, user.getContaoID());
@@ -569,7 +569,7 @@ public class DatabaseManager extends AbstractDatabaseHandler {
                 return;
 
             // ProbeUser did enough to be a free user
-            playerManager.updateGroupManagerGroup(playerName, ContaoGroup.FREE.getName());
+            playerManager.updateGroupManagerGroup(playerName, ContaoGroup.FREE);
             updateContaoGroup(ContaoGroup.FREE, user.getContaoID());
         } catch (Exception e) {
             ConsoleUtils.printException(e, Core.NAME, "Can't check probe user whether he can be a free member! PlayerName=" + playerName);

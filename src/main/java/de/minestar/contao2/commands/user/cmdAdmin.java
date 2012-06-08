@@ -83,6 +83,6 @@ public class cmdAdmin extends AbstractCommand {
             PlayerUtils.sendSuccess(target, "Du bist nun Admin (bezahlt bis '" + date + "')!");
 
         // UPDATE GROUPMANAGER-GROUP
-        this.playerManager.updateGroupManagerGroup(ingameName, ContaoGroup.ADMIN.getName());
+        this.playerManager.updateGroupManagerGroup(ingameName, ContaoGroup.ADMIN);
     }
 }

@@ -79,7 +79,7 @@ public class PlayerListener implements Listener {
             return;
 
         if (!currentGroup.equals(oldGroup)) {
-            if (currentGroup.isGroupHigher(oldGroup)) {
+            if (currentGroup.isHigher(oldGroup)) {
                 // UPDGRADE
                 PlayerUtils.sendMessage(event.getPlayer(), ChatColor.GREEN, "Du wurdest automatisch folgender Gruppe zugewiesen: " + currentGroup.name() + " (vorherige Gruppe: " + oldGroup.name() + ")");
             } else {

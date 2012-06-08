@@ -67,6 +67,6 @@ public class cmdDefault extends AbstractCommand {
 
         ChatUtils.writeSuccess(sender, pluginName, "Spieler '" + ingameName + "' ist nun in Gruppe 'Default'!");
         // UPDATE GROUPMANAGER-GROUP
-        this.playerManager.updateGroupManagerGroup(ingameName, ContaoGroup.DEFAULT.getName());
+        this.playerManager.updateGroupManagerGroup(ingameName, ContaoGroup.DEFAULT);
     }
 }

@@ -66,6 +66,6 @@ public class cmdX extends AbstractExtendedCommand {
         mPlayer.setString("contao.xadmin", sender.getName());
 
         ChatUtils.writeSuccess(sender, pluginName, "Spieler '" + ingameName + "' ist nun in Gruppe 'X'!");
-        this.playerManager.updateGroupManagerGroup(ingameName, ContaoGroup.X.name());
+        this.playerManager.updateGroupManagerGroup(ingameName, ContaoGroup.X);
     }
 }
