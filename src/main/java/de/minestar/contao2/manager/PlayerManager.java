@@ -105,6 +105,10 @@ public class PlayerManager {
             ChatUtils.writeMessage(sender, color + group.name() + " ( " + this.groupMap.get(group).size() + " ) : " + this.onlineList.get(group));
     }
 
+    public String updateGroupManagerGroup(String playerName, ContaoGroup group) {
+        return this.updateGroupManagerGroup(playerName, group.getName());
+    }
+
     public String updateGroupManagerGroup(String playerName, String groupName) {
         String oldGroupName = MinestarCore.getPlayer(playerName).getGroup();
         // FINALLY CHANGE THE GROUP

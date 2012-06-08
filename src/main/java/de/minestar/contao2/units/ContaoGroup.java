@@ -18,33 +18,32 @@
 
 package de.minestar.contao2.units;
 
+import de.minestar.core.units.MinestarGroup;
+
 public enum ContaoGroup {
+
     //@formatter:off
-    ADMIN   ("admins",  "a:2:{i:0;s:1:\"3\";i:1;s:1:\"2\";}", 50),
-    MOD     ("mods",    "a:2:{i:0;s:1:\"6\";i:1;s:1:\"2\";}", 40),
-    PAY     ("pay",     "a:1:{i:0;s:1:\"2\";}", 30),
-    FREE    ("vip",     "a:1:{i:0;s:1:\"1\";}", 20),
-    PROBE   ("probe",   "a:1:{i:0;s:1:\"5\";}", 10),
-    DEFAULT ("default", "a:1:{i:0;s:1:\"4\";}", 0),
-    X       ("X",       "a:1:{i:0;s:1:\"4\";}", -10);
+    ADMIN   (MinestarGroup.ADMIN,   "a:2:{i:0;s:1:\"3\";i:1;s:1:\"2\";}"),
+    MOD     (MinestarGroup.MOD,     "a:2:{i:0;s:1:\"6\";i:1;s:1:\"2\";}"),
+    PAY     (MinestarGroup.PAY,     "a:1:{i:0;s:1:\"2\";}"),
+    FREE    (MinestarGroup.FREE,    "a:1:{i:0;s:1:\"1\";}"),
+    PROBE   (MinestarGroup.PROBE,   "a:1:{i:0;s:1:\"5\";}"),
+    DEFAULT (MinestarGroup.DEFAULT, "a:1:{i:0;s:1:\"4\";}"),
+    X       (MinestarGroup.X,       "a:1:{i:0;s:1:\"4\";}");
     //@formatter:on
 
-    // The groupmnanger groupname
-    private String name;
+    private final MinestarGroup group;
     // The serialized string in contao database
-    private String contaoString;
-    // The level of this group: high levels are groups with more permissions
-    private int level;
+    private final String contaoString;
 
-    private ContaoGroup(String name, String contaoString, int level) {
-        this.name = name;
+    private ContaoGroup(MinestarGroup group, String contaoString) {
         this.contaoString = contaoString;
-        this.level = level;
+        this.group = group;
     }
 
     /** @return The GroupManager group name as defined in the group.yml */
     public String getName() {
-        return name;
+        return group.getName();
     }
 
     /**
@@ -61,14 +60,8 @@ public enum ContaoGroup {
                 return group;
         return ContaoGroup.DEFAULT;
     }
-
-    public int getLevel() {
-        return this.level;
-    }
-
-    public boolean isGroupHigher(ContaoGroup otherGroup) {
-        if (otherGroup == null)
-            return false;
-        return this.level > otherGroup.getLevel();
+    
+    public boolean isHigher(ContaoGroup that) {
+        return this.ordinal() < that.ordinal();
     }
 }

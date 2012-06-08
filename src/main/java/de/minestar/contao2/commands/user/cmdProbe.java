@@ -95,7 +95,7 @@ public class cmdProbe extends AbstractCommand {
             PlayerUtils.sendSuccess(newUser, "Viel Spass im Probegebiet :)");
         }
         // UPDATE GROUPMANAGER-GROUP
-        this.playerManager.updateGroupManagerGroup(ingameName, ContaoGroup.PROBE.getName());
+        this.playerManager.updateGroupManagerGroup(ingameName, ContaoGroup.PROBE);
     }
 
     private boolean checkPlayer(String ingameName, int contaoID, CommandSender sender, Player target) {
@@ -136,6 +136,6 @@ public class cmdProbe extends AbstractCommand {
             PlayerUtils.sendMessage(newUser, ChatColor.RED, "Du bist nun Probeuser!");
 
         // UPDATE GROUPMANAGER-GROUP
-        this.playerManager.updateGroupManagerGroup(ingameName, ContaoGroup.PROBE.getName());
+        this.playerManager.updateGroupManagerGroup(ingameName, ContaoGroup.PROBE);
     }
 }

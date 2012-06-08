@@ -81,6 +81,6 @@ public class cmdPay extends AbstractCommand {
             PlayerUtils.sendSuccess(target, "Du bist nun Payuser (bezahlt bis '" + date + "')!");
 
         // UPDATE GROUPMANAGER-GROUP
-        this.playerManager.updateGroupManagerGroup(ingameName, ContaoGroup.PAY.getName());
+        this.playerManager.updateGroupManagerGroup(ingameName, ContaoGroup.PAY);
     }
 }

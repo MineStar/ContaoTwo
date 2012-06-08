@@ -93,6 +93,6 @@ public class cmdFree extends AbstractCommand {
             PlayerUtils.sendSuccess(target, "Du bist nun Freeuser!");
 
         // UPDATE GROUPMANAGER-GROUP
-        this.playerManager.updateGroupManagerGroup(ingameName, ContaoGroup.FREE.getName());
+        this.playerManager.updateGroupManagerGroup(ingameName, ContaoGroup.FREE);
     }
 }
