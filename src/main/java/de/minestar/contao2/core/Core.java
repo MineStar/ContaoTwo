@@ -136,8 +136,8 @@ public class Core extends AbstractCore {
                     new cmdAddWarning   ("awarn",       "<ingamename> <text>",          "contao.rights.awarn" ,     this.databaseManager),
                     new cmdRemoveWarning("rwarn",       "<ingamename> <warningIndex>" , "contao.rights.rwarn",      this.databaseManager),
                     new cmdX            ("x",           "<ingamename> <reason>",        "contao.rights.x",          this.playerManager),
-                    new cmdMod          ("mod",         "<ingamename>",                 "contao.rights.mod",        this.playerManager),
-                    new cmdUnMod        ("unmod",       "<ingamename>",                 "contao.rights.unmod",      this.playerManager)
+                    new cmdMod          ("mod",         "<ingamename>",                 "contao.rights.mod",        this.playerManager, this.databaseManager),
+                    new cmdUnMod        ("unmod",       "<ingamename>",                 "contao.rights.unmod",      this.playerManager, this.databaseManager)
                 ),
                 
                 new cmdPPay         ("/ppay", "", "contao.ppay",

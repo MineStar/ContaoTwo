@@ -23,8 +23,10 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
 import de.minestar.contao2.core.Core;
+import de.minestar.contao2.manager.DatabaseManager;
 import de.minestar.contao2.manager.PlayerManager;
 import de.minestar.contao2.units.ContaoGroup;
+import de.minestar.contao2.units.MCUser;
 import de.minestar.minestarlibrary.commands.AbstractCommand;
 import de.minestar.minestarlibrary.utils.ChatUtils;
 import de.minestar.minestarlibrary.utils.PlayerUtils;
@@ -32,10 +34,12 @@ import de.minestar.minestarlibrary.utils.PlayerUtils;
 public class cmdMod extends AbstractCommand {
 
     private PlayerManager pManager;
+    private DatabaseManager dbManager;
 
-    public cmdMod(String syntax, String arguments, String node, PlayerManager pManager) {
+    public cmdMod(String syntax, String arguments, String node, PlayerManager pManager, DatabaseManager dbManager) {
         super(Core.NAME, syntax, arguments, node);
         this.pManager = pManager;
+        this.dbManager = dbManager;
     }
 
     @Override
@@ -50,21 +54,28 @@ public class cmdMod extends AbstractCommand {
 
     private void modPlayer(String playerName, CommandSender sender) {
 
-        // SEARCH FOR PLAYER
-        String correctPlayerName = PlayerUtils.getCorrectPlayerName(playerName);
-        if (playerName == null) {
-            ChatUtils.writeError(sender, playerName, "Player '" + playerName + "' not found");
+        MCUser user = dbManager.getIngameData(playerName);
+        if (user == null) {
+            ChatUtils.writeError(sender, pluginName, "Fehler: Minecraftnick nicht gefunden!");
             return;
         }
-        // UPDATE GROUP
-        pManager.updateGroupManagerGroup(correctPlayerName, ContaoGroup.MOD.getName());
 
-        // SEND MESSAGE TO COMMAND CALLER
-        ChatUtils.writeSuccess(sender, pluginName, "Der Spieler '" + correctPlayerName + "' ist nun Moderator");
+        String ingameName = user.getNickname();
+        int contaoID = user.getContaoID();
 
-        // TRY TO SEND MESSAGE TO PLAYER(NEEDN'T BE ONLINE!)
-        Player p = PlayerUtils.getOnlinePlayer(playerName);
-        if (p != null)
-            PlayerUtils.sendSuccess(p, "Du bist nun Moderator :)");
+        dbManager.setExpDateInMCTable(user.getExpDate(), contaoID);
+
+        // CONTAO GRUPPE AUF ADMIN SETZEN
+        dbManager.updateContaoGroup(ContaoGroup.MOD, contaoID);
+
+        // PRINT INFO
+        ChatUtils.writeSuccess(sender, pluginName, "Spieler '" + ingameName + "' ist nun Moderator!");
+
+        Player target = PlayerUtils.getOnlinePlayer(ingameName);
+        if (target != null)
+            PlayerUtils.sendSuccess(target, "Du bist nun Moderator.");
+
+        // UPDATE GROUPMANAGER-GROUP
+        pManager.updateGroupManagerGroup(ingameName, ContaoGroup.MOD);
     }
 }
