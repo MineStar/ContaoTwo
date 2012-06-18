@@ -67,16 +67,16 @@ public class cmdStatus extends AbstractExtendedCommand {
     }
 
     private void getStatus(String targetName, CommandSender sender) {
+        // DISPLAY X REASON FOR X-USER
+        if (MinestarCore.getPlayer(targetName).getMinestarGroup().equals(MinestarGroup.X)) {
+            printXReason(sender, targetName);
+            return;
+        }
 
         MCUser user = databaseManager.getIngameData(targetName);
         if (user == null) {
-            // DISPLAY X REASON FOR X-USER
-            if (MinestarCore.getPlayer(targetName).getMinestarGroup().equals(MinestarGroup.X))
-                printXReason(sender, targetName);
             // USER IS NOT A X USER AND NOT IN DATABASE
-            else
-                ChatUtils.writeError(sender, pluginName, "Der Spieler '" + targetName + "' befindet sich nicht in der Datenbank!");
-
+            ChatUtils.writeError(sender, pluginName, "Der Spieler '" + targetName + "' befindet sich nicht in der Datenbank!");
             return;
         }
 
@@ -145,7 +145,11 @@ public class cmdStatus extends AbstractExtendedCommand {
         MinestarPlayer mPlayer = MinestarCore.getPlayer(targetName);
         String xReason = mPlayer.getString("contao.xreason");
         if (xReason != null) {
-            ChatUtils.writeInfo(sender, "X-User Grund: " + xReason);
+            // ONLY PEOPLE WITH ENOUGH PERMISSION CAN SEE THE REASON
+            // (FOR EXAMPLE MODS AND ADMINS)
+            if (sender instanceof Player && MinestarCore.getPlayer((Player) sender).getMinestarGroup().isGroupHigher(MinestarGroup.PAY))
+                ChatUtils.writeInfo(sender, "X-User Grund: " + xReason);
+
             ChatUtils.writeInfo(sender, "X-User Admin: " + mPlayer.getString("contao.xadmin"));
         }
     }
