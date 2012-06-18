@@ -33,6 +33,7 @@ import de.minestar.contao2.units.MCWarning;
 import de.minestar.contao2.units.PlayerWarnings;
 import de.minestar.contao2.units.Statistic;
 import de.minestar.core.MinestarCore;
+import de.minestar.core.units.MinestarGroup;
 import de.minestar.core.units.MinestarPlayer;
 import de.minestar.minestarlibrary.commands.AbstractExtendedCommand;
 import de.minestar.minestarlibrary.utils.ChatUtils;
@@ -69,7 +70,13 @@ public class cmdStatus extends AbstractExtendedCommand {
 
         MCUser user = databaseManager.getIngameData(targetName);
         if (user == null) {
-            ChatUtils.writeError(sender, pluginName, "Der Spieler '" + targetName + "' befindet sich nicht in der Datenbank!");
+            // DISPLAY X REASON FOR X-USER
+            if (MinestarCore.getPlayer(targetName).getMinestarGroup().equals(MinestarGroup.X))
+                printXReason(sender, targetName);
+            // USER IS NOT A X USER AND NOT IN DATABASE
+            else
+                ChatUtils.writeError(sender, pluginName, "Der Spieler '" + targetName + "' befindet sich nicht in der Datenbank!");
+
             return;
         }
 
@@ -81,7 +88,7 @@ public class cmdStatus extends AbstractExtendedCommand {
         printAccountDates(sender, targetName);
         printWarnings(sender, targetName);
         printStatistics(sender, targetName);
-        printXReason(sender, targetName);
+
     }
 
     private void printGroup(CommandSender caller, String playerName, int contaoID) {
