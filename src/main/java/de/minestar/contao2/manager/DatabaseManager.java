@@ -30,9 +30,11 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import de.minestar.contao2.core.Core;
+import de.minestar.contao2.threading.PingThread;
 import de.minestar.contao2.units.ContaoGroup;
 import de.minestar.contao2.units.MCUser;
 import de.minestar.contao2.units.MCWarning;
@@ -78,6 +80,8 @@ public class DatabaseManager extends AbstractDatabaseHandler {
 
     public DatabaseManager(String NAME, File dataFolder) {
         super(NAME, dataFolder);
+
+        startThread();
     }
 
     @Override
@@ -144,7 +148,7 @@ public class DatabaseManager extends AbstractDatabaseHandler {
 
         saveStatistics = con.prepareStatement("UPDATE mc_pay SET totalPlaced = ?, totalBreak = ? WHERE minecraft_nick = ?");
 
-        canBeFree = con.prepareStatement("SELECT 1 FROM mc_pay WHERE contao_user_id = ? AND totalBreak + totalPlaced >= 1000 AND DATEDIFF(NOW(), probeEndDate) >= 7");
+        canBeFree = con.prepareStatement("SELECT 1 FROM mc_pay WHERE contao_user_id = ? AND totalBreak + totalPlaced >= 10000 AND DATEDIFF(NOW(), probeEndDate) >= 7");
     }
 
     public void addProbe(String playerName, int contaoID, String expDate, String modPlayer) {
@@ -601,5 +605,13 @@ public class DatabaseManager extends AbstractDatabaseHandler {
      */
     public StatisticManager getsManager() {
         return sManager;
+    }
+
+    private void startThread() {
+        Runnable pingThread = new PingThread(this.dbConnection.getConnection());
+
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(Core.INSTANCE, pingThread, 20L * 10L, 20L * 10L);
+
+        ConsoleUtils.printInfo(Core.NAME, "Started ping thread for database connection.");
     }
 }
