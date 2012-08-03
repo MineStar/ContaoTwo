@@ -56,6 +56,7 @@ public class Core extends AbstractCore {
 
     public Core() {
         super(NAME);
+        INSTANCE = this;
     }
 
     /** Manager */
@@ -67,6 +68,8 @@ public class Core extends AbstractCore {
     private PlayerListener connectionListener;
     private StatisticListener blockListener;
     private FakePlayerListener fakePlayerListener;
+
+    public static Core INSTANCE;
 
     @Override
     protected boolean loadingConfigs(File dataFolder) {
