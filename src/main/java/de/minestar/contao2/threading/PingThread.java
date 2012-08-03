@@ -22,11 +22,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-
 import de.minestar.contao2.core.Core;
 import de.minestar.minestarlibrary.utils.ConsoleUtils;
+import de.minestar.misterslave.core.MisterSlaveCore;
 
 public class PingThread implements Runnable {
 
@@ -47,32 +45,24 @@ public class PingThread implements Runnable {
     @Override
     public void run() {
         if (pingFailed)
-            handlePingFail();
+            return;
         else {
             if (pingStatement != null) {
                 try {
                     ResultSet resultSet = pingStatement.executeQuery();
                     if (!resultSet.next())
-                        pingFailed = true;
+                        handlePingFail();
+                    else
+                        ConsoleUtils.printInfo(Core.NAME, "Ping...");
                 } catch (Exception e) {
                     ConsoleUtils.printException(e, Core.NAME, "Ping failed!");
-                    pingFailed = true;
+                    handlePingFail();
                 }
             }
         }
     }
 
-    private boolean broadcasted = false;
-
     private void handlePingFail() {
-        if (broadcasted) {
-            Bukkit.broadcastMessage(ChatColor.RED + "[SERVER]: Das ContaoPlugin hat die Datenbankverbindung verloren!");
-            Bukkit.broadcastMessage(ChatColor.RED + "[SERVER]: Der Server wird in 10 Sekunden heruntergefahren und neugestartet!");
-            broadcasted = true;
-        } else {
-            Bukkit.broadcastMessage(ChatColor.RED + "[SERVER]: Der Server wird wegen Datenbankproblemen neugestart!");
-            Bukkit.shutdown();
-        }
+        MisterSlaveCore.restartContao();
     }
-
 }

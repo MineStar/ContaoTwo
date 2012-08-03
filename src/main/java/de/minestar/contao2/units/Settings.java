@@ -66,7 +66,7 @@ public class Settings {
         try {
             // LOAD EXISTING CONFIG FILE
             if (configFile.exists())
-                config = new MinestarConfig(dataFolder, pluginName, pluginVersion);
+                config = new MinestarConfig(configFile, pluginName, pluginVersion);
             // CREATE A DEFAUL ONE
             else
                 config = MinestarConfig.copyDefault(Settings.class.getResourceAsStream("/config.yml"), configFile);
