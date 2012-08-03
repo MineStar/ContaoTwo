@@ -52,8 +52,6 @@ public class PingThread implements Runnable {
                     ResultSet resultSet = pingStatement.executeQuery();
                     if (!resultSet.next())
                         handlePingFail();
-                    else
-                        ConsoleUtils.printInfo(Core.NAME, "Ping...");
                 } catch (Exception e) {
                     ConsoleUtils.printException(e, Core.NAME, "Ping failed!");
                     handlePingFail();
