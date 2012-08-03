@@ -144,7 +144,7 @@ public class DatabaseManager extends AbstractDatabaseHandler {
 
         saveStatistics = con.prepareStatement("UPDATE mc_pay SET totalPlaced = ?, totalBreak = ? WHERE minecraft_nick = ?");
 
-        canBeFree = con.prepareStatement("SELECT 1 FROM mc_pay WHERE contao_user_id = ? AND totalBreak + totalPlaced >= 1000 AND DATEDIFF(NOW(), probeEndDate) >= 7");
+        canBeFree = con.prepareStatement("SELECT 1 FROM mc_pay WHERE contao_user_id = ? AND totalBreak + totalPlaced >= 10000 AND DATEDIFF(NOW(), probeEndDate) >= 7");
     }
 
     public void addProbe(String playerName, int contaoID, String expDate, String modPlayer) {
