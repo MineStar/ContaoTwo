@@ -31,7 +31,6 @@ import java.util.Date;
 import java.util.HashMap;
 
 import org.bukkit.Bukkit;
-import org.bukkit.configuration.file.YamlConfiguration;
 
 import de.minestar.contao2.core.Core;
 import de.minestar.contao2.threading.PingThread;
@@ -40,13 +39,10 @@ import de.minestar.contao2.units.MCUser;
 import de.minestar.contao2.units.MCWarning;
 import de.minestar.contao2.units.PlayerWarnings;
 import de.minestar.contao2.units.Statistic;
-import de.minestar.minestarlibrary.database.AbstractDatabaseHandler;
-import de.minestar.minestarlibrary.database.DatabaseConnection;
-import de.minestar.minestarlibrary.database.DatabaseType;
-import de.minestar.minestarlibrary.database.DatabaseUtils;
+import de.minestar.minestarlibrary.database.AbstractMySQLHandler;
 import de.minestar.minestarlibrary.utils.ConsoleUtils;
 
-public class DatabaseManager extends AbstractDatabaseHandler {
+public class DatabaseManager extends AbstractMySQLHandler {
 
     private PlayerManager playerManager;
     private StatisticManager sManager;
@@ -78,24 +74,10 @@ public class DatabaseManager extends AbstractDatabaseHandler {
 
     private PreparedStatement canBeFree;
 
-    public DatabaseManager(String NAME, File dataFolder) {
-        super(NAME, dataFolder);
+    public DatabaseManager(String NAME, File SQLConfigFile) {
+        super(NAME, SQLConfigFile);
 
         startThread();
-    }
-
-    @Override
-    protected DatabaseConnection createConnection(String NAME, File dataFolder) throws Exception {
-
-        File configFile = new File(dataFolder, "sqlconfig.yml");
-        if (!configFile.exists()) {
-            DatabaseUtils.createDatabaseConfig(DatabaseType.MySQL, configFile, NAME);
-            return null;
-        }
-        YamlConfiguration config = new YamlConfiguration();
-        config.load(configFile);
-
-        return new DatabaseConnection(NAME, config.getString("Host"), config.getString("Port"), config.getString("Database"), config.getString("User"), config.getString("Password"));
     }
 
     @Override

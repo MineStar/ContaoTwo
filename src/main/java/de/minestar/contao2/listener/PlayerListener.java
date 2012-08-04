@@ -25,7 +25,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerChatEvent;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -125,7 +125,7 @@ public class PlayerListener implements Listener {
 
     // ON PLAYER CHAT
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onPlayerChat(PlayerChatEvent event) {
+    public void onPlayerChat(AsyncPlayerChatEvent event) {
         // EVENT IS CANCELLED? => RETURN
         if (event.isCancelled())
             return;
@@ -171,6 +171,7 @@ public class PlayerListener implements Listener {
 
         event.setMessage(prefixColor + prefix + col + player.getDisplayName() + ChatColor.WHITE + ": " + event.getMessage());
     }
+
     @EventHandler
     public void onPlayerChangedGroup(PlayerChangedGroupEvent event) {
         this.playerManager.movePlayer(event);

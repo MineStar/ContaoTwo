@@ -81,7 +81,7 @@ public class Core extends AbstractCore {
     @Override
     protected boolean createManager() {
 
-        this.databaseManager = new DatabaseManager(NAME, getDataFolder());
+        this.databaseManager = new DatabaseManager(NAME, new File(getDataFolder(),"sqlconfig.yml"));
         this.playerManager = new PlayerManager();
         this.statisticManager = new StatisticManager(this.databaseManager);
         this.databaseManager.initManager(this.playerManager, this.statisticManager);
