@@ -125,11 +125,15 @@ public class PlayerManager {
 
     public void updateOnlineLists() {
         StringBuilder sBuilder = new StringBuilder();
+        Player player;
         for (Map.Entry<ContaoGroup, HashSet<String>> entry : this.groupMap.entrySet()) {
             sBuilder.setLength(0);
             for (String thisPlayer : entry.getValue()) {
-                sBuilder.append(thisPlayer);
-                sBuilder.append(", ");
+                player = Bukkit.getPlayer(thisPlayer);
+                if (player != null && player.isOnline()) {
+                    sBuilder.append(thisPlayer);
+                    sBuilder.append(", ");
+                }
             }
             if (sBuilder.length() > 2)
                 sBuilder.delete(sBuilder.length() - 2, sBuilder.length());
@@ -138,7 +142,6 @@ public class PlayerManager {
         }
         this.saveJSON();
     }
-
     private void addPlayer(String playerName) {
         // GET GROUP & PLAYER
         MinestarPlayer thisPlayer = MinestarCore.getPlayer(playerName);
