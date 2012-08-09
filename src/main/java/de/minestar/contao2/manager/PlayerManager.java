@@ -142,6 +142,7 @@ public class PlayerManager {
         }
         this.saveJSON();
     }
+
     private void addPlayer(String playerName) {
         // GET GROUP & PLAYER
         MinestarPlayer thisPlayer = MinestarCore.getPlayer(playerName);
