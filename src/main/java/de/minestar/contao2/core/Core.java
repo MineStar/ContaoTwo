@@ -19,8 +19,6 @@
 package de.minestar.contao2.core;
 
 import java.io.File;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.scheduler.BukkitScheduler;
@@ -79,7 +77,7 @@ public class Core extends AbstractCore {
     @Override
     protected boolean createManager() {
 
-        this.databaseManager = new DatabaseManager(NAME, new File(getDataFolder(),"sqlconfig.yml"));
+        this.databaseManager = new DatabaseManager(NAME, new File(getDataFolder(), "sqlconfig.yml"));
         this.playerManager = new PlayerManager();
         this.statisticManager = new StatisticManager(this.databaseManager);
         this.databaseManager.initManager(this.playerManager, this.statisticManager);
@@ -147,6 +145,7 @@ public class Core extends AbstractCore {
 
         return true;
     }
+
     @Override
     protected boolean commonDisable() {
         if (databaseManager != null) {
@@ -155,18 +154,5 @@ public class Core extends AbstractCore {
         }
 
         return true;
-    }
-
-    // VALIDATE DATE
-    public static boolean validateDate(String date) {
-
-        SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy");
-        format.setLenient(false);
-        try {
-            format.parse(date.trim());
-            return true;
-        } catch (ParseException pe) {
-            return false;
-        }
     }
 }

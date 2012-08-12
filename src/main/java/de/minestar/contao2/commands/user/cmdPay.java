@@ -18,6 +18,8 @@
 
 package de.minestar.contao2.commands.user;
 
+import java.text.SimpleDateFormat;
+
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
@@ -53,11 +55,17 @@ public class cmdPay extends AbstractCommand {
         addPay(args, console);
     }
 
+    private final static SimpleDateFormat FORMAT = new SimpleDateFormat("dd.MM.yyyy");
+
+    static {
+        FORMAT.setLenient(false);
+    }
+
     private void addPay(String[] args, CommandSender sender) {
 
         String date = args[1];
         // if date is not in dd.MM.yyyy format
-        if (!Core.validateDate(date))
+        if (!validateDate(date))
             return;
 
         MCUser user = databaseManager.getIngameData(args[0]);
@@ -82,5 +90,14 @@ public class cmdPay extends AbstractCommand {
 
         // UPDATE GROUPMANAGER-GROUP
         this.playerManager.updateGroupManagerGroup(ingameName, ContaoGroup.PAY);
+    }
+
+    private boolean validateDate(String date) {
+        try {
+            FORMAT.parse(date);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }
