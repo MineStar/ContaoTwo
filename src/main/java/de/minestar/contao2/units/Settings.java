@@ -98,7 +98,7 @@ public class Settings {
         kickedForPayMsg = config.getString("messages.disconnectedMSG");
 
         // MESSAGE SEND TO FREE PLAYER WHEN THERE IS NO FREE SLOT AVAILABLE
-        noFreeSlotsMsg = config.getString("messages.moFreeSlotsMSG");
+        noFreeSlotsMsg = config.getString("messages.noFreeSlotsMSG");
 
         // THE MESSAGE OF THE DAY
         motd = config.getString("messages.MOTD");
