@@ -129,7 +129,7 @@ public class Settings {
 
     public static void setFreeSlots(int freeSlots) {
         Settings.freeSlots = freeSlots;
-        config.set("publicSlots", freeSlots);
+        config.set("slots.publicSlots", freeSlots);
         try {
             config.save(configFile);
         } catch (Exception e) {
@@ -143,7 +143,7 @@ public class Settings {
 
     public static void setMaxSlots(int maxSlots) {
         Settings.maxSlots = maxSlots;
-        config.set("maxSlots", maxSlots);
+        config.set("slots.maxSlots", maxSlots);
         try {
             config.save(configFile);
         } catch (Exception e) {
