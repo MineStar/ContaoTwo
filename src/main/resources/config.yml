@@ -34,5 +34,8 @@ colors:
     probe: '5'
     default: '7'
     x: '7'
+mod:
+    prefix: '|M|'
+    prefixColor: 'c'
 common:
     userStatsFile: userstats.json
