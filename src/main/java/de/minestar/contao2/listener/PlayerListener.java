@@ -28,17 +28,22 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerPreLoginEvent;
+import org.bukkit.event.player.PlayerPreLoginEvent.Result;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import de.minestar.contao2.manager.DatabaseManager;
 import de.minestar.contao2.manager.PlayerManager;
 import de.minestar.contao2.manager.StatisticManager;
+import de.minestar.contao2.statistics.FreeLoginFailStat;
+import de.minestar.contao2.statistics.LoginStat;
+import de.minestar.contao2.statistics.LogoutStat;
 import de.minestar.contao2.units.ContaoGroup;
 import de.minestar.contao2.units.Settings;
 import de.minestar.core.MinestarCore;
 import de.minestar.core.units.MinestarGroup;
 import de.minestar.core.units.MinestarPlayer;
 import de.minestar.minestarlibrary.events.PlayerChangedGroupEvent;
+import de.minestar.minestarlibrary.stats.StatisticHandler;
 import de.minestar.minestarlibrary.utils.PlayerUtils;
 
 public class PlayerListener implements Listener {
@@ -91,12 +96,16 @@ public class PlayerListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOW)
     public void onPlayerPreLogin(PlayerPreLoginEvent event) {
+
         // GET MINESTAR-PLAYER
         MinestarPlayer thisPlayer = MinestarCore.getPlayer(event.getName());
 
         // IGNORE ADMINS
-        if (thisPlayer.getMinestarGroup().equals(MinestarGroup.ADMIN))
+        if (thisPlayer.getMinestarGroup().equals(MinestarGroup.ADMIN)) {
+            // FIRE STATISTIC
+            StatisticHandler.handleStatistic(new LoginStat(event.getName(), MinestarGroup.ADMIN.getName(), true));
             return;
+        }
 
         // SAVE OLD GROUP
         this.oldGroups.put(event.getName(), ContaoGroup.getGroup(thisPlayer.getGroup()));
@@ -107,10 +116,15 @@ public class PlayerListener implements Listener {
         // PERFORM CHECK FOR FREE SPACE
         if (thisPlayer.getGroup().equalsIgnoreCase(ContaoGroup.FREE.getName())) {
             if (this.playerManager.getFreeSlots() < 1) {
-                event.setKickMessage(Settings.getNoFreeSlotsMsg());
-                event.setResult(PlayerPreLoginEvent.Result.KICK_OTHER);
+                event.disallow(Result.KICK_FULL, Settings.getNoFreeSlotsMsg());
+
+                // FIRE STATISTIC
+                StatisticHandler.handleStatistic(new FreeLoginFailStat(event.getName()));
             }
         }
+
+        // FIRE STATISTIC
+        StatisticHandler.handleStatistic(new LoginStat(event.getName(), MinestarCore.getPlayer(event.getName()).getGroup(), event.getResult().equals(Result.ALLOWED)));
     }
 
     @EventHandler(priority = EventPriority.LOW)
@@ -121,6 +135,9 @@ public class PlayerListener implements Listener {
     private void onPlayerDisconnect(Player player) {
         this.playerManager.removePlayer(player.getName());
         this.playerManager.updateOnlineLists();
+
+        // FIRE STATISTIC
+        StatisticHandler.handleStatistic(new LogoutStat(player.getName(), MinestarCore.getPlayer(player).getGroup()));
     }
 
     // ON PLAYER CHAT

@@ -37,11 +37,13 @@ import org.json.simple.JSONObject;
 import com.bukkit.gemo.utils.UtilPermissions;
 
 import de.minestar.contao2.core.Core;
+import de.minestar.contao2.statistics.GroupChangeStat;
 import de.minestar.contao2.units.ContaoGroup;
 import de.minestar.contao2.units.Settings;
 import de.minestar.core.MinestarCore;
 import de.minestar.core.units.MinestarPlayer;
 import de.minestar.minestarlibrary.events.PlayerChangedGroupEvent;
+import de.minestar.minestarlibrary.stats.StatisticHandler;
 import de.minestar.minestarlibrary.utils.ChatUtils;
 import de.minestar.minestarlibrary.utils.ConsoleUtils;
 
@@ -91,7 +93,6 @@ public class PlayerManager {
         ChatUtils.writeMessage(sender, ChatColor.GOLD + "" + Bukkit.getOnlinePlayers().length + " / " + Bukkit.getMaxPlayers());
         // WRITE GROUPS
         this.printSingleGroup(Settings.getAdminColor(), ContaoGroup.ADMIN, sender);
-        // TODO: Implement other things for mod
         this.printSingleGroup(Settings.getPayColor(), ContaoGroup.PAY, sender);
         this.printSingleGroup(Settings.getFreeColor(), ContaoGroup.FREE, sender);
         this.printSingleGroup(Settings.getProbeColor(), ContaoGroup.PROBE, sender);
@@ -112,6 +113,7 @@ public class PlayerManager {
         String oldGroupName = MinestarCore.getPlayer(playerName).getGroup();
         // FINALLY CHANGE THE GROUP
         String newGroup = MinestarCore.getPlayer(playerName).setGroup(groupName);
+
         this.updatePlayer(playerName);
         this.updateOnlineLists();
 
@@ -120,6 +122,10 @@ public class PlayerManager {
             PlayerChangedGroupEvent event = new PlayerChangedGroupEvent(playerName, oldGroupName, newGroup);
             Bukkit.getServer().getPluginManager().callEvent(event);
         }
+
+        // FIRE STATISTIC
+        StatisticHandler.handleStatistic(new GroupChangeStat(playerName, oldGroupName, newGroup));
+
         return newGroup;
     }
 

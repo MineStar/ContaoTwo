@@ -44,10 +44,17 @@ import de.minestar.contao2.listener.StatisticListener;
 import de.minestar.contao2.manager.DatabaseManager;
 import de.minestar.contao2.manager.PlayerManager;
 import de.minestar.contao2.manager.StatisticManager;
+import de.minestar.contao2.statistics.FreeLoginFailStat;
+import de.minestar.contao2.statistics.GroupChangeStat;
+import de.minestar.contao2.statistics.LoginStat;
+import de.minestar.contao2.statistics.LogoutStat;
 import de.minestar.contao2.units.Settings;
 import de.minestar.minestarlibrary.AbstractCore;
+import de.minestar.minestarlibrary.annotations.UseStatistic;
 import de.minestar.minestarlibrary.commands.CommandList;
+import de.minestar.minestarlibrary.stats.StatisticHandler;
 
+@UseStatistic
 public class Core extends AbstractCore {
 
     public static final String NAME = "ContaoTwo";
@@ -142,6 +149,17 @@ public class Core extends AbstractCore {
                 )
         );
         //@formatter:on
+
+        return true;
+    }
+
+    @Override
+    protected boolean registerStatistics() {
+
+        StatisticHandler.registerStatistic(GroupChangeStat.class);
+        StatisticHandler.registerStatistic(LoginStat.class);
+        StatisticHandler.registerStatistic(LogoutStat.class);
+        StatisticHandler.registerStatistic(FreeLoginFailStat.class);
 
         return true;
     }
