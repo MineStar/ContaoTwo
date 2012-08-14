@@ -18,5 +18,5 @@ commands:
     description: Bla bla
     usage: /stats
   payweek:
-    description: Gutschein einlösen
+    description: Gutschein einloesen
     usage: /payweek
