@@ -25,6 +25,7 @@ import org.bukkit.scheduler.BukkitScheduler;
 
 import de.minestar.contao2.commands.list.cmdList;
 import de.minestar.contao2.commands.ppay.cmdPPay;
+import de.minestar.contao2.commands.ppay.cmdPayWeek;
 import de.minestar.contao2.commands.ppay.cmdSet;
 import de.minestar.contao2.commands.user.cmdAddProbeTime;
 import de.minestar.contao2.commands.user.cmdAddWarning;
@@ -127,6 +128,8 @@ public class Core extends AbstractCore {
                 new cmdList             ("/who",        "[PlayerName]",                 "",                         this.playerManager),
                 new cmdList             ("/list",       "[PlayerName]",                 "",                         this.playerManager),
                 new cmdList             ("/online",     "[PlayerName]",                 "",                         this.playerManager),
+                
+                new cmdPayWeek          ("/payweek",     "",                            "",                         this.playerManager, this.databaseManager),                
                 
                 new cmdStatus           ("/stats",      "",                             "",                         this.databaseManager, this.statisticManager),
 

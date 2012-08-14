@@ -73,6 +73,7 @@ public class DatabaseManager extends AbstractMySQLHandler {
     private PreparedStatement saveStatistics;
 
     private PreparedStatement canBeFree;
+    private PreparedStatement hasUsedFreeWeek, setFreeWeekUsed;
 
     public DatabaseManager(String NAME, File SQLConfigFile) {
         super(NAME, SQLConfigFile);
@@ -131,6 +132,35 @@ public class DatabaseManager extends AbstractMySQLHandler {
         saveStatistics = con.prepareStatement("UPDATE mc_pay SET totalPlaced = ?, totalBreak = ? WHERE minecraft_nick = ?");
 
         canBeFree = con.prepareStatement("SELECT 1 FROM mc_pay WHERE contao_user_id = ? AND totalBreak + totalPlaced >= 10000 AND DATEDIFF(NOW(), probeEndDate) >= 7");
+
+        hasUsedFreeWeek = con.prepareStatement("SELECT usedFreePayWeek FROM mc_pay WHERE minecraft_nick = ?");
+
+        setFreeWeekUsed = con.prepareStatement("UPDATE mc_pay SET usedFreePayWeek = 1 WHERE minecraft_nick = ?");
+    }
+
+    public boolean hasUsedFreeWeek(String playerName) {
+        // SELECT usedFreePayWeek FROM mc_pay WHERE minecraft_nick = ?
+        try {
+            hasUsedFreeWeek.setString(1, playerName);
+            ResultSet result = hasUsedFreeWeek.executeQuery();
+            if (result.next()) {
+                return result.getBoolean("usedFreePayWeek");
+            }
+            return true;
+        } catch (Exception e) {
+            ConsoleUtils.printException(e, Core.NAME, "Can't fetch results for hasUsedFreeWeek! PlayerName=" + playerName);
+        }
+        return true;
+    }
+
+    public void setFreeWeekUsed(String playerName) {
+        // SELECT usedFreePayWeek FROM mc_pay WHERE minecraft_nick = ?
+        try {
+            setFreeWeekUsed.setString(1, playerName);
+            setFreeWeekUsed.executeUpdate();
+        } catch (Exception e) {
+            ConsoleUtils.printException(e, Core.NAME, "Can't update hasUsedFreeWeek! PlayerName=" + playerName);
+        }
     }
 
     public void addProbe(String playerName, int contaoID, String expDate, String modPlayer) {
