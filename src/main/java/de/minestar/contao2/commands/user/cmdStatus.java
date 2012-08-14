@@ -33,6 +33,7 @@ import de.minestar.contao2.units.MCWarning;
 import de.minestar.contao2.units.PlayerWarnings;
 import de.minestar.contao2.units.Statistic;
 import de.minestar.core.MinestarCore;
+import de.minestar.core.units.MinestarGroup;
 import de.minestar.core.units.MinestarPlayer;
 import de.minestar.minestarlibrary.commands.AbstractExtendedCommand;
 import de.minestar.minestarlibrary.utils.ChatUtils;
@@ -66,9 +67,15 @@ public class cmdStatus extends AbstractExtendedCommand {
     }
 
     private void getStatus(String targetName, CommandSender sender) {
+        // DISPLAY X REASON FOR X-USER
+        if (MinestarCore.getPlayer(targetName).getMinestarGroup().equals(MinestarGroup.X)) {
+            printXReason(sender, targetName);
+            return;
+        }
 
         MCUser user = databaseManager.getIngameData(targetName);
         if (user == null) {
+            // USER IS NOT A X USER AND NOT IN DATABASE
             ChatUtils.writeError(sender, pluginName, "Der Spieler '" + targetName + "' befindet sich nicht in der Datenbank!");
             return;
         }
@@ -81,7 +88,7 @@ public class cmdStatus extends AbstractExtendedCommand {
         printAccountDates(sender, targetName);
         printWarnings(sender, targetName);
         printStatistics(sender, targetName);
-        printXReason(sender, targetName);
+
     }
 
     private void printGroup(CommandSender caller, String playerName, int contaoID) {
@@ -138,7 +145,11 @@ public class cmdStatus extends AbstractExtendedCommand {
         MinestarPlayer mPlayer = MinestarCore.getPlayer(targetName);
         String xReason = mPlayer.getString("contao.xreason");
         if (xReason != null) {
-            ChatUtils.writeInfo(sender, "X-User Grund: " + xReason);
+            // ONLY PEOPLE WITH ENOUGH PERMISSION CAN SEE THE REASON
+            // (FOR EXAMPLE MODS AND ADMINS)
+            if (sender instanceof Player && MinestarCore.getPlayer((Player) sender).getMinestarGroup().isGroupHigher(MinestarGroup.PAY))
+                ChatUtils.writeInfo(sender, "X-User Grund: " + xReason);
+
             ChatUtils.writeInfo(sender, "X-User Admin: " + mPlayer.getString("contao.xadmin"));
         }
     }
