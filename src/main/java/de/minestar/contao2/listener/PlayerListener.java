@@ -116,7 +116,7 @@ public class PlayerListener implements Listener {
         // PERFORM CHECK FOR FREE SPACE
         if (thisPlayer.getGroup().equalsIgnoreCase(ContaoGroup.FREE.getName())) {
             if (this.playerManager.getFreeSlots() < 1) {
-                event.disallow(Result.KICK_FULL, Settings.getNoFreeSlotsMsg());
+                event.disallow(Result.KICK_OTHER, Settings.getNoFreeSlotsMsg());
 
                 // FIRE STATISTIC
                 StatisticHandler.handleStatistic(new FreeLoginFailStat(event.getName()));
