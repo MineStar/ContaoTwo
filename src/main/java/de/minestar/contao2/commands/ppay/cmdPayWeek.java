@@ -58,7 +58,7 @@ public class cmdPayWeek extends AbstractExtendedCommand {
         }
 
         // GET CONTAOUSER
-        MCUser user = databaseManager.getIngameData(args[0]);
+        MCUser user = databaseManager.getIngameData(player.getName());
         if (user == null) {
             PlayerUtils.sendError(player, Core.NAME, "Fehler: Minecraftnick nicht gefunden");
             return;

@@ -89,7 +89,7 @@ public class DatabaseManager extends AbstractMySQLHandler {
     @Override
     protected void createStatements(String NAME, Connection con) throws Exception {
 
-        insertMCPay = con.prepareStatement("INSERT INTO mc_pay (contao_user_id, minecraft_nick, expire_date, admin_nick, startDate, probeEndDate) VALUES (?,?,STR_TO_DATE(?,'%d.%m.%Y'),?, NOW(), ADDDATE(NOW(), INTERVAL 14 DAY))");
+        insertMCPay = con.prepareStatement("INSERT INTO mc_pay (contao_user_id, minecraft_nick, expire_date, admin_nick, startDate, probeEndDate, usedFreePayWeek) VALUES (?,?,STR_TO_DATE(?,'%d.%m.%Y'),?, NOW(), ADDDATE(NOW(), INTERVAL 14 DAY), ?)");
 
         updateExpireDate = con.prepareStatement("UPDATE mc_pay SET expire_date = STR_TO_DATE(?,'%d.%m.%Y') WHERE contao_user_id = ?");
 
@@ -174,6 +174,7 @@ public class DatabaseManager extends AbstractMySQLHandler {
             insertMCPay.setString(2, playerName);
             insertMCPay.setString(3, expDate);
             insertMCPay.setString(4, modPlayer);
+            insertMCPay.setBoolean(5, false);
             insertMCPay.executeUpdate();
         } catch (Exception e) {
             ConsoleUtils.printException(e, Core.NAME, "Can't insert data in the mc_pay table! PlayerName=" + playerName + ",ContaoID=" + contaoID + ",ExpDate=" + expDate + ",modPlayer=" + modPlayer);
