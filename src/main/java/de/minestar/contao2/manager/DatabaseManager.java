@@ -30,10 +30,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 
-import org.bukkit.Bukkit;
-
 import de.minestar.contao2.core.Core;
-import de.minestar.contao2.threading.PingThread;
 import de.minestar.contao2.units.ContaoGroup;
 import de.minestar.contao2.units.MCUser;
 import de.minestar.contao2.units.MCWarning;
@@ -77,8 +74,6 @@ public class DatabaseManager extends AbstractMySQLHandler {
 
     public DatabaseManager(String NAME, File SQLConfigFile) {
         super(NAME, SQLConfigFile);
-
-        startThread();
     }
 
     @Override
@@ -618,13 +613,5 @@ public class DatabaseManager extends AbstractMySQLHandler {
      */
     public StatisticManager getsManager() {
         return sManager;
-    }
-
-    private void startThread() {
-        Runnable pingThread = new PingThread(this.dbConnection.getConnection());
-
-        Bukkit.getScheduler().scheduleSyncRepeatingTask(Core.INSTANCE, pingThread, 20L * 10L, 20L * 10L);
-
-        ConsoleUtils.printInfo(Core.NAME, "Started ping thread for database connection.");
     }
 }
