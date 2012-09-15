@@ -60,7 +60,7 @@ public enum ContaoGroup {
                 return group;
         return ContaoGroup.DEFAULT;
     }
-    
+
     public boolean isHigher(ContaoGroup that) {
         return this.ordinal() < that.ordinal();
     }

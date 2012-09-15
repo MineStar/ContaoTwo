@@ -20,9 +20,14 @@ package de.minestar.contao2.commands.user;
 
 import java.util.List;
 
+import net.minecraft.server.BanEntry;
+import net.minecraft.server.BanList;
+
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.entity.Player;
 
 import de.minestar.contao2.core.Core;
@@ -70,6 +75,7 @@ public class cmdStatus extends AbstractExtendedCommand {
         // DISPLAY X REASON FOR X-USER
         if (MinestarCore.getPlayer(targetName).getMinestarGroup().equals(MinestarGroup.X)) {
             printXReason(sender, targetName);
+            printBanned(sender, targetName);
             return;
         }
 
@@ -88,7 +94,21 @@ public class cmdStatus extends AbstractExtendedCommand {
         printAccountDates(sender, targetName);
         printWarnings(sender, targetName);
         printStatistics(sender, targetName);
+        printBanned(sender, targetName);
 
+    }
+
+    private void printBanned(CommandSender sender, String targetName) {
+        CraftServer cServer = (CraftServer) Bukkit.getServer();
+        BanList banlist = cServer.getHandle().getNameBans();
+        if (banlist.isBanned(targetName)) {
+            BanEntry banEntry = (BanEntry) banlist.getEntries().get(targetName);
+            if (banEntry != null) {
+                ChatUtils.writeInfo(sender, "Der Spieler ist gebannt (Grund: " + banEntry.getReason() + " , von: " + banEntry.getSource() + ")!");
+            } else {
+                ChatUtils.writeInfo(sender, "Der Spieler ist gebannt!");
+            }
+        }
     }
 
     private void printGroup(CommandSender caller, String playerName, int contaoID) {
@@ -151,6 +171,8 @@ public class cmdStatus extends AbstractExtendedCommand {
                 ChatUtils.writeInfo(sender, "X-User Grund: " + xReason);
 
             ChatUtils.writeInfo(sender, "X-User Admin: " + mPlayer.getString("contao.xadmin"));
+        } else {
+            ChatUtils.writeError(sender, "Kein X-Grund gefunden!");
         }
     }
 }
