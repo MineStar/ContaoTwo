@@ -83,6 +83,7 @@ public class cmdStatus extends AbstractExtendedCommand {
         if (user == null) {
             // USER IS NOT A X USER AND NOT IN DATABASE
             ChatUtils.writeError(sender, pluginName, "Der Spieler '" + targetName + "' befindet sich nicht in der Datenbank!");
+            this.printBanned(sender, targetName);
             return;
         }
 
@@ -108,6 +109,8 @@ public class cmdStatus extends AbstractExtendedCommand {
             } else {
                 ChatUtils.writeInfo(sender, "Der Spieler ist gebannt!");
             }
+        } else {
+            ChatUtils.writeInfo(sender, "Der Spieler ist nicht gebannt!");
         }
     }
 
