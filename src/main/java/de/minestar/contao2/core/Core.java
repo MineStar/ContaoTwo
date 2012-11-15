@@ -112,6 +112,8 @@ public class Core extends AbstractCore {
         pm.registerEvents(this.blockListener, this);
         pm.registerEvents(this.fakePlayerListener, this);
 
+        System.out.println("folder: " + this.getDataFolder());
+
         return true;
     }
 

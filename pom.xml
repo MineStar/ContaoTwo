@@ -20,24 +20,14 @@
 	</distributionManagement>
 	<dependencies>
 		<dependency>
-			<groupId>org.bukkit</groupId>
-			<artifactId>bukkit</artifactId>
-			<version>1.4.2-R0.1-20121031.075117-14</version>
-		</dependency>
-		<dependency>
 			<groupId>de.minestar</groupId>
 			<artifactId>MinestarCore</artifactId>
-			<version>1.6.4</version>
-		</dependency>
-		<dependency>
-			<groupId>de.minestar</groupId>
-			<artifactId>FalseBookCore</artifactId>
-			<version>0.92.3alpha</version>
+			<version>1.7</version>
 		</dependency>
 		<dependency>
 			<groupId>de.minestar</groupId>
 			<artifactId>minestarlibrary</artifactId>
-			<version>1.9</version>
+			<version>1.9.2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.anjocaido.groupmanager</groupId>
