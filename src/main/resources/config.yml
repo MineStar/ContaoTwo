@@ -39,3 +39,6 @@ mod:
     prefixColor: 'c'
 common:
     userStatsFile: userstats.json
+forgeAPI:
+    enabled: false
+    URL: "localhost:9000/REST/contao"

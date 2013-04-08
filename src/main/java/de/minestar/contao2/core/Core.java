@@ -19,9 +19,17 @@
 package de.minestar.contao2.core;
 
 import java.io.File;
+import java.lang.reflect.Method;
 
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.scheduler.BukkitScheduler;
+import org.glassfish.grizzly.http.server.HttpServer;
+
+import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
+import com.sun.jersey.api.core.PackagesResourceConfig;
+import com.sun.jersey.api.core.ResourceConfig;
 
 import de.minestar.contao2.commands.list.cmdList;
 import de.minestar.contao2.commands.ppay.cmdPPay;
@@ -56,6 +64,7 @@ import de.minestar.minestarlibrary.AbstractCore;
 import de.minestar.minestarlibrary.annotations.UseStatistic;
 import de.minestar.minestarlibrary.commands.CommandList;
 import de.minestar.minestarlibrary.stats.StatisticHandler;
+import de.minestar.minestarlibrary.utils.ConsoleUtils;
 
 @UseStatistic
 public class Core extends AbstractCore {
@@ -68,7 +77,7 @@ public class Core extends AbstractCore {
     }
 
     /** Manager */
-    private PlayerManager playerManager;
+    public PlayerManager playerManager;
     private StatisticManager statisticManager;
     private DatabaseManager databaseManager;
 
@@ -78,6 +87,9 @@ public class Core extends AbstractCore {
     private FakePlayerListener fakePlayerListener;
 
     public static Core INSTANCE;
+
+    /** Forge API */
+    private static HttpServer httpServer;
 
     @Override
     protected boolean loadingConfigs(File dataFolder) {
@@ -174,10 +186,31 @@ public class Core extends AbstractCore {
     }
 
     @Override
+    protected boolean commonEnable() {
+
+        if (Settings.isForgeEnabled()) {
+            try {
+                ResourceConfig rc = new PackagesResourceConfig("com.sun.jersey.server.spi.container", "de.minestar.contao2.forgeAPI");
+                httpServer = GrizzlyServerFactory.createHttpServer(Settings.getForgeRESTURL(), rc);
+//                httpServer = GrizzlyServerFactory.createHttpServer(Settings.getForgeRESTURL());
+            } catch (Exception e) {
+                ConsoleUtils.printException(e, getName(), "Can't start a HTTP Server for the REST API");
+//                httpServer = null;
+//                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
     protected boolean commonDisable() {
         if (databaseManager != null) {
             statisticManager.saveAllStatistics();
             databaseManager.closeConnection();
+        }
+
+        if (Settings.isForgeEnabled() && httpServer != null) {
+            httpServer.stop();
         }
 
         return true;

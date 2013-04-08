@@ -53,6 +53,9 @@ public class Settings {
     private static String modPrefix;
     private static ChatColor modPrefixColor;
 
+    private static boolean isForgeEnabled;
+    private static String forgeRESTURL;
+
     /* USED FOR SETTING */
 
     private static MinestarConfig config;
@@ -125,6 +128,10 @@ public class Settings {
         /* MOD PREFIX */
         modPrefix = config.getString("mod.prefix");
         modPrefixColor = ChatColor.getByChar(config.getString("mod.prefixColor"));
+
+        /* FORGE REST API */
+        isForgeEnabled = config.getBoolean("forgeAPI.enabled");
+        forgeRESTURL = config.getString("forgeAPI.URL");
     }
 
     public static int getFreeSlots() {
@@ -217,4 +224,12 @@ public class Settings {
         return modPrefixColor;
     }
 
+    /* FORGE API */
+    public static boolean isForgeEnabled() {
+        return isForgeEnabled;
+    }
+
+    public static String getForgeRESTURL() {
+        return forgeRESTURL;
+    }
 }

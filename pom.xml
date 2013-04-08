@@ -43,6 +43,21 @@
 			<artifactId>GroupManager</artifactId>
 			<version>1.0-Alpha-5</version>
 		</dependency>
+		<dependency>
+			<groupId>com.sun.jersey</groupId>
+			<artifactId>jersey-server</artifactId>
+			<version>1.17.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.sun.jersey</groupId>
+			<artifactId>jersey-grizzly2</artifactId>
+			<version>1.17</version>
+		</dependency>
+		<dependency>
+		    <groupId>com.sun.jersey</groupId>
+		    <artifactId>jersey-client</artifactId>
+		    <version>1.17</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -52,5 +67,40 @@
 				<filtering>true</filtering>
 			</resource>
 		</resources>
+
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>2.0</version>
+				<configuration>
+				<transformers>
+   					<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+	     				<manifestEntries>
+		      				<Main-Class>de.minestar.contao2.core.Core</Main-Class>
+		      				<Build-Number>1</Build-Number>
+	     				</manifestEntries>
+    				</transformer>
+                    <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+  				</transformers>
+					<artifactSet>
+						<includes>
+							<include>com.sun.jersey:*</include>
+							<include>com.sun.ws.rs:*</include>
+							<include>org.glassfish.grizzly:*</include>
+							<include>asm:*</include>
+						</includes>
+					</artifactSet>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
 	</build>
 </project>
