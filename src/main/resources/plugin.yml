@@ -2,7 +2,7 @@ name: ContaoTwo
 main: de.minestar.contao2.core.Core
 version: ${pom.version}
 softdepend: [Illuminati]
-depend: [GroupManager, MinestarCore, MineStarLibrary]
+depend: [GroupManager, MinestarCore, MineStarLibrary, BungeeBridge]
 commands:
   user:
     description: Contao related commands

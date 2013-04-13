@@ -22,10 +22,11 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
+import de.minestar.bungeebridge.core.BungeeBridgeCore;
+import de.minestar.bungeebridge.statistics.MCWarning;
+import de.minestar.bungeebridge.statistics.PlayerWarnings;
 import de.minestar.contao2.core.Core;
 import de.minestar.contao2.manager.DatabaseManager;
-import de.minestar.contao2.units.MCWarning;
-import de.minestar.contao2.units.PlayerWarnings;
 import de.minestar.minestarlibrary.commands.AbstractCommand;
 import de.minestar.minestarlibrary.utils.ChatUtils;
 
@@ -64,7 +65,7 @@ public class cmdRemoveWarning extends AbstractCommand {
             return;
         }
 
-        PlayerWarnings warnings = databaseManager.getsManager().getWarnings(playerName);
+        PlayerWarnings warnings = databaseManager.getStatisticManager().getWarnings(playerName);
         if (warnings == null) {
             ChatUtils.writeError(sender, pluginName, "Spieler '" + playerName + "' hat keine Verwarnungen!");
             return;
@@ -76,8 +77,8 @@ public class cmdRemoveWarning extends AbstractCommand {
             return;
         }
 
-        if (databaseManager.removeWarning(playerName, warning.getDate())) {
-            databaseManager.getsManager().getWarnings(playerName).removeWarning(warningNumber);
+        if (BungeeBridgeCore.getDatabaseManager().removeWarning(playerName, warning.getDate())) {
+            databaseManager.getStatisticManager().getWarnings(playerName).removeWarning(warningNumber);
             ChatUtils.writeSuccess(sender, pluginName, "Verwarnung wurde erfolgreich gelöscht!");
         } else
             ChatUtils.writeError(sender, pluginName, "Fehler beim löschen der Verwarnung!");

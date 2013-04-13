@@ -23,6 +23,8 @@ import java.io.File;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.scheduler.BukkitScheduler;
 
+import de.minestar.bungeebridge.core.BungeeBridgeCore;
+import de.minestar.bungeebridge.manager.StatisticManager;
 import de.minestar.contao2.commands.list.cmdList;
 import de.minestar.contao2.commands.ppay.cmdPPay;
 import de.minestar.contao2.commands.ppay.cmdPayWeek;
@@ -43,10 +45,8 @@ import de.minestar.contao2.commands.user.cmdUser;
 import de.minestar.contao2.commands.user.cmdX;
 import de.minestar.contao2.listener.FakePlayerListener;
 import de.minestar.contao2.listener.PlayerListener;
-import de.minestar.contao2.listener.StatisticListener;
 import de.minestar.contao2.manager.DatabaseManager;
 import de.minestar.contao2.manager.PlayerManager;
-import de.minestar.contao2.manager.StatisticManager;
 import de.minestar.contao2.statistics.FreeLoginFailStat;
 import de.minestar.contao2.statistics.GroupChangeStat;
 import de.minestar.contao2.statistics.LoginStat;
@@ -74,7 +74,6 @@ public class Core extends AbstractCore {
 
     /** Listener */
     private PlayerListener connectionListener;
-    private StatisticListener blockListener;
     private FakePlayerListener fakePlayerListener;
 
     public static Core INSTANCE;
@@ -89,7 +88,7 @@ public class Core extends AbstractCore {
 
         this.databaseManager = new DatabaseManager(NAME, new File(getDataFolder(), "sqlconfig.yml"));
         this.playerManager = new PlayerManager();
-        this.statisticManager = new StatisticManager(this.databaseManager);
+        this.statisticManager = BungeeBridgeCore.getStatisticManager();
         this.databaseManager.initManager(this.playerManager, this.statisticManager);
 
         return true;
@@ -99,7 +98,6 @@ public class Core extends AbstractCore {
     protected boolean createListener() {
 
         this.connectionListener = new PlayerListener(this.playerManager, this.databaseManager, this.statisticManager);
-        this.blockListener = new StatisticListener(this.statisticManager);
         this.fakePlayerListener = new FakePlayerListener(this.playerManager);
 
         return true;
@@ -109,7 +107,6 @@ public class Core extends AbstractCore {
     protected boolean registerEvents(PluginManager pm) {
 
         pm.registerEvents(this.connectionListener, this);
-        pm.registerEvents(this.blockListener, this);
         pm.registerEvents(this.fakePlayerListener, this);
 
         System.out.println("folder: " + this.getDataFolder());
@@ -119,9 +116,7 @@ public class Core extends AbstractCore {
 
     @Override
     protected boolean startThreads(BukkitScheduler scheduler) {
-
         scheduler.scheduleSyncRepeatingTask(this, this.statisticManager, 20 * 60, 20 * 60);
-
         return true;
     }
 
