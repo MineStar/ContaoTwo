@@ -171,7 +171,6 @@ public class Core extends AbstractCore {
     @Override
     protected boolean commonDisable() {
         if (databaseManager != null) {
-            statisticManager.saveAllStatistics();
             databaseManager.closeConnection();
         }
 
