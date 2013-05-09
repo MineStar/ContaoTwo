@@ -23,7 +23,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
-import de.minestar.bungeebridge.core.BungeeBridgeCore;
 import de.minestar.contao2.core.Core;
 import de.minestar.contao2.manager.DatabaseManager;
 import de.minestar.minestarlibrary.commands.AbstractExtendedCommand;
@@ -51,6 +50,7 @@ public class cmdAddWarning extends AbstractExtendedCommand {
     }
 
     private void addWarning(String[] args, CommandSender sender) {
+
         String playerName = args[0];
 
         if (!databaseManager.isMCNickInMCTable(playerName)) {
@@ -60,7 +60,7 @@ public class cmdAddWarning extends AbstractExtendedCommand {
 
         String text = ChatUtils.getMessage(args, " ", 1);
 
-        if (BungeeBridgeCore.getDatabaseManager().addWarning(playerName, text, sender.getName())) {
+        if (databaseManager.addWarning(playerName, text, sender.getName())) {
             ChatUtils.writeSuccess(sender, pluginName, "Spieler '" + playerName + "' wurde verwarnt!");
             Player target = PlayerUtils.getOnlinePlayer(playerName);
             if (target != null) {

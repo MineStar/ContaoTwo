@@ -30,13 +30,13 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.craftbukkit.v1_5_R2.CraftServer;
 import org.bukkit.entity.Player;
 
-import de.minestar.bungeebridge.manager.StatisticManager;
-import de.minestar.bungeebridge.statistics.MCWarning;
-import de.minestar.bungeebridge.statistics.PlayerWarnings;
-import de.minestar.bungeebridge.statistics.Statistic;
 import de.minestar.contao2.core.Core;
 import de.minestar.contao2.manager.DatabaseManager;
+import de.minestar.contao2.manager.StatisticManager;
 import de.minestar.contao2.units.MCUser;
+import de.minestar.contao2.units.MCWarning;
+import de.minestar.contao2.units.PlayerWarnings;
+import de.minestar.contao2.units.Statistic;
 import de.minestar.core.MinestarCore;
 import de.minestar.core.units.MinestarGroup;
 import de.minestar.core.units.MinestarPlayer;
@@ -46,8 +46,8 @@ import de.minestar.minestarlibrary.utils.ConsoleUtils;
 
 public class cmdStatus extends AbstractExtendedCommand {
 
-    private StatisticManager statisticManager;
     private DatabaseManager databaseManager;
+    private StatisticManager statisticManager;
 
     public cmdStatus(String syntax, String arguments, String node, DatabaseManager databaseManager, StatisticManager statisticManager) {
         super(Core.NAME, syntax, arguments, node);
@@ -96,6 +96,7 @@ public class cmdStatus extends AbstractExtendedCommand {
         printWarnings(sender, targetName);
         printStatistics(sender, targetName);
         printBanned(sender, targetName);
+
     }
 
     private void printBanned(CommandSender sender, String targetName) {
@@ -137,7 +138,8 @@ public class cmdStatus extends AbstractExtendedCommand {
     }
 
     private void printWarnings(CommandSender sender, String playerName) {
-        PlayerWarnings warnings = this.statisticManager.getWarnings(playerName);
+
+        PlayerWarnings warnings = databaseManager.getsManager().getWarnings(playerName);
         // user has no warnings or have in the same session warnings lost
         if (warnings == null || warnings.isEmpty())
             ChatUtils.writeColoredMessage(sender, ChatColor.BLUE, "Keine Verwarnungen. Guter Junge :)");
@@ -151,7 +153,7 @@ public class cmdStatus extends AbstractExtendedCommand {
     }
 
     private void printStatistics(CommandSender sender, String playerName) {
-        Statistic stats = this.statisticManager.getPlayersStatistic(playerName);
+        Statistic stats = statisticManager.getPlayersStatistic(playerName);
 
         if (stats == null)
             ChatUtils.writeColoredMessage(sender, ChatColor.RED, "Hat keine Statistiken!");
@@ -162,6 +164,7 @@ public class cmdStatus extends AbstractExtendedCommand {
     }
 
     private void printXReason(CommandSender sender, String targetName) {
+
         MinestarPlayer mPlayer = MinestarCore.getPlayer(targetName);
         String xReason = mPlayer.getString("contao.xreason");
         if (xReason != null) {

@@ -30,9 +30,9 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import de.minestar.bungeebridge.manager.StatisticManager;
 import de.minestar.contao2.manager.DatabaseManager;
 import de.minestar.contao2.manager.PlayerManager;
+import de.minestar.contao2.manager.StatisticManager;
 import de.minestar.contao2.statistics.FreeLoginFailStat;
 import de.minestar.contao2.statistics.LoginStat;
 import de.minestar.contao2.statistics.LogoutStat;

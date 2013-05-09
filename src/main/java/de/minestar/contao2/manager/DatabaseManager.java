@@ -30,17 +30,19 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 
-import de.minestar.bungeebridge.manager.StatisticManager;
 import de.minestar.contao2.core.Core;
 import de.minestar.contao2.units.ContaoGroup;
 import de.minestar.contao2.units.MCUser;
+import de.minestar.contao2.units.MCWarning;
+import de.minestar.contao2.units.PlayerWarnings;
+import de.minestar.contao2.units.Statistic;
 import de.minestar.minestarlibrary.database.AbstractMySQLHandler;
 import de.minestar.minestarlibrary.utils.ConsoleUtils;
 
 public class DatabaseManager extends AbstractMySQLHandler {
 
     private PlayerManager playerManager;
-    private StatisticManager statisticManager;
+    private StatisticManager sManager;
 
     private PreparedStatement insertMCPay;
     private PreparedStatement updateExpireDate;
@@ -59,6 +61,13 @@ public class DatabaseManager extends AbstractMySQLHandler {
     private PreparedStatement addProbeDate;
     private PreparedStatement isProbeMember;
     private PreparedStatement convertFreeToProbe;
+
+    private PreparedStatement addWarning;
+    private PreparedStatement deleteWarning;
+
+    private PreparedStatement selectAllStatistics;
+    private PreparedStatement selectAllWarnings;
+    private PreparedStatement saveStatistics;
 
     private PreparedStatement canBeFree;
     private PreparedStatement hasUsedFreeWeek, setFreeWeekUsed;
@@ -103,9 +112,19 @@ public class DatabaseManager extends AbstractMySQLHandler {
 
         addProbeDate = con.prepareStatement("UPDATE mc_pay SET probeEndDate = ADDDATE(probeEndDate, INTERVAL ? DAY) WHERE minecraft_nick = ?");
 
+        addWarning = con.prepareStatement("INSERT INTO mc_warning (mc_pay_id,reason,date,adminnickname) VALUES ((SELECT id FROM mc_pay WHERE minecraft_nick = ?), ?, STR_TO_DATE(?,'%d.%m.%Y %H:%i:%s'), ?)");
+
+        selectAllWarnings = con.prepareStatement("SELECT minecraft_nick, mc_warning.reason, DATE_FORMAT(date, '%d.%m.%Y %H:%i:%s'),adminnickname FROM mc_warning,mc_pay WHERE mc_warning.mc_pay_id = mc_pay.id ORDER BY minecraft_nick,mc_warning.date");
+
+        deleteWarning = con.prepareStatement("DELETE FROM mc_warning WHERE mc_pay_id = (SELECT id FROM mc_pay WHERE minecraft_nick = ?) AND DATE_FORMAT(date,'%d.%m.%Y %H:%i:%s') = ?");
+
         isProbeMember = con.prepareStatement("SELECT 1 FROM mc_pay WHERE minecraft_nick = ? AND probeEndDate IS NULL");
 
         isInProbation = con.prepareStatement("SELECT 1 FROM mc_pay WHERE minecraft_nick = ? AND DATEDIFF(NOW(),probeEndDate) < 0");
+
+        selectAllStatistics = con.prepareStatement("SELECT minecraft_nick, totalBreak, totalPlaced FROM mc_pay ORDER BY minecraft_nick ASC");
+
+        saveStatistics = con.prepareStatement("UPDATE mc_pay SET totalPlaced = ?, totalBreak = ? WHERE minecraft_nick = ?");
 
         canBeFree = con.prepareStatement("SELECT 1 FROM mc_pay WHERE contao_user_id = ? AND totalBreak + totalPlaced >= 10000 AND DATEDIFF(NOW(), probeEndDate) >= 7");
 
@@ -405,6 +424,85 @@ public class DatabaseManager extends AbstractMySQLHandler {
         return false;
     }
 
+    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+
+    public boolean addWarning(String playerName, String reason, String adminName) {
+
+        String date = dateFormat.format(new Date());
+        sManager.addWarning(playerName, new MCWarning(reason, date, adminName));
+
+        // INSERT INTO mc_warning (mc_pay_id,reason,date,adminnickname) VALUES
+        // ((SELECT id
+        // FROM mc_pay WHERE minecraft_nick = ?), ?, NOW(), ?)
+        try {
+            addWarning.setString(1, playerName);
+            addWarning.setString(2, reason);
+            addWarning.setString(3, date);
+            addWarning.setString(4, adminName);
+            return addWarning.executeUpdate() == 1;
+        } catch (Exception e) {
+            ConsoleUtils.printException(e, Core.NAME, "Can't add a warning to a player! PlayerName=" + playerName + ",adminName=" + adminName + ",text=" + reason);
+        }
+
+        return false;
+    }
+
+    public boolean removeWarning(String playerName, String date) {
+        try {
+            deleteWarning.setString(1, playerName);
+            deleteWarning.setString(2, date);
+            return deleteWarning.executeUpdate() == 1;
+        } catch (Exception e) {
+            ConsoleUtils.printException(e, Core.NAME, "Can't remove a warning from mc_pay! PlayerName=" + playerName + ",WarningDate=" + date);
+        }
+        return false;
+    }
+
+    public HashMap<String, Statistic> loadAllStatistics() {
+        HashMap<String, Statistic> statistics = new HashMap<String, Statistic>();
+        try {
+            ResultSet result = selectAllStatistics.executeQuery();
+            while (result.next()) {
+                statistics.put(result.getString("minecraft_nick").toLowerCase(), new Statistic(result.getInt("totalPlaced"), result.getInt("totalBreak")));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return statistics;
+    }
+
+    public HashMap<String, PlayerWarnings> loadAllWarnings() {
+        HashMap<String, PlayerWarnings> warnings = new HashMap<String, PlayerWarnings>();
+        try {
+            ResultSet result = selectAllWarnings.executeQuery();
+            PlayerWarnings thisPlayer = null;
+            String playerName = null;
+            while (result.next()) {
+                playerName = result.getString("minecraft_nick").toLowerCase();
+                thisPlayer = warnings.get(playerName);
+                if (thisPlayer == null) {
+                    thisPlayer = new PlayerWarnings();
+                    warnings.put(playerName, thisPlayer);
+                }
+                thisPlayer.addWarning(new MCWarning(result.getString(2), result.getString(3), result.getString(4)));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return warnings;
+    }
+
+    public void saveStatistics(String playerName, int totalPlaced, int totalBreak) {
+        try {
+            saveStatistics.setInt(1, totalPlaced);
+            saveStatistics.setInt(2, totalBreak);
+            saveStatistics.setString(3, playerName);
+            saveStatistics.executeUpdate();
+        } catch (Exception e) {
+            ConsoleUtils.printException(e, Core.NAME, "Can't store statistics to database! PlayerName=" + playerName + ",totalPlaced=" + totalPlaced + ",totalBreak=" + totalBreak);
+        }
+    }
+
     public void performContaoCheck(String playerName, String group) {
         // GET INGAME-NAME AND CONTAO-ID
         MCUser user = getIngameData(playerName);
@@ -479,7 +577,7 @@ public class DatabaseManager extends AbstractMySQLHandler {
             // Check warning status
 
             // Returns an empty resultset if the user has no warnings
-            if (this.statisticManager.getWarnings(playerName) != null)
+            if (this.sManager.getWarnings(playerName) != null)
                 return;
 
             // ProbeUser did enough to be a free user
@@ -498,9 +596,9 @@ public class DatabaseManager extends AbstractMySQLHandler {
         return cal.getTime();
     }
 
-    public void initManager(PlayerManager pManager, StatisticManager statisticManager) {
+    public void initManager(PlayerManager pManager, StatisticManager sManager) {
         this.playerManager = pManager;
-        this.statisticManager = statisticManager;
+        this.sManager = sManager;
     }
 
     /**
@@ -510,7 +608,10 @@ public class DatabaseManager extends AbstractMySQLHandler {
         return playerManager;
     }
 
-    public StatisticManager getStatisticManager() {
-        return statisticManager;
+    /**
+     * @return the sManager
+     */
+    public StatisticManager getsManager() {
+        return sManager;
     }
 }
