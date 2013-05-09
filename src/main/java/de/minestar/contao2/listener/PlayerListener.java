@@ -21,7 +21,6 @@ package de.minestar.contao2.listener;
 import java.util.HashMap;
 
 import org.bukkit.ChatColor;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -31,9 +30,6 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import de.minestar.bungeebridge.core.BungeeBridgeCore;
-import de.minestar.bungeebridge.manager.StatisticManager;
-import de.minestar.bungeebridge.statistics.Statistic;
 import de.minestar.contao2.manager.DatabaseManager;
 import de.minestar.contao2.manager.PlayerManager;
 import de.minestar.contao2.statistics.FreeLoginFailStat;
@@ -46,21 +42,18 @@ import de.minestar.core.units.MinestarGroup;
 import de.minestar.core.units.MinestarPlayer;
 import de.minestar.minestarlibrary.events.PlayerChangedGroupEvent;
 import de.minestar.minestarlibrary.stats.StatisticHandler;
-import de.minestar.minestarlibrary.utils.ChatUtils;
 import de.minestar.minestarlibrary.utils.PlayerUtils;
 
 public class PlayerListener implements Listener {
 
     private PlayerManager playerManager;
     private DatabaseManager databaseManager;
-    private StatisticManager statisticManager;
 
     private HashMap<String, ContaoGroup> oldGroups;
 
-    public PlayerListener(PlayerManager playerManager, DatabaseManager databaseManager, StatisticManager statisticManager) {
+    public PlayerListener(PlayerManager playerManager, DatabaseManager databaseManager) {
         this.playerManager = playerManager;
         this.databaseManager = databaseManager;
-        this.statisticManager = statisticManager;
 
         this.oldGroups = new HashMap<String, ContaoGroup>();
     }
@@ -72,9 +65,7 @@ public class PlayerListener implements Listener {
 
         if (Settings.showWelcomeMsg()) {
             this.playerManager.printOnlineList(event.getPlayer());
-            this.printStatistics(event.getPlayer(), event.getPlayer().getName());
         }
-        this.statisticManager.printWarnings(event.getPlayer());
 
         // GET MINESTAR-PLAYER
         MinestarPlayer thisPlayer = MinestarCore.getPlayer(event.getPlayer().getName());
@@ -98,28 +89,6 @@ public class PlayerListener implements Listener {
         }
     }
 
-    private void printStatistics(CommandSender sender, String playerName) {
-        Statistic dbStats = BungeeBridgeCore.getDatabaseManager().loadSingleStatistic(playerName);
-        Statistic currentStats = this.statisticManager.getPlayersStatistic(playerName);
-
-        if (dbStats == null) {
-            if (currentStats == null) {
-                ChatUtils.writeColoredMessage(sender, ChatColor.RED, "Hat keine Statistiken!");
-            } else {
-                ChatUtils.writeColoredMessage(sender, ChatColor.BLUE, "Bloecke zerstoert: " + currentStats.getTotalBreak());
-                ChatUtils.writeColoredMessage(sender, ChatColor.BLUE, "Bloecke gesetzt  : " + currentStats.getTotalPlaced());
-            }
-        } else {
-            if (currentStats == null) {
-                ChatUtils.writeColoredMessage(sender, ChatColor.BLUE, "Bloecke zerstoert: " + dbStats.getTotalBreak());
-                ChatUtils.writeColoredMessage(sender, ChatColor.BLUE, "Bloecke gesetzt  : " + dbStats.getTotalPlaced());
-            } else {
-                ChatUtils.writeColoredMessage(sender, ChatColor.BLUE, "Bloecke zerstoert: " + (dbStats.getTotalBreak() + currentStats.getTotalBreak()));
-                ChatUtils.writeColoredMessage(sender, ChatColor.BLUE, "Bloecke gesetzt  : " + (dbStats.getTotalPlaced() + currentStats.getTotalPlaced()));
-            }
-        }
-    }
-
     @EventHandler(priority = EventPriority.LOW)
     public void onPlayerLogin(PlayerLoginEvent event) {
 
@@ -138,6 +107,13 @@ public class PlayerListener implements Listener {
 
         // PERFORM CONTAOCHECK
         this.databaseManager.performContaoCheck(thisPlayer.getPlayerName(), thisPlayer.getGroup());
+
+        // probe & default should not enter
+        if (thisPlayer.getGroup().equalsIgnoreCase(ContaoGroup.DEFAULT.getName()) || thisPlayer.getGroup().equalsIgnoreCase(ContaoGroup.PROBE.getName()) || thisPlayer.getGroup().equalsIgnoreCase(ContaoGroup.X.getName())) {
+            event.setKickMessage("You are not allowed to join this server!");
+            event.setResult(PlayerLoginEvent.Result.KICK_OTHER);
+            return;
+        }
 
         // PERFORM CHECK FOR FREE SPACE
         if (thisPlayer.getGroup().equalsIgnoreCase(ContaoGroup.FREE.getName())) {

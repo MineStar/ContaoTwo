@@ -30,11 +30,6 @@
 	<dependencies>
 		<dependency>
 			<groupId>de.minestar</groupId>
-			<artifactId>MinestarCore</artifactId>
-			<version>1.5.1_R3-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>de.minestar</groupId>
 			<artifactId>MineStarLibrary</artifactId>
 			<version>1.5.1_R3-SNAPSHOT</version>
 		</dependency>
@@ -45,8 +40,8 @@
 		</dependency>
 		<dependency>
 			<groupId>de.minestar</groupId>
-			<artifactId>BungeeBridge</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<artifactId>MinestarCore</artifactId>
+			<version>1.5.1_R3-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 

@@ -21,25 +21,19 @@ package de.minestar.contao2.core;
 import java.io.File;
 
 import org.bukkit.plugin.PluginManager;
-import org.bukkit.scheduler.BukkitScheduler;
 
-import de.minestar.bungeebridge.core.BungeeBridgeCore;
-import de.minestar.bungeebridge.manager.StatisticManager;
 import de.minestar.contao2.commands.list.cmdList;
 import de.minestar.contao2.commands.ppay.cmdPPay;
 import de.minestar.contao2.commands.ppay.cmdPayWeek;
 import de.minestar.contao2.commands.ppay.cmdSet;
 import de.minestar.contao2.commands.user.cmdAddProbeTime;
-import de.minestar.contao2.commands.user.cmdAddWarning;
 import de.minestar.contao2.commands.user.cmdAdmin;
 import de.minestar.contao2.commands.user.cmdDefault;
 import de.minestar.contao2.commands.user.cmdFree;
 import de.minestar.contao2.commands.user.cmdMod;
 import de.minestar.contao2.commands.user.cmdPay;
 import de.minestar.contao2.commands.user.cmdProbe;
-import de.minestar.contao2.commands.user.cmdRemoveWarning;
 import de.minestar.contao2.commands.user.cmdSearch;
-import de.minestar.contao2.commands.user.cmdStatus;
 import de.minestar.contao2.commands.user.cmdUnMod;
 import de.minestar.contao2.commands.user.cmdUser;
 import de.minestar.contao2.commands.user.cmdX;
@@ -69,7 +63,6 @@ public class Core extends AbstractCore {
 
     /** Manager */
     private PlayerManager playerManager;
-    private StatisticManager statisticManager;
     private DatabaseManager databaseManager;
 
     /** Listener */
@@ -88,8 +81,7 @@ public class Core extends AbstractCore {
 
         this.databaseManager = new DatabaseManager(NAME, new File(getDataFolder(), "sqlconfig.yml"));
         this.playerManager = new PlayerManager();
-        this.statisticManager = BungeeBridgeCore.getStatisticManager();
-        this.databaseManager.initManager(this.playerManager, this.statisticManager);
+        this.databaseManager.initManager(this.playerManager);
 
         return true;
     }
@@ -97,7 +89,7 @@ public class Core extends AbstractCore {
     @Override
     protected boolean createListener() {
 
-        this.connectionListener = new PlayerListener(this.playerManager, this.databaseManager, this.statisticManager);
+        this.connectionListener = new PlayerListener(this.playerManager, this.databaseManager);
         this.fakePlayerListener = new FakePlayerListener(this.playerManager);
 
         return true;
@@ -115,12 +107,6 @@ public class Core extends AbstractCore {
     }
 
     @Override
-    protected boolean startThreads(BukkitScheduler scheduler) {
-        scheduler.scheduleSyncRepeatingTask(this, this.statisticManager, 20 * 60, 20 * 60);
-        return true;
-    }
-
-    @Override
     protected boolean createCommands() {
         //@formatter:off
         this.cmdList = new CommandList(NAME,
@@ -130,8 +116,6 @@ public class Core extends AbstractCore {
                 
                 new cmdPayWeek          ("/payweek",     "",                            "",                         this.playerManager, this.databaseManager),                
                 
-                new cmdStatus           ("/stats",      "",                             "",                         this.databaseManager, this.statisticManager),
-
                 new cmdUser         ("/user", "", "",
                     new cmdAdmin        ("admin",       "<ingamename> <dd.mm.yyyy>",    "contao.rights.admin",      this.playerManager, this.databaseManager),
                     new cmdDefault      ("default",     "<ingamename>",                 "contao.rights.default",    this.playerManager),
@@ -140,9 +124,6 @@ public class Core extends AbstractCore {
                     new cmdProbe        ("probe",       "<ingamename> <contao-id>",     "contao.rights.probe",      this.playerManager, this.databaseManager),
                     new cmdAddProbeTime ("probeadd",    "<PlayerName> <Days>",          "contao.rights.probeadd",   this.databaseManager),
                     new cmdSearch       ("search",      "<homepagename>",               "contao.rights.search",     this.databaseManager),
-                    new cmdStatus       ("status",      "",                             "",                         this.databaseManager, this.statisticManager),
-                    new cmdAddWarning   ("awarn",       "<ingamename> <text>",          "contao.rights.awarn" ,     this.databaseManager),
-                    new cmdRemoveWarning("rwarn",       "<ingamename> <warningIndex>" , "contao.rights.rwarn",      this.databaseManager),
                     new cmdX            ("x",           "<ingamename> <reason>",        "contao.rights.x",          this.playerManager),
                     new cmdMod          ("mod",         "<ingamename>",                 "contao.rights.mod",        this.playerManager, this.databaseManager),
                     new cmdUnMod        ("unmod",       "<ingamename>",                 "contao.rights.unmod",      this.playerManager, this.databaseManager)

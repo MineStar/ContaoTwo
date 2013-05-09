@@ -30,7 +30,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 
-import de.minestar.bungeebridge.manager.StatisticManager;
 import de.minestar.contao2.core.Core;
 import de.minestar.contao2.units.ContaoGroup;
 import de.minestar.contao2.units.MCUser;
@@ -40,7 +39,6 @@ import de.minestar.minestarlibrary.utils.ConsoleUtils;
 public class DatabaseManager extends AbstractMySQLHandler {
 
     private PlayerManager playerManager;
-    private StatisticManager statisticManager;
 
     private PreparedStatement insertMCPay;
     private PreparedStatement updateExpireDate;
@@ -465,29 +463,7 @@ public class DatabaseManager extends AbstractMySQLHandler {
 
     private void checkProbeUser(String playerName, MCUser user) {
 
-        try {
-            // SELECT 1 FROM mc_pay WHERE minecraft_nick = ? AND totalBreak +
-            // totalPlaced >= 10000 AND DATEDIFF(NOW(), probeEndDate) >= 7
-            canBeFree.setInt(1, user.getContaoID());
-            ResultSet rs = canBeFree.executeQuery();
-
-            // Query return nothing or that the user doesn't accomblish the
-            // conditions
-            if (!(rs.next() && rs.getBoolean(1)))
-                return;
-
-            // Check warning status
-
-            // Returns an empty resultset if the user has no warnings
-            if (this.statisticManager.getWarnings(playerName) != null)
-                return;
-
-            // ProbeUser did enough to be a free user
-            playerManager.updateGroupManagerGroup(playerName, ContaoGroup.FREE);
-            updateContaoGroup(ContaoGroup.FREE, user.getContaoID());
-        } catch (Exception e) {
-            ConsoleUtils.printException(e, Core.NAME, "Can't check probe user whether he can be a free member! PlayerName=" + playerName);
-        }
+        return;
     }
 
     // GET RELATIVE DAYS
@@ -498,9 +474,8 @@ public class DatabaseManager extends AbstractMySQLHandler {
         return cal.getTime();
     }
 
-    public void initManager(PlayerManager pManager, StatisticManager statisticManager) {
+    public void initManager(PlayerManager pManager) {
         this.playerManager = pManager;
-        this.statisticManager = statisticManager;
     }
 
     /**
@@ -508,9 +483,5 @@ public class DatabaseManager extends AbstractMySQLHandler {
      */
     public PlayerManager getpManager() {
         return playerManager;
-    }
-
-    public StatisticManager getStatisticManager() {
-        return statisticManager;
     }
 }
