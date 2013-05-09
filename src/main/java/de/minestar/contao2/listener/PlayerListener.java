@@ -21,7 +21,6 @@ package de.minestar.contao2.listener;
 import java.util.HashMap;
 
 import org.bukkit.ChatColor;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -31,9 +30,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import de.minestar.bungeebridge.core.BungeeBridgeCore;
 import de.minestar.bungeebridge.manager.StatisticManager;
-import de.minestar.bungeebridge.statistics.Statistic;
 import de.minestar.contao2.manager.DatabaseManager;
 import de.minestar.contao2.manager.PlayerManager;
 import de.minestar.contao2.statistics.FreeLoginFailStat;
@@ -46,7 +43,6 @@ import de.minestar.core.units.MinestarGroup;
 import de.minestar.core.units.MinestarPlayer;
 import de.minestar.minestarlibrary.events.PlayerChangedGroupEvent;
 import de.minestar.minestarlibrary.stats.StatisticHandler;
-import de.minestar.minestarlibrary.utils.ChatUtils;
 import de.minestar.minestarlibrary.utils.PlayerUtils;
 
 public class PlayerListener implements Listener {
@@ -69,10 +65,9 @@ public class PlayerListener implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         this.playerManager.updatePlayer(event.getPlayer());
         this.playerManager.updateOnlineLists();
-
         if (Settings.showWelcomeMsg()) {
             this.playerManager.printOnlineList(event.getPlayer());
-            this.printStatistics(event.getPlayer(), event.getPlayer().getName());
+            this.statisticManager.printStatistics(event.getPlayer());
         }
         this.statisticManager.printWarnings(event.getPlayer());
 
@@ -94,28 +89,6 @@ public class PlayerListener implements Listener {
             } else {
                 // DOWNGRADE
                 PlayerUtils.sendMessage(event.getPlayer(), ChatColor.RED, "Du wurdest automatisch folgender Gruppe zugewiesen: " + currentGroup.name() + " (vorherige Gruppe: " + oldGroup.name() + ")");
-            }
-        }
-    }
-
-    private void printStatistics(CommandSender sender, String playerName) {
-        Statistic dbStats = BungeeBridgeCore.getDatabaseManager().loadSingleStatistic(playerName);
-        Statistic currentStats = this.statisticManager.getPlayersStatistic(playerName);
-
-        if (dbStats == null) {
-            if (currentStats == null) {
-                ChatUtils.writeColoredMessage(sender, ChatColor.RED, "Hat keine Statistiken!");
-            } else {
-                ChatUtils.writeColoredMessage(sender, ChatColor.BLUE, "Bloecke zerstoert: " + currentStats.getTotalBreak());
-                ChatUtils.writeColoredMessage(sender, ChatColor.BLUE, "Bloecke gesetzt  : " + currentStats.getTotalPlaced());
-            }
-        } else {
-            if (currentStats == null) {
-                ChatUtils.writeColoredMessage(sender, ChatColor.BLUE, "Bloecke zerstoert: " + dbStats.getTotalBreak());
-                ChatUtils.writeColoredMessage(sender, ChatColor.BLUE, "Bloecke gesetzt  : " + dbStats.getTotalPlaced());
-            } else {
-                ChatUtils.writeColoredMessage(sender, ChatColor.BLUE, "Bloecke zerstoert: " + (dbStats.getTotalBreak() + currentStats.getTotalBreak()));
-                ChatUtils.writeColoredMessage(sender, ChatColor.BLUE, "Bloecke gesetzt  : " + (dbStats.getTotalPlaced() + currentStats.getTotalPlaced()));
             }
         }
     }
