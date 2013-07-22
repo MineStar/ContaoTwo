@@ -18,6 +18,8 @@
 
 package de.minestar.contao2.commands.user;
 
+import java.util.HashMap;
+
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
@@ -32,6 +34,8 @@ import de.minestar.minestarlibrary.utils.ChatUtils;
 import de.minestar.minestarlibrary.utils.PlayerUtils;
 
 public class cmdProbe extends AbstractCommand {
+
+    private HashMap<String, Long> timeMap = new HashMap<String, Long>();
 
     private PlayerManager playerManager;
     private DatabaseManager databaseManager;
@@ -57,8 +61,13 @@ public class cmdProbe extends AbstractCommand {
         // SET CONTAO GROUP
         String ingameName = PlayerUtils.getCorrectPlayerName(args[0]);
         if (ingameName == null) {
-            ChatUtils.writeError(sender, pluginName, "Es existiert kein Spieler mit dem Namen '" + args[0] + "'!");
-            return;
+            ingameName = args[0];
+            if (!timeMap.containsKey(ingameName) || timeMap.get(ingameName) < System.currentTimeMillis()) {
+                ChatUtils.writeInfo(sender, pluginName, "WARNUNG: Der Spieler mit dem Namen '" + args[0] + "' ist offline. Befehl innerhalb der nächsten 10 Sekunden neu eingeben, falls der Name richtig war!");
+                timeMap.put(ingameName, System.currentTimeMillis() + 10 * 1000);
+                return;
+            }
+            timeMap.remove(ingameName);
         }
 
         int contaoID = 0;
@@ -72,9 +81,11 @@ public class cmdProbe extends AbstractCommand {
 
         // Degrade
         ContaoGroup group = playerManager.getGroup(ingameName);
-        if (group.equals(ContaoGroup.FREE) || group.equals(ContaoGroup.PAY) || group.equals(ContaoGroup.MOD) || group.equals(ContaoGroup.ADMIN)) {
-            handleDegrade(ingameName, contaoID, sender, newUser);
-            return;
+        if (group != null) {
+            if (group.equals(ContaoGroup.FREE) || group.equals(ContaoGroup.PAY) || group.equals(ContaoGroup.MOD) || group.equals(ContaoGroup.ADMIN)) {
+                handleDegrade(ingameName, contaoID, sender, newUser);
+                return;
+            }
         }
 
         if (!checkPlayer(ingameName, contaoID, sender, newUser))

@@ -18,6 +18,8 @@
 
 package de.minestar.contao2.commands.user;
 
+import java.util.HashMap;
+
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
@@ -33,6 +35,7 @@ import de.minestar.minestarlibrary.utils.PlayerUtils;
 
 public class cmdX extends AbstractExtendedCommand {
 
+    private HashMap<String, Long> timeMap = new HashMap<String, Long>();
     private PlayerManager playerManager;
 
     public cmdX(String syntax, String arguments, String node, PlayerManager playerManager) {
@@ -56,8 +59,14 @@ public class cmdX extends AbstractExtendedCommand {
         String ingameName = PlayerUtils.getCorrectPlayerName(args[0]);
 
         if (ingameName == null) {
-            ChatUtils.writeError(sender, pluginName, "Spieler '" + args[0] + "' existiert nicht!");
-            return;
+            ingameName = args[0];
+            if (!timeMap.containsKey(ingameName) || timeMap.get(ingameName) < System.currentTimeMillis()) {
+                ChatUtils.writeInfo(sender, pluginName, "WARNUNG: Der Spieler mit dem Namen '" + args[0] + "' ist offline. Befehl innerhalb der nächsten 10 Sekunden neu eingeben, falls der Name richtig war!");
+                timeMap.put(ingameName, System.currentTimeMillis() + 10 * 1000);
+                return;
+            }
+
+            timeMap.remove(ingameName);
         }
 
         // Store information why he is x user and who has x used him

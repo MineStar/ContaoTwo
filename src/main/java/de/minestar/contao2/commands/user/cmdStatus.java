@@ -20,14 +20,14 @@ package de.minestar.contao2.commands.user;
 
 import java.util.List;
 
-import net.minecraft.server.v1_5_R3.BanEntry;
-import net.minecraft.server.v1_5_R3.BanList;
+import net.minecraft.server.v1_6_R2.BanEntry;
+import net.minecraft.server.v1_6_R2.BanList;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.craftbukkit.v1_5_R3.CraftServer;
+import org.bukkit.craftbukkit.v1_6_R2.CraftServer;
 import org.bukkit.entity.Player;
 
 import de.minestar.contao2.core.Core;
