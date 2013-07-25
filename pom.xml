@@ -30,7 +30,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>de.minestar</groupId>
-			<artifactId>MineStarLibrary</artifactId>
+			<artifactId>MinestarCore</artifactId>
 			<version>1.6.2_R1-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
