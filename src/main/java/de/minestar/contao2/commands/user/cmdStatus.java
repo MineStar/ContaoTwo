@@ -18,6 +18,8 @@
 
 package de.minestar.contao2.commands.user;
 
+import java.text.DateFormat;
+import java.util.Date;
 import java.util.List;
 
 import net.minecraft.server.v1_6_R2.BanEntry;
@@ -99,18 +101,37 @@ public class cmdStatus extends AbstractExtendedCommand {
 
     }
 
+    private final static DateFormat FORMAT = DateFormat.getDateTimeInstance();
+
     private void printBanned(CommandSender sender, String targetName) {
         CraftServer cServer = (CraftServer) Bukkit.getServer();
         BanList banlist = cServer.getHandle().getNameBans();
-        if (banlist.isBanned(targetName)) {
-            BanEntry banEntry = (BanEntry) banlist.getEntries().get(targetName);
-            if (banEntry != null) {
-                ChatUtils.writeInfo(sender, "Der Spieler ist gebannt (Grund: " + banEntry.getReason() + " , von: " + banEntry.getSource() + ")!");
-            } else {
-                ChatUtils.writeInfo(sender, "Der Spieler ist gebannt!");
-            }
-        } else {
+        if (!banlist.isBanned(targetName)) {
             ChatUtils.writeInfo(sender, "Der Spieler ist nicht gebannt!");
+            return;
+        } else {
+            BanEntry banEntry = (BanEntry) banlist.getEntries().get(targetName);
+            StringBuilder msg = new StringBuilder("Der Spieler ist gebannt");
+            // Fill message with information
+            if (banEntry != null) {
+                // Reason
+                msg.append("Grund: ").append(banEntry.getReason());
+                msg.append(" , ");
+                // Source == Who banned the player
+                msg.append("von: ").append(banEntry.getSource());
+                msg.append(" , ");
+
+                // Expiration date
+                msg.append("bis:");
+                Date d = banEntry.getExpires();
+                if (d != null)
+                    msg.append(FORMAT.format(d));
+                else
+                    msg.append("Ende aller Tage");
+            }
+            // Close message and send to player
+            msg.append('!');
+            ChatUtils.writeInfo(sender, msg.toString());
         }
     }
 
