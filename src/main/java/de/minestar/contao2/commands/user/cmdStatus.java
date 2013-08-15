@@ -111,18 +111,18 @@ public class cmdStatus extends AbstractExtendedCommand {
             return;
         } else {
             BanEntry banEntry = (BanEntry) banlist.getEntries().get(targetName);
-            StringBuilder msg = new StringBuilder("Der Spieler ist gebannt");
+            StringBuilder msg = new StringBuilder("Der Spieler ist gebannt.");
             // Fill message with information
             if (banEntry != null) {
                 // Reason
                 msg.append("Grund: ").append(banEntry.getReason());
-                msg.append(" , ");
+                msg.append(" ,");
                 // Source == Who banned the player
                 msg.append("von: ").append(banEntry.getSource());
-                msg.append(" , ");
+                msg.append(", ");
 
                 // Expiration date
-                msg.append("bis:");
+                msg.append("bis: ");
                 Date d = banEntry.getExpires();
                 if (d != null)
                     msg.append(FORMAT.format(d));
