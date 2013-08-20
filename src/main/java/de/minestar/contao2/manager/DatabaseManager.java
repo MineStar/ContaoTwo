@@ -72,6 +72,8 @@ public class DatabaseManager extends AbstractMySQLHandler {
     private PreparedStatement canBeFree;
     private PreparedStatement hasUsedFreeWeek, setFreeWeekUsed;
 
+    private final static int PROBE_TIME = 7;
+
     public DatabaseManager(String NAME, File SQLConfigFile) {
         super(NAME, SQLConfigFile);
     }
@@ -84,7 +86,7 @@ public class DatabaseManager extends AbstractMySQLHandler {
     @Override
     protected void createStatements(String NAME, Connection con) throws Exception {
 
-        insertMCPay = con.prepareStatement("INSERT INTO mc_pay (contao_user_id, minecraft_nick, expire_date, admin_nick, startDate, probeEndDate, usedFreePayWeek) VALUES (?,?,STR_TO_DATE(?,'%d.%m.%Y'),?, NOW(), ADDDATE(NOW(), INTERVAL 14 DAY), ?)");
+        insertMCPay = con.prepareStatement("INSERT INTO mc_pay (contao_user_id, minecraft_nick, expire_date, admin_nick, startDate, probeEndDate, usedFreePayWeek) VALUES (?,?,STR_TO_DATE(?,'%d.%m.%Y'),?, NOW(), ADDDATE(NOW(), INTERVAL " + PROBE_TIME + " DAY), ?)");
 
         updateExpireDate = con.prepareStatement("UPDATE mc_pay SET expire_date = STR_TO_DATE(?,'%d.%m.%Y') WHERE contao_user_id = ?");
 
@@ -108,7 +110,7 @@ public class DatabaseManager extends AbstractMySQLHandler {
 
         deleteProbeStatus = con.prepareStatement("UPDATE mc_pay SET probeEndDate = NULL WHERE minecraft_nick = ?");
 
-        convertFreeToProbe = con.prepareStatement("UPDATE mc_pay SET probeEndDate = ADDDATE(NOW(), INTERVAL 14 DAY) WHERE minecraft_nick = ?");
+        convertFreeToProbe = con.prepareStatement("UPDATE mc_pay SET probeEndDate = ADDDATE(NOW(), INTERVAL " + PROBE_TIME + " DAY) WHERE minecraft_nick = ?");
 
         addProbeDate = con.prepareStatement("UPDATE mc_pay SET probeEndDate = ADDDATE(probeEndDate, INTERVAL ? DAY) WHERE minecraft_nick = ?");
 
@@ -163,7 +165,7 @@ public class DatabaseManager extends AbstractMySQLHandler {
         // INSERT INTO mc_pay (contao_user_id, minecraft_nick, expire_date,
         // admin_nick, startDate, probeEndDate) VALUES
         // (?,?,STR_TO_DATE(?,'%d.%m.%Y'),?, NOW(),
-        // ADDDATE(NOW(), INTERVAL 14 DAY))
+        // ADDDATE(NOW(), INTERVAL PROBE_TIME DAY))
         try {
             insertMCPay.setInt(1, contaoID);
             insertMCPay.setString(2, playerName);
@@ -412,7 +414,8 @@ public class DatabaseManager extends AbstractMySQLHandler {
 
     public boolean degradeFree(String playerName) {
 
-        // UPDATE mc_pay SET probeEndDate = ADDDATE(NOW(), INTERVAL 14 DAY)
+        // UPDATE mc_pay SET probeEndDate = ADDDATE(NOW(), INTERVAL PROBE_TIME
+        // DAY)
         // WHERE minecraft_nick = ?
         try {
             convertFreeToProbe.setString(1, playerName);
