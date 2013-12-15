@@ -580,7 +580,7 @@ public class DatabaseManager extends AbstractMySQLHandler {
             // Check warning status
 
             // Returns an empty resultset if the user has no warnings
-            if (this.sManager.getWarnings(playerName) != null)
+            if (this.sManager.getWarnings(playerName) != null && !this.sManager.getWarnings(playerName).isEmpty())
                 return;
 
             // ProbeUser did enough to be a free user
