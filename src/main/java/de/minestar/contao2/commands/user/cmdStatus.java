@@ -22,14 +22,13 @@ import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
 
-import net.minecraft.server.v1_7_R2.BanEntry;
-import net.minecraft.server.v1_7_R2.BanList;
-
+import org.bukkit.BanEntry;
+import org.bukkit.BanList;
+import org.bukkit.BanList.Type;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.craftbukkit.v1_7_R2.CraftServer;
 import org.bukkit.entity.Player;
 
 import de.minestar.contao2.core.Core;
@@ -104,13 +103,12 @@ public class cmdStatus extends AbstractExtendedCommand {
     private final static DateFormat FORMAT = DateFormat.getDateTimeInstance();
 
     private void printBanned(CommandSender sender, String targetName) {
-        CraftServer cServer = (CraftServer) Bukkit.getServer();
-        BanList banlist = cServer.getHandle().getNameBans();
+        BanList banlist = Bukkit.getBanList(Type.NAME);
         if (!banlist.isBanned(targetName)) {
             ChatUtils.writeInfo(sender, "Der Spieler ist nicht gebannt!");
             return;
         } else {
-            BanEntry banEntry = (BanEntry) banlist.getEntries().get(targetName);
+            BanEntry banEntry = banlist.getBanEntry(targetName);
             StringBuilder msg = new StringBuilder("Der Spieler ist gebannt.");
             // Fill message with information
             if (banEntry != null) {
@@ -123,7 +121,7 @@ public class cmdStatus extends AbstractExtendedCommand {
 
                 // Expiration date
                 msg.append("bis: ");
-                Date d = banEntry.getExpires();
+                Date d = banEntry.getExpiration();
                 if (d != null)
                     msg.append(FORMAT.format(d));
                 else
