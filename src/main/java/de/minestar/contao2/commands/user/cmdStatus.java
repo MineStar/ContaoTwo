@@ -27,6 +27,7 @@ import org.bukkit.BanList;
 import org.bukkit.BanList.Type;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
@@ -44,6 +45,7 @@ import de.minestar.core.units.MinestarPlayer;
 import de.minestar.minestarlibrary.commands.AbstractExtendedCommand;
 import de.minestar.minestarlibrary.utils.ChatUtils;
 import de.minestar.minestarlibrary.utils.ConsoleUtils;
+import de.minestar.minestarlibrary.utils.PlayerUtils;
 
 public class cmdStatus extends AbstractExtendedCommand {
 
@@ -88,6 +90,15 @@ public class cmdStatus extends AbstractExtendedCommand {
             return;
         }
 
+        MinestarPlayer msPlayer = MinestarCore.getPlayer(targetName);
+        if (msPlayer.isOffline()) {
+            OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(msPlayer.getPlayerName());
+            if (offlinePlayer != null) {
+                targetName = offlinePlayer.getName();
+            }
+        } else {
+            targetName = PlayerUtils.getOnlinePlayer(targetName).getName();
+        }
         ChatUtils.writeColoredMessage(sender, pluginName, ChatColor.GOLD, "Informationen ueber " + targetName);
 
         // We have checked whether the player exists in the database, so there
@@ -99,7 +110,6 @@ public class cmdStatus extends AbstractExtendedCommand {
         printBanned(sender, targetName);
 
     }
-
     private final static DateFormat FORMAT = DateFormat.getDateTimeInstance();
 
     private void printBanned(CommandSender sender, String targetName) {
@@ -177,8 +187,8 @@ public class cmdStatus extends AbstractExtendedCommand {
         if (stats == null)
             ChatUtils.writeColoredMessage(sender, ChatColor.RED, "Hat keine Statistiken!");
         else {
-            ChatUtils.writeColoredMessage(sender, ChatColor.BLUE, "Bloecke zerstoert: " + stats.getTotalBreak());
-            ChatUtils.writeColoredMessage(sender, ChatColor.BLUE, "Bloecke gesetzt  : " + stats.getTotalPlaced());
+            ChatUtils.writeColoredMessage(sender, ChatColor.BLUE, "Bloecke zerstoert : " + stats.getTotalBreak());
+            ChatUtils.writeColoredMessage(sender, ChatColor.BLUE, "Bloecke gesetzt : " + stats.getTotalPlaced());
         }
     }
 
