@@ -47,13 +47,14 @@ public class DatabaseManager extends AbstractMySQLHandler {
     private PreparedStatement insertMCPay;
     private PreparedStatement updateExpireDate;
     private PreparedStatement updateGroup;
+    private PreparedStatement updateMCNick;
     private PreparedStatement selectMCPayByName;
     private PreparedStatement selectMCPayById;
     private PreparedStatement checkAccount;
     private PreparedStatement selectGroup;
     private PreparedStatement selectContaoId;
     private PreparedStatement checkContaoId;
-    private PreparedStatement checkMCNick;
+    private PreparedStatement checkMCNick;   
 
     private PreparedStatement getAccountDates;
     private PreparedStatement isInProbation;
@@ -90,6 +91,8 @@ public class DatabaseManager extends AbstractMySQLHandler {
 
         updateExpireDate = con.prepareStatement("UPDATE mc_pay SET expire_date = STR_TO_DATE(?,'%d.%m.%Y') WHERE contao_user_id = ?");
 
+        updateMCNick = con.prepareStatement("UPDATE mc_pay SET minecraft_nick = ? WHERE minecraft_nick = ?");
+        
         updateGroup = con.prepareStatement("UPDATE tl_member SET groups = ? WHERE ID = ?");
 
         selectMCPayByName = con.prepareStatement("SELECT minecraft_nick, contao_user_id, DATE_FORMAT(expire_date, '%d.%m.%Y') FROM mc_pay WHERE minecraft_nick = ? LIMIT 1");
@@ -114,8 +117,8 @@ public class DatabaseManager extends AbstractMySQLHandler {
 
         addProbeDate = con.prepareStatement("UPDATE mc_pay SET probeEndDate = ADDDATE(probeEndDate, INTERVAL ? DAY) WHERE minecraft_nick = ?");
 
-        addWarning = con.prepareStatement("INSERT INTO mc_warning (mc_pay_id,reason,date,adminnickname) VALUES ((SELECT id FROM mc_pay WHERE minecraft_nick = ?), ?, STR_TO_DATE(?,'%d.%m.%Y %H:%i:%s'), ?)");
-
+        addWarning = con.prepareStatement("INSERT INTO mc_warning (mc_pay_id,reason,date,adminnickname) VALUES ((SELECT id FROM mc_pay WHERE minecraft_nick = ?), ?, STR_TO_DATE(?,'%d.%m.%Y %H:%i:%s'), ?)");     
+        
         selectAllWarnings = con.prepareStatement("SELECT minecraft_nick, mc_warning.reason, DATE_FORMAT(date, '%d.%m.%Y %H:%i:%s'),adminnickname FROM mc_warning,mc_pay WHERE mc_warning.mc_pay_id = mc_pay.id ORDER BY minecraft_nick,mc_warning.date");
 
         deleteWarning = con.prepareStatement("DELETE FROM mc_warning WHERE mc_pay_id = (SELECT id FROM mc_pay WHERE minecraft_nick = ?) AND DATE_FORMAT(date,'%d.%m.%Y %H:%i:%s') = ?");
@@ -616,5 +619,18 @@ public class DatabaseManager extends AbstractMySQLHandler {
      */
     public StatisticManager getsManager() {
         return sManager;
+    }
+    
+    public boolean updateMCNick(String oldPlayer, String newPlayer) {
+        try {
+            // UPDATE THE WARP NAME
+            updateMCNick.setString(1, newPlayer);
+            updateMCNick.setString(2, oldPlayer);
+            updateMCNick.executeUpdate();
+            return true;
+        } catch (Exception e) {
+            ConsoleUtils.printException(e, Core.NAME, "Can't change MC-Nick " + oldPlayer + " to " + newPlayer);
+            return false;
+        }
     }
 }

@@ -39,6 +39,10 @@ public class StatisticManager implements Runnable {
 
     public StatisticManager(DatabaseManager dbManager) {
         this.databaseManager = dbManager;
+        this.refresh();
+    }
+
+    public void refresh() {
         this.loadAllStatistics();
         this.loadAllWarnings();
     }

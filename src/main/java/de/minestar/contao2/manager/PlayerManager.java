@@ -53,7 +53,10 @@ public class PlayerManager {
     private ConcurrentHashMap<String, ContaoGroup> playerMap;
 
     public PlayerManager() {
+        this.refresh();
+    }
 
+    public void refresh() {
         this.onlineList = new HashMap<ContaoGroup, String>();
         this.groupMap = new HashMap<ContaoGroup, HashSet<String>>();
         this.playerMap = new ConcurrentHashMap<String, ContaoGroup>();

@@ -42,6 +42,7 @@ import de.minestar.core.MinestarCore;
 import de.minestar.core.units.MinestarGroup;
 import de.minestar.core.units.MinestarPlayer;
 import de.minestar.minestarlibrary.events.PlayerChangedGroupEvent;
+import de.minestar.minestarlibrary.events.PlayerChangedNameEvent;
 import de.minestar.minestarlibrary.stats.StatisticHandler;
 import de.minestar.minestarlibrary.utils.PlayerUtils;
 
@@ -59,6 +60,13 @@ public class PlayerListener implements Listener {
         this.statisticManager = statisticManager;
 
         this.oldGroups = new HashMap<String, ContaoGroup>();
+    }
+
+    @EventHandler
+    public void onPlayerChangeNick(PlayerChangedNameEvent event) {
+        this.databaseManager.updateMCNick(event.getOldName(), event.getNewName());
+        this.playerManager.refresh();
+        this.statisticManager.refresh();
     }
 
     @EventHandler(priority = EventPriority.LOW)
