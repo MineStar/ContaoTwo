@@ -30,6 +30,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
+import de.minestar.contao2.core.Core;
 import de.minestar.contao2.manager.DatabaseManager;
 import de.minestar.contao2.manager.PlayerManager;
 import de.minestar.contao2.manager.StatisticManager;
@@ -67,6 +68,11 @@ public class PlayerListener implements Listener {
         this.databaseManager.updateMCNick(event.getOldName(), event.getNewName());
         this.playerManager.refresh();
         this.statisticManager.refresh();
+
+        Player player = PlayerUtils.getOnlinePlayer(event.getCommandSender());
+        if (player != null) {
+            PlayerUtils.sendInfo(player, Core.NAME, "Transfer complete.");
+        }
     }
 
     @EventHandler(priority = EventPriority.LOW)
