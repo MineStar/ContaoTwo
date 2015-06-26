@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -71,7 +72,7 @@ public class PlayerManager {
     }
 
     private void onReload() {
-        Player[] playerList = Bukkit.getOnlinePlayers();
+        Collection<? extends Player> playerList = Bukkit.getOnlinePlayers();
         for (Player player : playerList) {
             this.updatePlayer(player);
         }
@@ -93,7 +94,7 @@ public class PlayerManager {
 
     public void printOnlineList(CommandSender sender) {
         // WRITE HEAD
-        ChatUtils.writeMessage(sender, ChatColor.GOLD + "" + Bukkit.getOnlinePlayers().length + " / " + Bukkit.getMaxPlayers());
+        ChatUtils.writeMessage(sender, ChatColor.GOLD + "" + Bukkit.getOnlinePlayers().size() + " / " + Bukkit.getMaxPlayers());
         // WRITE GROUPS
         this.printSingleGroup(Settings.getAdminColor(), ContaoGroup.ADMIN, sender);
         // TODO: Implement other things for mod
@@ -246,7 +247,7 @@ public class PlayerManager {
         JSONObject json = new JSONObject();
         // FILL JSON FILE WITH DATA
 
-        json.put("ConnectedUsers", Bukkit.getOnlinePlayers().length);
+        json.put("ConnectedUsers", Bukkit.getOnlinePlayers().size());
         json.put("ConnectedDefaultUsers", this.groupMap.get(ContaoGroup.DEFAULT).size() + this.groupMap.get(ContaoGroup.X).size());
         json.put("ConnectedProbeUsers", this.groupMap.get(ContaoGroup.PROBE).size());
         json.put("ConnectedFreeUsers", this.groupMap.get(ContaoGroup.FREE).size());
