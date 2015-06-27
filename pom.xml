@@ -5,27 +5,27 @@
     <artifactId>ContaoTwo</artifactId>
     <version>1.8.7-R0.1-SNAPSHOT</version>
 
+	<repositories>
+		<repository>
+			<id>MinestarNexus</id>
+			<url>http://jenkins.outi-networks.de:8082/nexus/content/groups/public/</url>
+		</repository>
+	</repositories>	
+	
     <distributionManagement>
         <!-- use the following if you're not using a snapshot version. -->
         <repository>
             <id>minestarDeployment</id>
             <name>Internal Releases</name>
-            <url>http://server2.minestar.de:8081/nexus/content/repositories/releases</url>
+            <url>http://jenkins.outi-networks.de:8082/nexus/content/repositories/releases/</url>
         </repository>
         <!-- use the following if you ARE using a snapshot version. -->
         <snapshotRepository>
             <id>minestarDeployment</id>
             <name>Internal Releases</name>
-            <url>http://server2.minestar.de:8081/nexus/content/repositories/snapshots</url>
+            <url>http://jenkins.outi-networks.de:8082/nexus/content/repositories/snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
-
-    <repositories>
-        <repository>
-            <id>MinestarNexus</id>
-            <url>http://server2.minestar.de:8081/nexus/content/groups/public/</url>
-        </repository>
-    </repositories>
 
     <dependencies>
         <dependency>
