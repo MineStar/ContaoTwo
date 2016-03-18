@@ -187,8 +187,8 @@ public class cmdStatus extends AbstractExtendedCommand {
         if (stats == null)
             ChatUtils.writeColoredMessage(sender, ChatColor.RED, "Hat keine Statistiken!");
         else {
-            ChatUtils.writeColoredMessage(sender, ChatColor.BLUE, "Bloecke zerstoert : " + stats.getTotalBreak());
-            ChatUtils.writeColoredMessage(sender, ChatColor.BLUE, "Bloecke gesetzt : " + stats.getTotalPlaced());
+            ChatUtils.writeColoredMessage(sender, ChatColor.BLUE, "Blöcke zerstört : " + stats.getTotalBreak());
+            ChatUtils.writeColoredMessage(sender, ChatColor.BLUE, "Blöcke gesetzt : " + stats.getTotalPlaced());
         }
     }
 

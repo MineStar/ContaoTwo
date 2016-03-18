@@ -37,7 +37,7 @@ public class cmdDefault extends AbstractCommand {
 
     public cmdDefault(String syntax, String arguments, String node, PlayerManager playerManager) {
         super(Core.NAME, syntax, arguments, node);
-        this.description = "Default-User hinzufügen";
+        this.description = "Default-User hinzufÃ¼gen";
         this.playerManager = playerManager;
     }
 

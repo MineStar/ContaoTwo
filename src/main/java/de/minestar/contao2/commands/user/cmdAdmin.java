@@ -40,7 +40,7 @@ public class cmdAdmin extends AbstractCommand {
 
     public cmdAdmin(String syntax, String arguments, String node, PlayerManager playerManager, DatabaseManager databaseManager) {
         super(Core.NAME, syntax, arguments, node);
-        this.description = "Admin hinzufügen";
+        this.description = "Admin hinzufÃ¼gen";
         this.playerManager = playerManager;
         this.databaseManager = databaseManager;
     }

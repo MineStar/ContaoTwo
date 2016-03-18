@@ -64,9 +64,9 @@ public class cmdPayWeek extends AbstractExtendedCommand {
             return;
         }
 
-        // GUTSCHEIN EINGELÖST?
+        // GUTSCHEIN EINGELï¿½ST?
         if (this.databaseManager.hasUsedFreeWeek(player.getName())) {
-            PlayerUtils.sendError(player, Core.NAME, "Du hast deinen Gutschein bereits eingelöst!");
+            PlayerUtils.sendError(player, Core.NAME, "Du hast deinen Gutschein bereits eingelÃ¶st!");
             return;
         }
 
@@ -76,7 +76,7 @@ public class cmdPayWeek extends AbstractExtendedCommand {
         // CONTAO GRUPPE AUF PAY SETZEN
         databaseManager.updateContaoGroup(ContaoGroup.PAY, user.getContaoID());
 
-        // GUTSCHEIN ALS EINGELÖST SETZEN
+        // GUTSCHEIN ALS EINGELï¿½ST SETZEN
         this.databaseManager.setFreeWeekUsed(player.getName());
 
         // UPDATE GROUPMANAGER-GROUP

@@ -42,7 +42,7 @@ public class cmdProbe extends AbstractCommand {
 
     public cmdProbe(String syntax, String arguments, String node, PlayerManager playerManager, DatabaseManager dbHandler) {
         super(Core.NAME, syntax, arguments, node);
-        this.description = "Probeuser hinzuf�gen";
+        this.description = "Probeuser hinzufügen";
         this.playerManager = playerManager;
         this.databaseManager = dbHandler;
     }
@@ -63,7 +63,7 @@ public class cmdProbe extends AbstractCommand {
         if (ingameName == null) {
             ingameName = args[0];
             if (!timeMap.containsKey(ingameName) || timeMap.get(ingameName) < System.currentTimeMillis()) {
-                ChatUtils.writeInfo(sender, pluginName, "WARNUNG: Der Spieler mit dem Namen '" + args[0] + "' ist offline. Befehl innerhalb der n�chsten 10 Sekunden neu eingeben, falls der Name richtig war!");
+                ChatUtils.writeInfo(sender, pluginName, "WARNUNG: Der Spieler mit dem Namen '" + args[0] + "' ist offline. Befehl innerhalb der nächsten 10 Sekunden neu eingeben, falls der Name richtig war!");
                 timeMap.put(ingameName, System.currentTimeMillis() + 10 * 1000);
                 return;
             }
@@ -118,8 +118,8 @@ public class cmdProbe extends AbstractCommand {
 
         // CONTAO-ACCOUNT INAKTIV = return
         if (!databaseManager.isContaoAccountActive(contaoID)) {
-            ChatUtils.writeError(sender, pluginName, "Fehler: Bestaetigungsemail wurde noch nicht bestaetigt.");
-            ChatUtils.writeInfo(sender, pluginName, "Bitte dem User bescheid sagen das er bestaetigen muss.");
+            ChatUtils.writeError(sender, pluginName, "Fehler: Bestätigungsemail wurde noch nicht bestätigt.");
+            ChatUtils.writeInfo(sender, pluginName, "Bitte dem User bescheid sagen das er bestätigen muss.");
             return false;
         }
 

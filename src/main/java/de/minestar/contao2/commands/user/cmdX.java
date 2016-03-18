@@ -40,7 +40,7 @@ public class cmdX extends AbstractExtendedCommand {
 
     public cmdX(String syntax, String arguments, String node, PlayerManager playerManager) {
         super(Core.NAME, syntax, arguments, node);
-        this.description = "X-User hinzufügen";
+        this.description = "X-User hinzufÃ¼gen";
         this.playerManager = playerManager;
     }
 
@@ -61,7 +61,7 @@ public class cmdX extends AbstractExtendedCommand {
         if (ingameName == null) {
             ingameName = args[0];
             if (!timeMap.containsKey(ingameName) || timeMap.get(ingameName) < System.currentTimeMillis()) {
-                ChatUtils.writeInfo(sender, pluginName, "WARNUNG: Der Spieler mit dem Namen '" + args[0] + "' ist offline. Befehl innerhalb der nächsten 10 Sekunden neu eingeben, falls der Name richtig war!");
+                ChatUtils.writeInfo(sender, pluginName, "WARNUNG: Der Spieler mit dem Namen '" + args[0] + "' ist offline. Befehl innerhalb der nÃ¤chsten 10 Sekunden neu eingeben, falls der Name richtig war!");
                 timeMap.put(ingameName, System.currentTimeMillis() + 10 * 1000);
                 return;
             }

@@ -66,9 +66,9 @@ public class cmdAddProbeTime extends AbstractCommand {
         }
 
         if (databaseManager.addProbeTime(additionalDays, playerName))
-            ChatUtils.writeSuccess(sender, pluginName, "Probezeit f�r Spieler '" + playerName + "' verlaengert!");
+            ChatUtils.writeSuccess(sender, pluginName, "Probezeit für Spieler '" + playerName + "' verlängert!");
         else
-            ChatUtils.writeError(sender, pluginName, "Fehler beim Verlaengern der Probezeit!");
+            ChatUtils.writeError(sender, pluginName, "Fehler beim Verlängern der Probezeit!");
 
     }
 }
