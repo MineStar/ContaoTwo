@@ -45,6 +45,7 @@ import de.minestar.contao2.listener.FakePlayerListener;
 import de.minestar.contao2.listener.PlayerListener;
 import de.minestar.contao2.listener.StatisticListener;
 import de.minestar.contao2.manager.DatabaseManager;
+import de.minestar.contao2.manager.OnlineManager;
 import de.minestar.contao2.manager.PlayerManager;
 import de.minestar.contao2.manager.StatisticManager;
 import de.minestar.contao2.statistics.FreeLoginFailStat;
@@ -71,6 +72,7 @@ public class Core extends AbstractCore {
     private PlayerManager playerManager;
     private StatisticManager statisticManager;
     private DatabaseManager databaseManager;
+    private OnlineManager onlineManager;
 
     /** Listener */
     private PlayerListener connectionListener;
@@ -88,9 +90,11 @@ public class Core extends AbstractCore {
     protected boolean createManager() {
 
         this.databaseManager = new DatabaseManager(NAME, new File(getDataFolder(), "sqlconfig.yml"));
+        this.onlineManager = new OnlineManager(NAME, new File(getDataFolder(), "onlineconfig.yml"));
         this.playerManager = new PlayerManager();
         this.statisticManager = new StatisticManager(this.databaseManager);
         this.databaseManager.initManager(this.playerManager, this.statisticManager);
+        this.onlineManager.initManager(this.playerManager);
 
         return true;
     }
@@ -98,7 +102,7 @@ public class Core extends AbstractCore {
     @Override
     protected boolean createListener() {
 
-        this.connectionListener = new PlayerListener(this.playerManager, this.databaseManager, this.statisticManager);
+        this.connectionListener = new PlayerListener(this.playerManager, this.databaseManager, this.statisticManager,this.onlineManager);
         this.blockListener = new StatisticListener(this.statisticManager);
         this.fakePlayerListener = new FakePlayerListener(this.playerManager);
 
@@ -180,6 +184,10 @@ public class Core extends AbstractCore {
             databaseManager.closeConnection();
         }
 
+        if (onlineManager != null) {
+            onlineManager.closeConnection();
+        }
+        
         return true;
     }
 }

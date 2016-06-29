@@ -46,6 +46,10 @@ public enum ContaoGroup {
         return group.getName();
     }
 
+    public String getShort() {
+        return group.getShort();
+    }
+    
     /**
      * @return The serialized String in the contao database representing the
      *         group of member

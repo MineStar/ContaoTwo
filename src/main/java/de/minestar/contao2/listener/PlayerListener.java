@@ -32,6 +32,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 import de.minestar.contao2.core.Core;
 import de.minestar.contao2.manager.DatabaseManager;
+import de.minestar.contao2.manager.OnlineManager;
 import de.minestar.contao2.manager.PlayerManager;
 import de.minestar.contao2.manager.StatisticManager;
 import de.minestar.contao2.statistics.FreeLoginFailStat;
@@ -52,13 +53,15 @@ public class PlayerListener implements Listener {
     private PlayerManager playerManager;
     private DatabaseManager databaseManager;
     private StatisticManager statisticManager;
+    private OnlineManager onlineManager;
 
     private HashMap<String, ContaoGroup> oldGroups;
 
-    public PlayerListener(PlayerManager playerManager, DatabaseManager databaseManager, StatisticManager statisticManager) {
+    public PlayerListener(PlayerManager playerManager, DatabaseManager databaseManager, StatisticManager statisticManager, OnlineManager onlineManager) {
         this.playerManager = playerManager;
         this.databaseManager = databaseManager;
         this.statisticManager = statisticManager;
+        this.onlineManager = onlineManager;
 
         this.oldGroups = new HashMap<String, ContaoGroup>();
     }
@@ -73,6 +76,7 @@ public class PlayerListener implements Listener {
         if (player != null) {
             PlayerUtils.sendInfo(player, Core.NAME, "Transfer complete.");
         }
+        this.onlineManager.updatePlayerList(null);
     }
 
     @EventHandler(priority = EventPriority.LOW)
@@ -92,6 +96,8 @@ public class PlayerListener implements Listener {
         ContaoGroup oldGroup = this.oldGroups.get(event.getPlayer().getName());
         ContaoGroup currentGroup = ContaoGroup.getGroup(thisPlayer.getGroup());
 
+        this.onlineManager.updatePlayerList(null);
+        
         // IGNORE ADMINS
         if (currentGroup.equals(ContaoGroup.ADMIN))
             return;
@@ -105,6 +111,7 @@ public class PlayerListener implements Listener {
                 PlayerUtils.sendMessage(event.getPlayer(), ChatColor.RED, "Du wurdest automatisch folgender Gruppe zugewiesen: " + currentGroup.name() + " (vorherige Gruppe: " + oldGroup.name() + ")");
             }
         }
+        
     }
 
     @EventHandler(priority = EventPriority.LOW)
@@ -139,6 +146,8 @@ public class PlayerListener implements Listener {
 
         // FIRE STATISTIC
         StatisticHandler.handleStatistic(new LoginStat(event.getPlayer().getName(), MinestarCore.getPlayer(event.getPlayer().getName()).getGroup(), event.getResult().equals(PlayerLoginEvent.Result.ALLOWED)));
+        
+        
     }
 
     @EventHandler(priority = EventPriority.LOW)
@@ -152,6 +161,8 @@ public class PlayerListener implements Listener {
 
         // FIRE STATISTIC
         StatisticHandler.handleStatistic(new LogoutStat(player.getName(), MinestarCore.getPlayer(player).getGroup()));
+        
+        this.onlineManager.updatePlayerList(player);
     }
 
     // ON PLAYER CHAT
@@ -206,5 +217,6 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onPlayerChangedGroup(PlayerChangedGroupEvent event) {
         this.playerManager.movePlayer(event);
+        this.onlineManager.updatePlayerList(null);
     }
 }

@@ -39,6 +39,7 @@ public class Settings {
     private static String kickedForPayMsg;
     private static String noFreeSlotsMsg;
     private static String motd;
+    private static String serverName;
 
     private static String jsonFilePath;
 
@@ -83,6 +84,8 @@ public class Settings {
 
     private static void loadValues() {
 
+        serverName = config.getString("server.Name");
+        
         // HOW MANY PLAYER CAN JOIN THE SERVER
         maxSlots = config.getInt("slots.maxSlots");
 
@@ -215,6 +218,10 @@ public class Settings {
 
     public static ChatColor getModPrefixColor() {
         return modPrefixColor;
+    }
+
+    public static String getServerName() {
+        return serverName;
     }
 
 }
