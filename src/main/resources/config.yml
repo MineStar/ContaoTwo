@@ -8,6 +8,7 @@ messages:
     disconnectedMSG: Ein PayUser hat deinen Platz bekommen, tut uns leid...
     noFreeSlotsMSG: Derzeit sind alle Free-Slots belegt
     MOTD: Wilkommen auf Minestar :)
+    writeStatsFile: false
 
 # Possible color codes are: 
 # 0 = Black

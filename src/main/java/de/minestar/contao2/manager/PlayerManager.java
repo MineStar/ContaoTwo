@@ -153,7 +153,7 @@ public class PlayerManager {
 
             this.onlineList.put(entry.getKey(), sBuilder.toString());
         }
-        //this.saveJSON();
+        if(Settings.JSONFileEnabled()) this.saveJSON();
     }
 
     private void addPlayer(String playerName) {

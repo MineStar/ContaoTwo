@@ -34,6 +34,7 @@ public class Settings {
     private static int maxSlots;
 
     private static boolean showWelcomeMsg;
+    private static boolean writeJsonFile;
 
     private static String serverFullMsg;
     private static String kickedForPayMsg;
@@ -106,6 +107,9 @@ public class Settings {
 
         // THE MESSAGE OF THE DAY
         motd = config.getString("messages.MOTD");
+        
+        // SHOULD THE JSON FILE SHOULD SAVED
+        writeJsonFile = config.getBoolean("messages.writeStatsFile");
 
         // THE PATH WHERE THE JSON FILE SHOULD SAVED
         jsonFilePath = config.getString("common.userStatsFile");
@@ -178,6 +182,11 @@ public class Settings {
         return motd;
     }
 
+    public static boolean JSONFileEnabled()
+    {
+        return writeJsonFile;
+    }
+    
     public static String getJSONFilePath() {
         return jsonFilePath;
     }
