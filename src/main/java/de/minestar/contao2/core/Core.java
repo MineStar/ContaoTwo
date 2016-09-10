@@ -20,6 +20,7 @@ package de.minestar.contao2.core;
 
 import java.io.File;
 
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.scheduler.BukkitScheduler;
 
@@ -81,6 +82,10 @@ public class Core extends AbstractCore {
 
     public static Core INSTANCE;
 
+    public static Plugin getPlugin() {
+        return Core.INSTANCE;
+    }
+    
     @Override
     protected boolean loadingConfigs(File dataFolder) {
         return Settings.init(dataFolder, NAME, this.getDescription().getVersion());

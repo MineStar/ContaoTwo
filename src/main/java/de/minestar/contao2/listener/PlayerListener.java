@@ -20,6 +20,7 @@ package de.minestar.contao2.listener;
 
 import java.util.HashMap;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -38,6 +39,7 @@ import de.minestar.contao2.manager.StatisticManager;
 import de.minestar.contao2.statistics.FreeLoginFailStat;
 import de.minestar.contao2.statistics.LoginStat;
 import de.minestar.contao2.statistics.LogoutStat;
+import de.minestar.contao2.threading.PlayerKickThread;
 import de.minestar.contao2.units.ContaoGroup;
 import de.minestar.contao2.units.Settings;
 import de.minestar.core.MinestarCore;
@@ -112,6 +114,13 @@ public class PlayerListener implements Listener {
             }
         }
         
+        // Player allowed to join ?
+        if (!this.playerManager.allowedToJoin(currentGroup))
+        {
+            // kick with thread after 2 seconds
+            PlayerKickThread thread = new PlayerKickThread(event.getPlayer().getName(),currentGroup.name());
+            Bukkit.getScheduler().scheduleSyncDelayedTask(Core.getPlugin(), thread, 40L);
+        }
     }
 
     @EventHandler(priority = EventPriority.LOW)

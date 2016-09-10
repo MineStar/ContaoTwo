@@ -270,4 +270,25 @@ public class PlayerManager {
             ConsoleUtils.printException(e, Core.NAME, "Can't save the JSON file!");
         }
     }
+    
+    public boolean allowedToJoin(ContaoGroup group)
+    {
+        switch (group) {
+            case MOD : 
+                return Settings.getAllowMod();
+            case PAY :
+                return Settings.getAllowPay();
+            case FREE :
+                return Settings.getAllowFree();
+            case PROBE :
+                return Settings.getAllowProbe();
+            case DEFAULT :
+                return Settings.getAllowDefault();
+            case X :
+                return Settings.getAllowX();
+            default :
+                return false;
+        }
+    }
+    
 }
