@@ -118,7 +118,7 @@ public class PlayerListener implements Listener {
         if (!this.playerManager.allowedToJoin(currentGroup))
         {
             // kick with thread after 2 seconds
-            PlayerKickThread thread = new PlayerKickThread(event.getPlayer().getName(),currentGroup.name());
+            PlayerKickThread thread = new PlayerKickThread(event.getPlayer().getUniqueId(),currentGroup.name());
             Bukkit.getScheduler().scheduleSyncDelayedTask(Core.getPlugin(), thread, 40L);
         }
     }

@@ -18,23 +18,25 @@
 
 package de.minestar.contao2.threading;
 
+import java.util.UUID;
+
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 public class PlayerKickThread implements Runnable {
 
-    private final String playerName;
+    private final UUID playerUUID;
     private final String GroupName;
 
-    public PlayerKickThread(String playerName, String GroupName) {
-        this.playerName = playerName;
+    public PlayerKickThread(UUID playerUUID, String GroupName) {
+        this.playerUUID = playerUUID;
         this.GroupName = GroupName;
     }
 
     @Override
     public void run() {
-        if (playerName != null) {
-            Player currentPlayer = Bukkit.getServer().getPlayer(this.playerName);
+        if (playerUUID != null) {
+            Player currentPlayer = Bukkit.getServer().getPlayer(this.playerUUID);
             if (currentPlayer != null) {
                 currentPlayer.kickPlayer("User der Gruppe " + GroupName + " dürfen hier nicht Joinen");
             }
