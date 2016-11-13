@@ -78,8 +78,8 @@ public class cmdRemoveWarning extends AbstractCommand {
 
         if (databaseManager.removeWarning(playerName, warning.getDate())) {
             databaseManager.getsManager().getWarnings(playerName).removeWarning(warningNumber);
-            ChatUtils.writeSuccess(sender, pluginName, "Verwarnung wurde erfolgreich gelöscht!");
+            ChatUtils.writeSuccess(sender, pluginName, "Verwarnung wurde erfolgreich gelÃ¶scht!");
         } else
-            ChatUtils.writeError(sender, pluginName, "Fehler beim löschen der Verwarnung!");
+            ChatUtils.writeError(sender, pluginName, "Fehler beim lÃ¶schen der Verwarnung!");
     }
 }

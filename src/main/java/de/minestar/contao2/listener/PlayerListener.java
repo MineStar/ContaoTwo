@@ -20,6 +20,7 @@ package de.minestar.contao2.listener;
 
 import java.util.HashMap;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -32,11 +33,13 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 import de.minestar.contao2.core.Core;
 import de.minestar.contao2.manager.DatabaseManager;
+import de.minestar.contao2.manager.OnlineManager;
 import de.minestar.contao2.manager.PlayerManager;
 import de.minestar.contao2.manager.StatisticManager;
 import de.minestar.contao2.statistics.FreeLoginFailStat;
 import de.minestar.contao2.statistics.LoginStat;
 import de.minestar.contao2.statistics.LogoutStat;
+import de.minestar.contao2.threading.PlayerKickThread;
 import de.minestar.contao2.units.ContaoGroup;
 import de.minestar.contao2.units.Settings;
 import de.minestar.core.MinestarCore;
@@ -52,13 +55,15 @@ public class PlayerListener implements Listener {
     private PlayerManager playerManager;
     private DatabaseManager databaseManager;
     private StatisticManager statisticManager;
+    private OnlineManager onlineManager;
 
     private HashMap<String, ContaoGroup> oldGroups;
 
-    public PlayerListener(PlayerManager playerManager, DatabaseManager databaseManager, StatisticManager statisticManager) {
+    public PlayerListener(PlayerManager playerManager, DatabaseManager databaseManager, StatisticManager statisticManager, OnlineManager onlineManager) {
         this.playerManager = playerManager;
         this.databaseManager = databaseManager;
         this.statisticManager = statisticManager;
+        this.onlineManager = onlineManager;
 
         this.oldGroups = new HashMap<String, ContaoGroup>();
     }
@@ -73,6 +78,7 @@ public class PlayerListener implements Listener {
         if (player != null) {
             PlayerUtils.sendInfo(player, Core.NAME, "Transfer complete.");
         }
+        this.onlineManager.updatePlayerList(null);
     }
 
     @EventHandler(priority = EventPriority.LOW)
@@ -92,6 +98,8 @@ public class PlayerListener implements Listener {
         ContaoGroup oldGroup = this.oldGroups.get(event.getPlayer().getName());
         ContaoGroup currentGroup = ContaoGroup.getGroup(thisPlayer.getGroup());
 
+        this.onlineManager.updatePlayerList(null);
+        
         // IGNORE ADMINS
         if (currentGroup.equals(ContaoGroup.ADMIN))
             return;
@@ -104,6 +112,14 @@ public class PlayerListener implements Listener {
                 // DOWNGRADE
                 PlayerUtils.sendMessage(event.getPlayer(), ChatColor.RED, "Du wurdest automatisch folgender Gruppe zugewiesen: " + currentGroup.name() + " (vorherige Gruppe: " + oldGroup.name() + ")");
             }
+        }
+        
+        // Player allowed to join ?
+        if (!this.playerManager.allowedToJoin(currentGroup))
+        {
+            // kick with thread after 2 seconds
+            PlayerKickThread thread = new PlayerKickThread(event.getPlayer().getUniqueId(),currentGroup.name());
+            Bukkit.getScheduler().scheduleSyncDelayedTask(Core.getPlugin(), thread, 40L);
         }
     }
 
@@ -139,6 +155,8 @@ public class PlayerListener implements Listener {
 
         // FIRE STATISTIC
         StatisticHandler.handleStatistic(new LoginStat(event.getPlayer().getName(), MinestarCore.getPlayer(event.getPlayer().getName()).getGroup(), event.getResult().equals(PlayerLoginEvent.Result.ALLOWED)));
+        
+        
     }
 
     @EventHandler(priority = EventPriority.LOW)
@@ -152,6 +170,8 @@ public class PlayerListener implements Listener {
 
         // FIRE STATISTIC
         StatisticHandler.handleStatistic(new LogoutStat(player.getName(), MinestarCore.getPlayer(player).getGroup()));
+        
+        this.onlineManager.updatePlayerList(player);
     }
 
     // ON PLAYER CHAT
@@ -206,5 +226,6 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onPlayerChangedGroup(PlayerChangedGroupEvent event) {
         this.playerManager.movePlayer(event);
+        this.onlineManager.updatePlayerList(null);
     }
 }

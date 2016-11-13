@@ -34,11 +34,20 @@ public class Settings {
     private static int maxSlots;
 
     private static boolean showWelcomeMsg;
+    private static boolean writeJsonFile;
+
+    private static boolean allowJoinMod;
+    private static boolean allowJoinPay;
+    private static boolean allowJoinFree;
+    private static boolean allowJoinProbe;
+    private static boolean allowJoinDefault;
+    private static boolean allowJoinX;
 
     private static String serverFullMsg;
     private static String kickedForPayMsg;
     private static String noFreeSlotsMsg;
     private static String motd;
+    private static String serverName;
 
     private static String jsonFilePath;
 
@@ -83,6 +92,8 @@ public class Settings {
 
     private static void loadValues() {
 
+        serverName = config.getString("server.Name");
+        
         // HOW MANY PLAYER CAN JOIN THE SERVER
         maxSlots = config.getInt("slots.maxSlots");
 
@@ -103,6 +114,9 @@ public class Settings {
 
         // THE MESSAGE OF THE DAY
         motd = config.getString("messages.MOTD");
+        
+        // SHOULD THE JSON FILE SHOULD SAVED
+        writeJsonFile = config.getBoolean("common.writeStatsFile");
 
         // THE PATH WHERE THE JSON FILE SHOULD SAVED
         jsonFilePath = config.getString("common.userStatsFile");
@@ -125,6 +139,15 @@ public class Settings {
         /* MOD PREFIX */
         modPrefix = config.getString("mod.prefix");
         modPrefixColor = ChatColor.getByChar(config.getString("mod.prefixColor"));
+        
+        /* allowed to join */ 
+        allowJoinMod = config.getBoolean("allowJoin.mod");
+        allowJoinPay = config.getBoolean("allowJoin.pay");
+        allowJoinFree = config.getBoolean("allowJoin.free");
+        allowJoinProbe = config.getBoolean("allowJoin.probe");
+        allowJoinDefault = config.getBoolean("allowJoin.default");
+        allowJoinX = config.getBoolean("allowJoin.x");
+        
     }
 
     public static int getFreeSlots() {
@@ -175,6 +198,11 @@ public class Settings {
         return motd;
     }
 
+    public static boolean JSONFileEnabled()
+    {
+        return writeJsonFile;
+    }
+    
     public static String getJSONFilePath() {
         return jsonFilePath;
     }
@@ -217,4 +245,39 @@ public class Settings {
         return modPrefixColor;
     }
 
+    public static String getServerName() {
+        return serverName;
+    }
+
+    
+    /*  Groups allowed to Join Server */
+    public static boolean getAllowMod()
+    {
+        return allowJoinMod;
+    }
+    
+    public static boolean getAllowPay()
+    {
+        return allowJoinPay;
+    }
+    
+    public static boolean getAllowFree()
+    {
+        return allowJoinFree;
+    }
+    
+    public static boolean getAllowProbe()
+    {
+        return allowJoinProbe;
+    }
+    
+    public static boolean getAllowDefault()
+    {
+        return allowJoinDefault;
+    }
+    
+    public static boolean getAllowX()
+    {
+        return allowJoinX;
+    }
 }

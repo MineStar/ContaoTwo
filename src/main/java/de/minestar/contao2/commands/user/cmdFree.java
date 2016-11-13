@@ -42,7 +42,7 @@ public class cmdFree extends AbstractCommand {
 
     public cmdFree(String syntax, String arguments, String node, PlayerManager playerManager, DatabaseManager databaseManager) {
         super(Core.NAME, syntax, arguments, node);
-        this.description = "Freeuser hinzufügen";
+        this.description = "Freeuser hinzufÃ¼gen";
         this.playerManager = playerManager;
         this.databaseManager = databaseManager;
     }

@@ -39,3 +39,12 @@ mod:
     prefixColor: 'c'
 common:
     userStatsFile: userstats.json
+    writeStatsFile: false
+allowJoin:
+    admin: true
+    mod: true
+    pay: true
+    free: true
+    probe: true
+    default: true
+    x: true

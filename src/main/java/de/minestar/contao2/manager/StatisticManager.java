@@ -126,8 +126,8 @@ public class StatisticManager implements Runnable {
         if (stats == null)
             ChatUtils.writeColoredMessage(player, ChatColor.RED, "Du hast keine Statistiken!");
         else {
-            ChatUtils.writeColoredMessage(player, ChatColor.BLUE, "Blöcke zerstört: " + stats.getTotalBreak());
-            ChatUtils.writeColoredMessage(player, ChatColor.BLUE, "Blöcke gesetzt  : " + stats.getTotalPlaced());
+            ChatUtils.writeColoredMessage(player, ChatColor.BLUE, "BlÃ¶cke zerstÃ¶rt: " + stats.getTotalBreak());
+            ChatUtils.writeColoredMessage(player, ChatColor.BLUE, "BlÃ¶cke gesetzt  : " + stats.getTotalPlaced());
         }
     }
 }
