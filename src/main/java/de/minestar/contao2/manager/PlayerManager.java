@@ -274,6 +274,8 @@ public class PlayerManager {
     public boolean allowedToJoin(ContaoGroup group)
     {
         switch (group) {
+            case ADMIN :
+                return true;
             case MOD : 
                 return Settings.getAllowMod();
             case PAY :

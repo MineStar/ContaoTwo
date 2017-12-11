@@ -100,6 +100,8 @@ public class DatabaseManager extends AbstractMySQLHandler {
     public final static int GROUP_ID_PAY = 32;
     public final static int GROUP_ID_MOD = 37;
     public final static int GROUP_ID_ADMIN = 13;
+    public final static int GROUP_ID_TMPBAN = 35;
+    public final static int GROUP_ID_PERMBAN = 36;
 
     private final static int PROBE_TIME = 7;
 
@@ -138,7 +140,7 @@ public class DatabaseManager extends AbstractMySQLHandler {
 
         selectForumIds = con.prepareStatement("SELECT userID, "+minecraftNickOptionStr+" FROM wcf1_user_option_value WHERE "+minecraftNickOptionStr+" LIKE ?");
 
-        selectFinalGroup = con.prepareStatement("SELECT groupID FROM user_group_final WHERE userID = ?");
+        selectFinalGroup = con.prepareStatement("SELECT groupID, admin, mods, banned FROM user_group_final WHERE userID = ?");
 
         checkForumId = con.prepareStatement("SELECT 1 FROM wcf1_user WHERE userID = ? LIMIT 1");
 
@@ -384,28 +386,40 @@ public class DatabaseManager extends AbstractMySQLHandler {
             ResultSet result = selectFinalGroup.executeQuery();
 
             if (result.next()) {
-                int forumGroup = result.getInt(1);
-                return getMCGroupName(forumGroup);
+                int forumGroup = result.getInt("groupID");
+                boolean admin = result.getBoolean("admin");
+                boolean mod = result.getBoolean("mods");
+                boolean banned = result.getBoolean("banned");
+                return getMCGroupName(forumGroup, admin, mod, banned);
             }
         } catch (Exception e) {
-            ConsoleUtils.printException(e, Core.NAME, "Can't get ContaoGroupName from tl_member! ContaoID=" + forumId);
+            ConsoleUtils.printException(e, Core.NAME, "Can't get ContaoGroupName from user_group_final! userID=" + forumId);
         }
 
         return null;
     }
 
     // GET MC GROUP FROM CONTAO-GROUPID
-    private String getMCGroupName(int id) {
-        if (id == GROUP_ID_FREE)
-            return ContaoGroup.FREE.getName();
-        else if (id == GROUP_ID_PAY)
-            return ContaoGroup.PAY.getName();
-        else if (id == GROUP_ID_ADMIN)
+    private String getMCGroupName(int groupID, boolean admin, boolean mod, boolean banned) {
+        if (banned)
+            return ContaoGroup.X.getName();
+        else if(admin)
             return ContaoGroup.ADMIN.getName();
-        else if (id == GROUP_ID_PROBE)
-            return ContaoGroup.PROBE.getName();
-        else if (id == GROUP_ID_MOD)
+        else if(mod)
             return ContaoGroup.MOD.getName();
+        //Anything else
+        else if (groupID == GROUP_ID_FREE)
+            return ContaoGroup.FREE.getName();
+        else if (groupID == GROUP_ID_PAY)
+            return ContaoGroup.PAY.getName();
+        else if (groupID == GROUP_ID_ADMIN)
+            return ContaoGroup.ADMIN.getName();
+        else if (groupID == GROUP_ID_PROBE)
+            return ContaoGroup.PROBE.getName();
+        else if (groupID == GROUP_ID_MOD)
+            return ContaoGroup.MOD.getName();
+        else if(groupID == GROUP_ID_TMPBAN || groupID == GROUP_ID_PERMBAN)
+            return ContaoGroup.X.getName();
         return ContaoGroup.DEFAULT.getName();
     }
 

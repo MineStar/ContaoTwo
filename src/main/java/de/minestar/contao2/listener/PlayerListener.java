@@ -101,9 +101,9 @@ public class PlayerListener implements Listener {
 
         this.onlineManager.updatePlayerList(null);
         
-        // IGNORE ADMINS
-        if (currentGroup.equals(ContaoGroup.ADMIN))
-            return;
+        // IGNORE ADMINS WHY?
+//        if (currentGroup.equals(ContaoGroup.ADMIN))
+//            return;
 
         if (!currentGroup.equals(oldGroup)) {
             if (currentGroup.isHigher(oldGroup)) {
@@ -130,12 +130,12 @@ public class PlayerListener implements Listener {
         // GET MINESTAR-PLAYER
         MinestarPlayer thisPlayer = MinestarCore.getPlayer(event.getPlayer().getName());
 
-        // IGNORE ADMINS
-        if (thisPlayer.getMinestarGroup().equals(MinestarGroup.ADMIN)) {
-            // FIRE STATISTIC
-            StatisticHandler.handleStatistic(new LoginStat(event.getPlayer().getName(), MinestarGroup.ADMIN.getName(), true));
-            return;
-        }
+        // IGNORE ADMINS JUST WHY?
+//        if (thisPlayer.getMinestarGroup().equals(MinestarGroup.ADMIN)) {
+//            // FIRE STATISTIC
+//            StatisticHandler.handleStatistic(new LoginStat(event.getPlayer().getName(), MinestarGroup.ADMIN.getName(), true));
+//            return;
+//        }
 
         // SAVE OLD GROUP
         this.oldGroups.put(event.getPlayer().getName(), ContaoGroup.getGroup(thisPlayer.getGroup()));
