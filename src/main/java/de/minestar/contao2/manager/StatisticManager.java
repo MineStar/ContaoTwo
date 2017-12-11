@@ -49,7 +49,14 @@ public class StatisticManager implements Runnable {
     }
 
     public Statistic getPlayersStatistic(UUID playerUUID) {
-        return statistics.get(playerUUID);
+        Statistic stat = statistics.get(playerUUID);
+        if(stat == null) {
+            stat = databaseManager.loadStatistics(playerUUID);
+            if(stat != null) {
+                statistics.put(playerUUID, stat);
+            }
+        }
+        return stat;
     }
 
     private void loadAllStatistics() {
@@ -104,7 +111,7 @@ public class StatisticManager implements Runnable {
 
         ChatUtils.writeMessage(player, "");
         if (stats == null)
-            ChatUtils.writeColoredMessage(player, ChatColor.RED, "Du hast keine Statistiken! Lasse einen Admin deine ID eintragen!");
+            ChatUtils.writeColoredMessage(player, ChatColor.RED, "Du hast keine Statistiken! Ein Admin oder Mod kann dir sicher helfen.");
         else {
             ChatUtils.writeColoredMessage(player, ChatColor.BLUE, "Blöcke zerstört: " + stats.getTotalBreak());
             ChatUtils.writeColoredMessage(player, ChatColor.BLUE, "Blöcke gesetzt  : " + stats.getTotalPlaced());

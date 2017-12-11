@@ -76,6 +76,8 @@ public class DatabaseManager extends AbstractMySQLHandler {
 //    private PreparedStatement selectAllWarnings;
     private PreparedStatement saveStatistics;
 
+    private PreparedStatement selectUserStatistics;
+
     private PreparedStatement canBeFree;
     private PreparedStatement hasUsedFreeWeek, setFreeWeekUsed;
 
@@ -165,6 +167,8 @@ public class DatabaseManager extends AbstractMySQLHandler {
         isInProbation = con.prepareStatement("SELECT 1 FROM mc_pay WHERE "+minecraftUUIDOptionStr+" = ? AND DATEDIFF(NOW(),probeEndDate) < 0");
 
         selectAllStatistics = con.prepareStatement("SELECT "+minecraftUUIDOptionStr+", "+minecraftTotalBreakOptionStr+", "+minecraftTotalPlacedOptionStr+" FROM wcf1_user_option_value where "+minecraftUUIDOptionStr+" IS NOT NULL");
+
+        selectUserStatistics = con.prepareStatement("SELECT "+minecraftTotalBreakOptionStr+", "+minecraftTotalPlacedOptionStr+" FROM wcf1_user_option_value where "+minecraftUUIDOptionStr+" =?");
 
         saveStatistics = con.prepareStatement("UPDATE wcf1_user_option_value SET "+minecraftTotalPlacedOptionStr+" = ?, "+minecraftTotalBreakOptionStr+" = ? WHERE "+minecraftUUIDOptionStr+" = ?");
 
@@ -752,7 +756,20 @@ public class DatabaseManager extends AbstractMySQLHandler {
     public StatisticManager getsManager() {
         return sManager;
     }
-    
+
+    public Statistic loadStatistics(UUID playerUUID) {
+        try {
+            selectUserStatistics.setString(1, playerUUID.toString());
+            ResultSet result = selectUserStatistics.executeQuery();
+            if (result.next()) {
+                return new Statistic(result.getInt(minecraftTotalPlacedOptionStr), result.getInt(minecraftTotalBreakOptionStr));
+            }
+        } catch (Exception e) {
+            ConsoleUtils.printException(e, Core.NAME, "Can't find statistics for User! uuid=" + playerUUID);
+        }
+        return null;
+    }
+
 //    public boolean updateMCNick(String oldPlayer, String newPlayer) {
 //        try {
 //            // UPDATE THE WARP NAME
