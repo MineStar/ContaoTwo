@@ -21,11 +21,11 @@ package de.minestar.contao2.units;
 public class MCUser {
     private final String expDate;
     private final String nickname;
-    private final int contaoID;
+    private final int userID;
 
-    public MCUser(String nickname, int contaoID, String expDate) {
+    public MCUser(String nickname, int userID, String expDate) {
         this.nickname = nickname;
-        this.contaoID = contaoID;
+        this.userID = userID;
         this.expDate = expDate;
     }
 
@@ -37,7 +37,7 @@ public class MCUser {
         return nickname;
     }
 
-    public int getContaoID() {
-        return contaoID;
+    public int getUserID() {
+        return userID;
     }
 }

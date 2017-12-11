@@ -18,26 +18,27 @@
 
 package de.minestar.contao2.units;
 
+import de.minestar.contao2.manager.DatabaseManager;
 import de.minestar.core.units.MinestarGroup;
 
 public enum ContaoGroup {
 
     //@formatter:off
-    ADMIN   (MinestarGroup.ADMIN,   "a:2:{i:0;s:1:\"3\";i:1;s:1:\"2\";}"),
-    MOD     (MinestarGroup.MOD,     "a:2:{i:0;s:1:\"6\";i:1;s:1:\"2\";}"),
-    PAY     (MinestarGroup.PAY,     "a:1:{i:0;s:1:\"2\";}"),
-    FREE    (MinestarGroup.FREE,    "a:1:{i:0;s:1:\"1\";}"),
-    PROBE   (MinestarGroup.PROBE,   "a:1:{i:0;s:1:\"5\";}"),
-    DEFAULT (MinestarGroup.DEFAULT, "a:1:{i:0;s:1:\"4\";}"),
-    X       (MinestarGroup.X,       "a:1:{i:0;s:1:\"4\";}");
+    ADMIN   (MinestarGroup.ADMIN,   DatabaseManager.GROUP_ID_ADMIN),
+    MOD     (MinestarGroup.MOD,     DatabaseManager.GROUP_ID_MOD),
+    PAY     (MinestarGroup.PAY,     DatabaseManager.GROUP_ID_PAY),
+    FREE    (MinestarGroup.FREE,    DatabaseManager.GROUP_ID_FREE),
+    PROBE   (MinestarGroup.PROBE,   DatabaseManager.GROUP_ID_PROBE),
+    DEFAULT (MinestarGroup.DEFAULT, -1),
+    X       (MinestarGroup.X,       -2);
     //@formatter:on
 
     private final MinestarGroup group;
-    // The serialized string in contao database
-    private final String contaoString;
 
-    private ContaoGroup(MinestarGroup group, String contaoString) {
-        this.contaoString = contaoString;
+    private final int groupID;
+
+    private ContaoGroup(MinestarGroup group, int groupID) {
+        this.groupID = groupID;
         this.group = group;
     }
 
@@ -51,11 +52,10 @@ public enum ContaoGroup {
     }
     
     /**
-     * @return The serialized String in the contao database representing the
-     *         group of member
+     * @return The DB Group ID
      */
-    public String getContaoString() {
-        return contaoString;
+    public int groupID() {
+        return groupID;
     }
 
     public static ContaoGroup getGroup(String groupName) {

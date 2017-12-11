@@ -47,12 +47,14 @@ public class cmdAdmin extends AbstractCommand {
 
     @Override
     public void execute(String[] args, Player player) {
-        addAdmin(args, player);
+        //TODO
+//        addAdmin(args, player);
     }
 
     @Override
     public void execute(String[] args, ConsoleCommandSender console) {
-        addAdmin(args, console);
+        //TODO
+//        addAdmin(args, console);
     }
 
     private final static SimpleDateFormat FORMAT = new SimpleDateFormat("dd.MM.yyyy");
@@ -61,45 +63,45 @@ public class cmdAdmin extends AbstractCommand {
         FORMAT.setLenient(false);
     }
 
-    private void addAdmin(String[] args, CommandSender sender) {
-
-        String date = args[1];
-        // if date is not in dd.MM.yyyy format
-        if (!validateDate(date))
-            return;
-
-        MCUser user = databaseManager.getIngameData(args[0]);
-        if (user == null) {
-            ChatUtils.writeError(sender, pluginName, "Fehler: Minecraftnick nicht gefunden!");
-            return;
-        }
-
-        String ingameName = user.getNickname();
-        int contaoID = user.getContaoID();
-
-        // ADD USER TO MC-DB
-        databaseManager.setExpDateInMCTable(date, contaoID);
-
-        // CONTAO GRUPPE AUF ADMIN SETZEN
-        databaseManager.updateContaoGroup(ContaoGroup.ADMIN, contaoID);
-
-        // PRINT INFO
-        ChatUtils.writeSuccess(sender, pluginName, "Spieler '" + ingameName + "' ist nun Admin (bezahlt bis '" + date + "')!");
-
-        Player target = PlayerUtils.getOnlinePlayer(ingameName);
-        if (target != null)
-            PlayerUtils.sendSuccess(target, "Du bist nun Admin (bezahlt bis '" + date + "')!");
-
-        // UPDATE GROUPMANAGER-GROUP
-        this.playerManager.updateGroupManagerGroup(ingameName, ContaoGroup.ADMIN);
-    }
-
-    private boolean validateDate(String date) {
-        try {
-            FORMAT.parse(date);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
+//    private void addAdmin(String[] args, CommandSender sender) {
+//
+//        String date = args[1];
+//        // if date is not in dd.MM.yyyy format
+//        if (!validateDate(date))
+//            return;
+//
+//        MCUser user = databaseManager.getIngameData(args[0]);
+//        if (user == null) {
+//            ChatUtils.writeError(sender, pluginName, "Fehler: Minecraftnick nicht gefunden!");
+//            return;
+//        }
+//
+//        String ingameName = user.getNickname();
+//        int contaoID = user.getUserID();
+//
+//        // ADD USER TO MC-DB
+//        databaseManager.setExpDateInMCTable(date, contaoID);
+//
+//        // CONTAO GRUPPE AUF ADMIN SETZEN
+//        databaseManager.updateContaoGroup(ContaoGroup.ADMIN, contaoID);
+//
+//        // PRINT INFO
+//        ChatUtils.writeSuccess(sender, pluginName, "Spieler '" + ingameName + "' ist nun Admin (bezahlt bis '" + date + "')!");
+//
+//        Player target = PlayerUtils.getOnlinePlayer(ingameName);
+//        if (target != null)
+//            PlayerUtils.sendSuccess(target, "Du bist nun Admin (bezahlt bis '" + date + "')!");
+//
+//        // UPDATE GROUPMANAGER-GROUP
+//        this.playerManager.updateGroupManagerGroup(ingameName, ContaoGroup.ADMIN);
+//    }
+//
+//    private boolean validateDate(String date) {
+//        try {
+//            FORMAT.parse(date);
+//            return true;
+//        } catch (Exception e) {
+//            return false;
+//        }
+//    }
 }

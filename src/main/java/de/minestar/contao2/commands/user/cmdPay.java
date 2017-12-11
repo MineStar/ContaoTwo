@@ -47,57 +47,59 @@ public class cmdPay extends AbstractCommand {
 
     @Override
     public void execute(String[] args, Player player) {
-        addPay(args, player);
+        //TODO
+//        addPay(args, player);
     }
 
     @Override
     public void execute(String[] args, ConsoleCommandSender console) {
-        addPay(args, console);
+        //TODO
+//        addPay(args, console);
     }
 
-    private final static SimpleDateFormat FORMAT = new SimpleDateFormat("dd.MM.yyyy");
-
-    static {
-        FORMAT.setLenient(false);
-    }
-
-    private void addPay(String[] args, CommandSender sender) {
-
-        String date = args[1];
-        // if date is not in dd.MM.yyyy format
-        if (!validateDate(date))
-            return;
-
-        MCUser user = databaseManager.getIngameData(args[0]);
-        if (user == null) {
-            ChatUtils.writeError(sender, pluginName, "Fehler: Minecraftnick nicht gefunden");
-            return;
-        }
-        String ingameName = user.getNickname();
-        int contaoID = user.getContaoID();
-
-        // UPDATE DATE WHEN PAY IS EXPIRED!
-        databaseManager.setExpDateInMCTable(date, contaoID);
-
-        // CONTAO GRUPPE AUF PAY SETZEN
-        databaseManager.updateContaoGroup(ContaoGroup.PAY, contaoID);
-
-        ChatUtils.writeSuccess(sender, pluginName, "Spieler '" + ingameName + "' ist nun Payuser (bezahlt bis '" + date + "')!");
-
-        Player target = PlayerUtils.getOnlinePlayer(ingameName);
-        if (target != null)
-            PlayerUtils.sendSuccess(target, "Du bist nun Payuser (bezahlt bis '" + date + "')!");
-
-        // UPDATE GROUPMANAGER-GROUP
-        this.playerManager.updateGroupManagerGroup(ingameName, ContaoGroup.PAY);
-    }
-
-    private boolean validateDate(String date) {
-        try {
-            FORMAT.parse(date);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
+//    private final static SimpleDateFormat FORMAT = new SimpleDateFormat("dd.MM.yyyy");
+//
+//    static {
+//        FORMAT.setLenient(false);
+//    }
+//
+//    private void addPay(String[] args, CommandSender sender) {
+//
+//        String date = args[1];
+//        // if date is not in dd.MM.yyyy format
+//        if (!validateDate(date))
+//            return;
+//
+//        MCUser user = databaseManager.getIngameData(args[0]);
+//        if (user == null) {
+//            ChatUtils.writeError(sender, pluginName, "Fehler: Minecraftnick nicht gefunden");
+//            return;
+//        }
+//        String ingameName = user.getNickname();
+//        int contaoID = user.getUserID();
+//
+//        // UPDATE DATE WHEN PAY IS EXPIRED!
+//        databaseManager.setExpDateInMCTable(date, contaoID);
+//
+//        // CONTAO GRUPPE AUF PAY SETZEN
+//        databaseManager.updateContaoGroup(ContaoGroup.PAY, contaoID);
+//
+//        ChatUtils.writeSuccess(sender, pluginName, "Spieler '" + ingameName + "' ist nun Payuser (bezahlt bis '" + date + "')!");
+//
+//        Player target = PlayerUtils.getOnlinePlayer(ingameName);
+//        if (target != null)
+//            PlayerUtils.sendSuccess(target, "Du bist nun Payuser (bezahlt bis '" + date + "')!");
+//
+//        // UPDATE GROUPMANAGER-GROUP
+//        this.playerManager.updateGroupManagerGroup(ingameName, ContaoGroup.PAY);
+//    }
+//
+//    private boolean validateDate(String date) {
+//        try {
+//            FORMAT.parse(date);
+//            return true;
+//        } catch (Exception e) {
+//            return false;
+//        }
+//    }
 }

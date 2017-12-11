@@ -18,6 +18,8 @@
 
 package de.minestar.contao2.listener;
 
+import de.minestar.minestarlibrary.utils.ChatUtils;
+import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -26,6 +28,8 @@ import org.bukkit.event.block.BlockPlaceEvent;
 
 import de.minestar.contao2.manager.StatisticManager;
 import de.minestar.contao2.units.Statistic;
+
+import java.util.UUID;
 
 public class StatisticListener implements Listener {
 
@@ -39,18 +43,21 @@ public class StatisticListener implements Listener {
     public void onBlockBreak(BlockBreakEvent event) {
         if (event.isCancelled())
             return;
-        String playerName = event.getPlayer().getName();
-        Statistic thisStatistic = statisticManager.getPlayersStatistic(playerName);
-        thisStatistic.incrementBreak();
+        UUID playerUUID = event.getPlayer().getUniqueId();
+        Statistic stat = statisticManager.getPlayersStatistic(playerUUID);
+        if(stat !=  null) {
+            stat.incrementBreak();
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onBlockPlace(BlockPlaceEvent event) {
         if (event.isCancelled())
             return;
-        String playerName = event.getPlayer().getName();
-        Statistic stat = statisticManager.getPlayersStatistic(playerName);
-        if (stat != null)
+        UUID playerUUID = event.getPlayer().getUniqueId();
+        Statistic stat = statisticManager.getPlayersStatistic(playerUUID);
+        if(stat !=  null) {
             stat.incrementPlace();
+        }
     }
 }

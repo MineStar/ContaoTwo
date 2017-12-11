@@ -9,7 +9,7 @@
 			<id>MinestarNexus</id>
 			<url>http://nexus.outi-networks.de/content/groups/public/</url>
 		</repository>
-	</repositories>	
+	</repositories>
 	<distributionManagement>
 		<!-- use the following if you're not using a snapshot version. -->
 		<repository>

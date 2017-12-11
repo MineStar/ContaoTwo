@@ -49,37 +49,38 @@ public class cmdPayWeek extends AbstractExtendedCommand {
 
     @Override
     public void execute(String[] args, Player player) {
-        MinestarPlayer msPlayer = MinestarCore.getPlayer(player);
-
-        // ONLY FREEUSERS CAN USE THIS COMMAND
-        if (!msPlayer.getMinestarGroup().equals(MinestarGroup.FREE)) {
-            PlayerUtils.sendError(player, Core.NAME, "Free-User only!");
-            return;
-        }
-
-        // GET CONTAOUSER
-        MCUser user = databaseManager.getIngameData(player.getName());
-        if (user == null) {
-            PlayerUtils.sendError(player, Core.NAME, "Fehler: Minecraftnick nicht gefunden");
-            return;
-        }
-
-        // GUTSCHEIN EINGEL�ST?
-        if (this.databaseManager.hasUsedFreeWeek(player.getName())) {
-            PlayerUtils.sendError(player, Core.NAME, "Du hast deinen Gutschein bereits eingelöst!");
-            return;
-        }
-
-        // PAYUSER-DATUM SETZEN
-        this.databaseManager.setExpDateInMCTable(dateFormat.format((System.currentTimeMillis() + TimeUnit.DAYS.toMillis(7))), user.getContaoID());
-
-        // CONTAO GRUPPE AUF PAY SETZEN
-        databaseManager.updateContaoGroup(ContaoGroup.PAY, user.getContaoID());
-
-        // GUTSCHEIN ALS EINGEL�ST SETZEN
-        this.databaseManager.setFreeWeekUsed(player.getName());
-
-        // UPDATE GROUPMANAGER-GROUP
-        this.playerManager.updateGroupManagerGroup(player.getName(), ContaoGroup.PAY);
+        //TODO
+//        MinestarPlayer msPlayer = MinestarCore.getPlayer(player);
+//
+//        // ONLY FREEUSERS CAN USE THIS COMMAND
+//        if (!msPlayer.getMinestarGroup().equals(MinestarGroup.FREE)) {
+//            PlayerUtils.sendError(player, Core.NAME, "Free-User only!");
+//            return;
+//        }
+//
+//        // GET CONTAOUSER
+//        MCUser user = databaseManager.getIngameData(player.getName());
+//        if (user == null) {
+//            PlayerUtils.sendError(player, Core.NAME, "Fehler: Minecraftnick nicht gefunden");
+//            return;
+//        }
+//
+//        // GUTSCHEIN EINGEL�ST?
+//        if (this.databaseManager.hasUsedFreeWeek(player.getName())) {
+//            PlayerUtils.sendError(player, Core.NAME, "Du hast deinen Gutschein bereits eingelöst!");
+//            return;
+//        }
+//
+//        // PAYUSER-DATUM SETZEN
+//        this.databaseManager.setExpDateInMCTable(dateFormat.format((System.currentTimeMillis() + TimeUnit.DAYS.toMillis(7))), user.getUserID());
+//
+//        // CONTAO GRUPPE AUF PAY SETZEN
+//        databaseManager.updateContaoGroup(ContaoGroup.PAY, user.getUserID());
+//
+//        // GUTSCHEIN ALS EINGEL�ST SETZEN
+//        this.databaseManager.setFreeWeekUsed(player.getName());
+//
+//        // UPDATE GROUPMANAGER-GROUP
+//        this.playerManager.updateGroupManagerGroup(player.getName(), ContaoGroup.PAY);
     }
 }

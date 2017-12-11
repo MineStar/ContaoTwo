@@ -18,7 +18,9 @@
 
 package de.minestar.contao2.commands.user;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
@@ -28,6 +30,8 @@ import de.minestar.contao2.manager.DatabaseManager;
 import de.minestar.minestarlibrary.commands.AbstractExtendedCommand;
 import de.minestar.minestarlibrary.utils.ChatUtils;
 import de.minestar.minestarlibrary.utils.PlayerUtils;
+
+import java.util.UUID;
 
 public class cmdAddWarning extends AbstractExtendedCommand {
 
@@ -41,33 +45,51 @@ public class cmdAddWarning extends AbstractExtendedCommand {
 
     @Override
     public void execute(String[] args, Player player) {
-        addWarning(args, player);
+        //TODO
+//        addWarning(args, player);
     }
 
     @Override
     public void execute(String[] args, ConsoleCommandSender console) {
-        addWarning(args, console);
+        //TODO
+//        addWarning(args, console);
     }
 
-    private void addWarning(String[] args, CommandSender sender) {
-
-        String playerName = args[0];
-
-        if (!databaseManager.isMCNickInMCTable(playerName)) {
-            ChatUtils.writeError(sender, pluginName, "Spieler '" + playerName + "' existiert nicht!");
-            return;
-        }
-
-        String text = ChatUtils.getMessage(args, " ", 1);
-
-        if (databaseManager.addWarning(playerName, text, sender.getName())) {
-            ChatUtils.writeSuccess(sender, pluginName, "Spieler '" + playerName + "' wurde verwarnt!");
-            Player target = PlayerUtils.getOnlinePlayer(playerName);
-            if (target != null) {
-                PlayerUtils.sendMessage(target, ChatColor.RED, sender.getName() + " hat dich verwarnt aus folgendem Grund :");
-                PlayerUtils.sendMessage(target, ChatColor.RED, text);
-            }
-        } else
-            ChatUtils.writeError(sender, pluginName, "Fehler beim Verwarnen!");
-    }
+//    private void addWarning(String[] args, CommandSender sender) {
+//
+//        String playerName = args[0];
+//
+//        Player player = PlayerUtils.getOnlinePlayer(playerName);
+//        if(player == null) {
+//            OfflinePlayer offlinePlayer = PlayerUtils.getOfflinePlayer(playerName);
+//            if(offlinePlayer == null) {
+//                ChatUtils.writeError(sender, pluginName, "Spiler '" + playerName + "' wurde nicht gefunden. War der Spieler schon einmal online?");
+//                return;
+//            } else if(args.length > 2 && "offline".equals(args[2])) {
+//                player = offlinePlayer.getPlayer();
+//            } else {
+//                ChatUtils.writeError(sender, pluginName, "Spiler '" + playerName + "' ist offline. Kommando mit offline wiederholen.");
+//                return;
+//            }
+//        }
+//
+//        UUID uuid = player.getUniqueId();
+//
+//        if (!databaseManager.isMCUUIDInUser(uuid)) {
+//            ChatUtils.writeError(sender, pluginName, "Spieler '" + playerName + "' nicht gefunden!");
+//            return;
+//        }
+//
+//        String text = ChatUtils.getMessage(args, " ", 1);
+//
+//        if (databaseManager.addWarning(uuid, text, sender.getName())) {
+//            ChatUtils.writeSuccess(sender, pluginName, "Spieler '" + playerName + "' wurde verwarnt!");
+//            Player target = PlayerUtils.getOnlinePlayer(playerName);
+//            if (target != null) {
+//                PlayerUtils.sendMessage(target, ChatColor.RED, sender.getName() + " hat dich verwarnt aus folgendem Grund :");
+//                PlayerUtils.sendMessage(target, ChatColor.RED, text);
+//            }
+//        } else
+//            ChatUtils.writeError(sender, pluginName, "Fehler beim Verwarnen!");
+//    }
 }

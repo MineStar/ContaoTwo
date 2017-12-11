@@ -43,30 +43,32 @@ public class cmdDefault extends AbstractCommand {
 
     @Override
     public void execute(String[] args, Player player) {
-        addDefault(args, player);
+        //TODO
+//        addDefault(args, player);
     }
 
     @Override
     public void execute(String[] args, ConsoleCommandSender console) {
-        addDefault(args, console);
+        //TODO
+//        addDefault(args, console);
     }
 
-    private void addDefault(String[] args, CommandSender sender) {
-
-        String ingameName = PlayerUtils.getCorrectPlayerName(args[0]);
-
-        if (ingameName == null) {
-            ChatUtils.writeError(sender, pluginName, "Es existiert kein User mit dem Namen '" + args[0] + "'!");
-            return;
-        }
-
-        // Remove information about the x-user
-        MinestarPlayer mPlayer = MinestarCore.getPlayer(ingameName);
-        mPlayer.removeValue("contao.xreason", String.class);
-        mPlayer.removeValue("contao.xadmin", String.class);
-
-        ChatUtils.writeSuccess(sender, pluginName, "Spieler '" + ingameName + "' ist nun in Gruppe 'Default'!");
-        // UPDATE GROUPMANAGER-GROUP
-        this.playerManager.updateGroupManagerGroup(ingameName, ContaoGroup.DEFAULT);
-    }
+//    private void addDefault(String[] args, CommandSender sender) {
+//
+//        String ingameName = PlayerUtils.getCorrectPlayerName(args[0]);
+//
+//        if (ingameName == null) {
+//            ChatUtils.writeError(sender, pluginName, "Es existiert kein User mit dem Namen '" + args[0] + "'!");
+//            return;
+//        }
+//
+//        // Remove information about the x-user
+//        MinestarPlayer mPlayer = MinestarCore.getPlayer(ingameName);
+//        mPlayer.removeValue("contao.xreason", String.class);
+//        mPlayer.removeValue("contao.xadmin", String.class);
+//
+//        ChatUtils.writeSuccess(sender, pluginName, "Spieler '" + ingameName + "' ist nun in Gruppe 'Default'!");
+//        // UPDATE GROUPMANAGER-GROUP
+//        this.playerManager.updateGroupManagerGroup(ingameName, ContaoGroup.DEFAULT);
+//    }
 }

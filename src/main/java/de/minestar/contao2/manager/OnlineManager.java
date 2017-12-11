@@ -80,7 +80,7 @@ public class OnlineManager extends AbstractMySQLHandler {
     {
         try
         {
-            String Users = "";
+            String Users;
             DateFormat df = new SimpleDateFormat("dd.MM.yyyy kk:mm");
             String upDate = df.format(new Date()).toString();
             String prefix = "";

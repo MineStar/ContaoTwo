@@ -19,6 +19,7 @@
 package de.minestar.contao2.manager;
 
 import java.util.Map.Entry;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -33,8 +34,8 @@ import de.minestar.minestarlibrary.utils.ChatUtils;
 
 public class StatisticManager implements Runnable {
 
-    private ConcurrentMap<String, Statistic> statistics = new ConcurrentHashMap<String, Statistic>();
-    private ConcurrentMap<String, PlayerWarnings> warnings = new ConcurrentHashMap<String, PlayerWarnings>();
+    private ConcurrentMap<UUID, Statistic> statistics = new ConcurrentHashMap<>();
+    private ConcurrentMap<UUID, PlayerWarnings> warnings = new ConcurrentHashMap<>();
     private DatabaseManager databaseManager;
 
     public StatisticManager(DatabaseManager dbManager) {
@@ -47,14 +48,8 @@ public class StatisticManager implements Runnable {
         this.loadAllWarnings();
     }
 
-    public Statistic getPlayersStatistic(String playerName) {
-        playerName = playerName.toLowerCase();
-        Statistic thisStatistic = statistics.get(playerName);
-        if (thisStatistic == null) {
-            thisStatistic = new Statistic(0, 0);
-            this.statistics.put(playerName, thisStatistic);
-        }
-        return thisStatistic;
+    public Statistic getPlayersStatistic(UUID playerUUID) {
+        return statistics.get(playerUUID);
     }
 
     private void loadAllStatistics() {
@@ -67,49 +62,34 @@ public class StatisticManager implements Runnable {
 
     @Override
     public void run() {
-        for (Entry<String, Statistic> entry : statistics.entrySet()) {
-            Statistic stats = entry.getValue();
-            if (stats.hasChanged()) {
-                databaseManager.saveStatistics(entry.getKey().toLowerCase(), stats.getTotalPlaced(), stats.getTotalBreak());
-                stats.setHasChanged(false);
-            }
-        }
+        saveAllStatistics();
     }
 
     public void saveAllStatistics() {
-        for (Entry<String, Statistic> entry : statistics.entrySet()) {
+        for (Entry<UUID, Statistic> entry : statistics.entrySet()) {
             Statistic stats = entry.getValue();
             if (stats.hasChanged()) {
-                databaseManager.saveStatistics(entry.getKey().toLowerCase(), stats.getTotalPlaced(), stats.getTotalBreak());
+                databaseManager.saveStatistics(entry.getKey(), stats.getTotalPlaced(), stats.getTotalBreak());
                 stats.setHasChanged(false);
             }
         }
     }
 
-    public void initPlayerStatistic(String playerName) {
-        playerName = playerName.toLowerCase();
-        if (!this.statistics.containsKey(playerName)) {
-            this.statistics.put(playerName.toLowerCase(), new Statistic(0, 0));
-        }
+    public PlayerWarnings getWarnings(UUID playerUUID) {
+        return warnings.get(playerUUID);
     }
 
-    public PlayerWarnings getWarnings(String playerName) {
-        playerName = playerName.toLowerCase();
-        return warnings.get(playerName);
-    }
-
-    public void addWarning(String playerName, MCWarning warning) {
-        playerName = playerName.toLowerCase();
-        PlayerWarnings thisPlayer = warnings.get(playerName);
+    public void addWarning(UUID playerUUID, MCWarning warning) {
+        PlayerWarnings thisPlayer = warnings.get(playerUUID);
         if (thisPlayer == null) {
             thisPlayer = new PlayerWarnings();
-            warnings.put(playerName, thisPlayer);
+            warnings.put(playerUUID, thisPlayer);
         }
         thisPlayer.addWarning(warning);
     }
 
     public void printWarnings(Player player) {
-        PlayerWarnings thisWarnings = this.getWarnings(player.getName());
+        PlayerWarnings thisWarnings = this.getWarnings(player.getUniqueId());
         if (thisWarnings != null && thisWarnings.getWarnings().size() > 0) {
             ChatUtils.writeMessage(player, "");
             ChatUtils.writeColoredMessage(player, Core.NAME, ChatColor.RED, "Du hast " + thisWarnings.getWarnings().size() + " Verwarnung" + (thisWarnings.getWarnings().size() > 1 ? "en" : "") + "!");
@@ -120,11 +100,11 @@ public class StatisticManager implements Runnable {
     }
 
     public void printStatistics(Player player) {
-        Statistic stats = this.getPlayersStatistic(player.getName());
+        Statistic stats = this.getPlayersStatistic(player.getUniqueId());
 
         ChatUtils.writeMessage(player, "");
         if (stats == null)
-            ChatUtils.writeColoredMessage(player, ChatColor.RED, "Du hast keine Statistiken!");
+            ChatUtils.writeColoredMessage(player, ChatColor.RED, "Du hast keine Statistiken! Lasse einen Admin deine ID eintragen!");
         else {
             ChatUtils.writeColoredMessage(player, ChatColor.BLUE, "Blöcke zerstört: " + stats.getTotalBreak());
             ChatUtils.writeColoredMessage(player, ChatColor.BLUE, "Blöcke gesetzt  : " + stats.getTotalPlaced());

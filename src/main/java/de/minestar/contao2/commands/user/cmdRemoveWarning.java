@@ -40,46 +40,48 @@ public class cmdRemoveWarning extends AbstractCommand {
 
     @Override
     public void execute(String[] args, Player player) {
-        removeWarning(args, player);
+        //TODO
+//        removeWarning(args, player);
     }
 
     @Override
     public void execute(String[] args, ConsoleCommandSender console) {
-        removeWarning(args, console);
+        //TODO
+//        removeWarning(args, console);
     }
 
-    private void removeWarning(String[] args, CommandSender sender) {
-
-        String playerName = args[0];
-        int warningNumber = 0;
-        try {
-            warningNumber = Integer.parseInt(args[1]);
-        } catch (Exception e) {
-            ChatUtils.writeError(sender, pluginName, args[1] + " ist keine Zahl!");
-            return;
-        }
-
-        if (!databaseManager.isMCNickInMCTable(playerName)) {
-            ChatUtils.writeError(sender, pluginName, "Spieler '" + playerName + "' nicht gefunden!");
-            return;
-        }
-
-        PlayerWarnings warnings = databaseManager.getsManager().getWarnings(playerName);
-        if (warnings == null) {
-            ChatUtils.writeError(sender, pluginName, "Spieler '" + playerName + "' hat keine Verwarnungen!");
-            return;
-        }
-
-        MCWarning warning = warnings.getWarning(warningNumber);
-        if (warning == null) {
-            ChatUtils.writeError(sender, pluginName, "Verwarnungsnummer nicht gefunden!");
-            return;
-        }
-
-        if (databaseManager.removeWarning(playerName, warning.getDate())) {
-            databaseManager.getsManager().getWarnings(playerName).removeWarning(warningNumber);
-            ChatUtils.writeSuccess(sender, pluginName, "Verwarnung wurde erfolgreich gelöscht!");
-        } else
-            ChatUtils.writeError(sender, pluginName, "Fehler beim löschen der Verwarnung!");
-    }
+//    private void removeWarning(String[] args, CommandSender sender) {
+//
+//        String playerName = args[0];
+//        int warningNumber = 0;
+//        try {
+//            warningNumber = Integer.parseInt(args[1]);
+//        } catch (Exception e) {
+//            ChatUtils.writeError(sender, pluginName, args[1] + " ist keine Zahl!");
+//            return;
+//        }
+//
+//        if (!databaseManager.isMCNickInUser(playerName)) {
+//            ChatUtils.writeError(sender, pluginName, "Spieler '" + playerName + "' nicht gefunden!");
+//            return;
+//        }
+//
+//        PlayerWarnings warnings = databaseManager.getsManager().getWarnings(playerName);
+//        if (warnings == null) {
+//            ChatUtils.writeError(sender, pluginName, "Spieler '" + playerName + "' hat keine Verwarnungen!");
+//            return;
+//        }
+//
+//        MCWarning warning = warnings.getWarning(warningNumber);
+//        if (warning == null) {
+//            ChatUtils.writeError(sender, pluginName, "Verwarnungsnummer nicht gefunden!");
+//            return;
+//        }
+//
+//        if (databaseManager.removeWarning(playerName, warning.getDate())) {
+//            databaseManager.getsManager().getWarnings(playerName).removeWarning(warningNumber);
+//            ChatUtils.writeSuccess(sender, pluginName, "Verwarnung wurde erfolgreich gelöscht!");
+//        } else
+//            ChatUtils.writeError(sender, pluginName, "Fehler beim löschen der Verwarnung!");
+//    }
 }

@@ -65,7 +65,7 @@ public class FreeLoginFailStat implements Statistic {
     @Override
     public Queue<Object> getData() {
 
-        Queue<Object> data = new LinkedList<Object>();
+        Queue<Object> data = new LinkedList<>();
 
         data.add(player);
         data.add(date);

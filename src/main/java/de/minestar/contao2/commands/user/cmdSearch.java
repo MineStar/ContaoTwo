@@ -54,26 +54,27 @@ public class cmdSearch extends AbstractCommand {
     private void searchUser(String name, CommandSender sender) {
 
         // GET INGAME-NAME AND CONTAO-ID
-        HashMap<Integer, String> userMap = databaseManager.getContaoID(name);
+        HashMap<Integer, String> userMap = databaseManager.getForumIDs(name);
         if (userMap.values().size() < 1) {
-            ChatUtils.writeError(sender, pluginName, "Kein Homepageaccount gefunden!");
+            ChatUtils.writeError(sender, pluginName, "Kein Homepageaccount mit eingetragenem Nick gefunden!");
             return;
         }
 
         ChatUtils.writeSuccess(sender, pluginName, userMap.size() + " Treffer:");
 
-        String text = "";
-        MCUser user = null;
+        String text;
         for (Entry<Integer, String> entry : userMap.entrySet()) {
-            if (databaseManager.isContaoIDInMCTable(entry.getKey())) {
-                text = " (registriert)";
-                databaseManager.getIngameData(entry.getKey());
-                if (user != null && !user.getExpDate().equalsIgnoreCase("11.11.1111"))
-                    text = " (Payuser bis : " + user.getExpDate() + ")";
+            int userID = entry.getKey();
+            String mcNick = entry.getValue();
+            String forumName = databaseManager.getForumName(userID);
+            String payEndDate = databaseManager.getPayEndDate(userID);
+            if (payEndDate != null) {
+                text = " | Payuser bis : " + payEndDate;
+            } else {
+                text = " | Kein PayUser";
             }
 
-            ChatUtils.writeInfo(sender, "Contao-ID von '" + entry.getValue() + "' : " + entry.getKey() + text);
-            text = "";
+            ChatUtils.writeInfo(sender, "UserID : " + userID + " | ForumName: " + forumName + " | Eingetragener Nick " + mcNick + text);
         }
     }
 }

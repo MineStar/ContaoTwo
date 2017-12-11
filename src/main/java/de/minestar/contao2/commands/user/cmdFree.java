@@ -49,50 +49,52 @@ public class cmdFree extends AbstractCommand {
 
     @Override
     public void execute(String[] args, Player player) {
-        freeMember(args, player);
+        //TODO
+//        freeMember(args, player);
     }
 
     @Override
     public void execute(String[] args, ConsoleCommandSender console) {
-        freeMember(args, console);
+        //TODO
+//        freeMember(args, console);
     }
 
-    private void freeMember(String[] args, CommandSender sender) {
-        MCUser user = databaseManager.getIngameData(args[0]);
-        if (user == null) {
-            ChatUtils.writeError(sender, pluginName, "Fehler: Minecraftnick nicht gefunden!");
-            return;
-        }
-        String ingameName = user.getNickname();
-        int contaoID = user.getContaoID();
-
-        if (databaseManager.isInProbation(ingameName)) {
-            String target = possibleFreeUser.get(sender.getName());
-            if (target == null || !target.equalsIgnoreCase(ingameName)) {
-                possibleFreeUser.put(sender.getName(), ingameName);
-                ChatUtils.writeError(sender, pluginName, "Spieler '" + ingameName + "' befindet sich noch in der ProbeZeit!");
-                ChatUtils.writeError(sender, pluginName, "Gebe nochmal /user free " + ingameName + " ein, um ihn dennoch freizuschalten!");
-                return;
-            }
-            possibleFreeUser.remove(sender.getName());
-        }
-
-        // remove pay status
-        databaseManager.setExpDateInMCTable("11.11.1111", contaoID);
-
-        // CONTAO GRUPPE AUF FREE SETZEN
-        databaseManager.updateContaoGroup(ContaoGroup.FREE, contaoID);
-
-        // remove probe status
-        databaseManager.deleteProbeStatus(ingameName);
-
-        ChatUtils.writeSuccess(sender, pluginName, "Spieler '" + ingameName + "' ist nun Freeuser!");
-
-        Player target = PlayerUtils.getOnlinePlayer(ingameName);
-        if (target != null)
-            PlayerUtils.sendSuccess(target, "Du bist nun Freeuser!");
-
-        // UPDATE GROUPMANAGER-GROUP
-        this.playerManager.updateGroupManagerGroup(ingameName, ContaoGroup.FREE);
-    }
+//    private void freeMember(String[] args, CommandSender sender) {
+//        MCUser user = databaseManager.getIngameData(args[0]);
+//        if (user == null) {
+//            ChatUtils.writeError(sender, pluginName, "Fehler: Minecraftnick nicht gefunden!");
+//            return;
+//        }
+//        String ingameName = user.getNickname();
+//        int contaoID = user.getUserID();
+//
+//        if (databaseManager.isInProbation(ingameName)) {
+//            String target = possibleFreeUser.get(sender.getName());
+//            if (target == null || !target.equalsIgnoreCase(ingameName)) {
+//                possibleFreeUser.put(sender.getName(), ingameName);
+//                ChatUtils.writeError(sender, pluginName, "Spieler '" + ingameName + "' befindet sich noch in der ProbeZeit!");
+//                ChatUtils.writeError(sender, pluginName, "Gebe nochmal /user free " + ingameName + " ein, um ihn dennoch freizuschalten!");
+//                return;
+//            }
+//            possibleFreeUser.remove(sender.getName());
+//        }
+//
+//        // remove pay status
+//        databaseManager.setExpDateInMCTable("11.11.1111", contaoID);
+//
+//        // CONTAO GRUPPE AUF FREE SETZEN
+//        databaseManager.updateContaoGroup(ContaoGroup.FREE, contaoID);
+//
+//        // remove probe status
+//        databaseManager.deleteProbeStatus(ingameName);
+//
+//        ChatUtils.writeSuccess(sender, pluginName, "Spieler '" + ingameName + "' ist nun Freeuser!");
+//
+//        Player target = PlayerUtils.getOnlinePlayer(ingameName);
+//        if (target != null)
+//            PlayerUtils.sendSuccess(target, "Du bist nun Freeuser!");
+//
+//        // UPDATE GROUPMANAGER-GROUP
+//        this.playerManager.updateGroupManagerGroup(ingameName, ContaoGroup.FREE);
+//    }
 }

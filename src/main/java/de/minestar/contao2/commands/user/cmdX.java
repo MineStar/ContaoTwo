@@ -39,6 +39,7 @@ public class cmdX extends AbstractExtendedCommand {
     private PlayerManager playerManager;
 
     public cmdX(String syntax, String arguments, String node, PlayerManager playerManager) {
+        //TODO push in DB
         super(Core.NAME, syntax, arguments, node);
         this.description = "X-User hinzufügen";
         this.playerManager = playerManager;

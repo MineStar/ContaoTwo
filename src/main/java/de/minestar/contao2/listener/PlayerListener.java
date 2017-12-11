@@ -20,6 +20,8 @@ package de.minestar.contao2.listener;
 
 import java.util.HashMap;
 
+import de.minestar.minestarlibrary.utils.ChatUtils;
+import de.minestar.minestarlibrary.utils.ConsoleUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -65,12 +67,11 @@ public class PlayerListener implements Listener {
         this.statisticManager = statisticManager;
         this.onlineManager = onlineManager;
 
-        this.oldGroups = new HashMap<String, ContaoGroup>();
+        this.oldGroups = new HashMap<>();
     }
 
     @EventHandler
     public void onPlayerChangeNick(PlayerChangedNameEvent event) {
-        this.databaseManager.updateMCNick(event.getOldName(), event.getNewName());
         this.playerManager.refresh();
         this.statisticManager.refresh();
 
@@ -140,7 +141,10 @@ public class PlayerListener implements Listener {
         this.oldGroups.put(event.getPlayer().getName(), ContaoGroup.getGroup(thisPlayer.getGroup()));
 
         // PERFORM CONTAOCHECK
-        this.databaseManager.performContaoCheck(thisPlayer.getPlayerName(), thisPlayer.getGroup());
+        String oldGroup = thisPlayer.getGroup();
+        performContaoCheck(event, event.getPlayer(), oldGroup);
+
+//        this.databaseManager.performContaoCheck(thisPlayer.getBukkitPlayer().getUniqueId(), thisPlayer.getGroup());
 
         // PERFORM CHECK FOR FREE SPACE
         if (thisPlayer.getGroup().equalsIgnoreCase(ContaoGroup.FREE.getName())) {
@@ -227,5 +231,21 @@ public class PlayerListener implements Listener {
     public void onPlayerChangedGroup(PlayerChangedGroupEvent event) {
         this.playerManager.movePlayer(event);
         this.onlineManager.updatePlayerList(null);
+    }
+
+    private void performContaoCheck(PlayerLoginEvent event, Player player, String oldGroup) {
+        int userID = databaseManager.getForumId(player.getUniqueId());
+        String newGroup = databaseManager.getContaoGroup(userID);
+        //TODO Pay User Check?
+        if(!oldGroup.equals(newGroup)) {
+            playerManager.updateGroupManagerGroup(event.getPlayer().getName(), newGroup);
+            ConsoleUtils.printWarning(Core.NAME, "Player '" + event.getPlayer().getName() + "' has a different forum( " + newGroup + " ) and groupmanager( " + oldGroup + " )-group!");
+        }
+        else if(oldGroup.equals(ContaoGroup.PROBE.getName())) {
+            if(databaseManager.canBeFree(userID)) {
+                playerManager.updateGroupManagerGroup(event.getPlayer().getName(), ContaoGroup.FREE);
+                //TODO Zurückschreiben in DB?
+            }
+        }
     }
 }

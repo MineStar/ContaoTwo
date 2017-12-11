@@ -18,6 +18,9 @@
 
 package de.minestar.contao2.commands.user;
 
+import de.minestar.minestarlibrary.utils.PlayerUtils;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
@@ -26,6 +29,8 @@ import de.minestar.contao2.core.Core;
 import de.minestar.contao2.manager.DatabaseManager;
 import de.minestar.minestarlibrary.commands.AbstractCommand;
 import de.minestar.minestarlibrary.utils.ChatUtils;
+
+import java.util.UUID;
 
 public class cmdAddProbeTime extends AbstractCommand {
 
@@ -49,23 +54,39 @@ public class cmdAddProbeTime extends AbstractCommand {
     private void addProbeTime(String[] args, CommandSender sender) {
         String playerName = args[0];
         // second argument is not a number
-        if (!args[1].matches("\\d*")) {
+        if (args.length < 2 && !args[1].matches("\\d*")) {
             ChatUtils.writeError(sender, pluginName, getHelpMessage());
             return;
         }
         int additionalDays = Integer.parseInt(args[1]);
 
-        if (!databaseManager.isMCNickInMCTable(playerName)) {
+        Player player = PlayerUtils.getOnlinePlayer(playerName);
+        if(player == null) {
+            OfflinePlayer offlinePlayer = PlayerUtils.getOfflinePlayer(playerName);
+            if(offlinePlayer == null) {
+                ChatUtils.writeError(sender, pluginName, "Spiler '" + playerName + "' wurde nicht gefunden. War der Spieler schon einmal online?");
+                return;
+            } else if(args.length > 2 && "offline".equals(args[2])) {
+                player = offlinePlayer.getPlayer();
+            } else {
+                ChatUtils.writeError(sender, pluginName, "Spiler '" + playerName + "' ist offline. Kommando mit offline wiederholen.");
+                return;
+            }
+        }
+
+        UUID uuid = player.getUniqueId();
+
+        if (!databaseManager.isMCUUIDInUser(uuid)) {
             ChatUtils.writeError(sender, pluginName, "Spieler '" + playerName + "' nicht gefunden!");
             return;
         }
 
-        if (!databaseManager.isProbeMember(playerName)) {
+        if (!databaseManager.isProbeMember(uuid)) {
             ChatUtils.writeError(sender, pluginName, "Spieler ist kein Probe user!");
             return;
         }
 
-        if (databaseManager.addProbeTime(additionalDays, playerName))
+        if (databaseManager.addProbeTime(additionalDays, uuid))
             ChatUtils.writeSuccess(sender, pluginName, "Probezeit für Spieler '" + playerName + "' verlängert!");
         else
             ChatUtils.writeError(sender, pluginName, "Fehler beim Verlängern der Probezeit!");

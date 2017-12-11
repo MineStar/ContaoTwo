@@ -44,39 +44,41 @@ public class cmdUnMod extends AbstractCommand {
 
     @Override
     public void execute(String[] args, Player player) {
-        unmodPlayer(args[0], player);
+        //TODO
+//        unmodPlayer(args[0], player);
     }
 
     @Override
     public void execute(String[] args, ConsoleCommandSender console) {
-        unmodPlayer(args[0], console);
+        //TODO
+//        unmodPlayer(args[0], console);
     }
 
-    private void unmodPlayer(String playerName, CommandSender sender) {
-
-        MCUser user = dbManager.getIngameData(playerName);
-        if (user == null) {
-            ChatUtils.writeError(sender, pluginName, "Fehler: Minecraftnick nicht gefunden!");
-            return;
-        }
-
-        String ingameName = user.getNickname();
-        int contaoID = user.getContaoID();
-
-        dbManager.setExpDateInMCTable(user.getExpDate(), contaoID);
-
-        // CONTAO GRUPPE AUF ADMIN SETZEN
-        dbManager.updateContaoGroup(ContaoGroup.PAY, contaoID);
-
-        // PRINT INFO
-        ChatUtils.writeSuccess(sender, pluginName, "Spieler '" + ingameName + "' ist kein Moderator mehr!");
-
-        Player target = PlayerUtils.getOnlinePlayer(ingameName);
-        if (target != null)
-            PlayerUtils.sendSuccess(target, "Du bist nun kein Moderator mehr!");
-
-        // UPDATE GROUPMANAGER-GROUP
-        pManager.updateGroupManagerGroup(ingameName, ContaoGroup.PAY);
-    }
+//    private void unmodPlayer(String playerName, CommandSender sender) {
+//
+//        MCUser user = dbManager.getIngameData(playerName);
+//        if (user == null) {
+//            ChatUtils.writeError(sender, pluginName, "Fehler: Minecraftnick nicht gefunden!");
+//            return;
+//        }
+//
+//        String ingameName = user.getNickname();
+//        int contaoID = user.getUserID();
+//
+//        dbManager.setExpDateInMCTable(user.getExpDate(), contaoID);
+//
+//        // CONTAO GRUPPE AUF ADMIN SETZEN
+//        dbManager.updateContaoGroup(ContaoGroup.PAY, contaoID);
+//
+//        // PRINT INFO
+//        ChatUtils.writeSuccess(sender, pluginName, "Spieler '" + ingameName + "' ist kein Moderator mehr!");
+//
+//        Player target = PlayerUtils.getOnlinePlayer(ingameName);
+//        if (target != null)
+//            PlayerUtils.sendSuccess(target, "Du bist nun kein Moderator mehr!");
+//
+//        // UPDATE GROUPMANAGER-GROUP
+//        pManager.updateGroupManagerGroup(ingameName, ContaoGroup.PAY);
+//    }
 
 }

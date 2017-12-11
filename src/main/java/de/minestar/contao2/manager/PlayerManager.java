@@ -58,16 +58,16 @@ public class PlayerManager {
     }
 
     public void refresh() {
-        this.onlineList = new HashMap<ContaoGroup, String>();
-        this.groupMap = new HashMap<ContaoGroup, HashSet<String>>();
-        this.playerMap = new ConcurrentHashMap<String, ContaoGroup>();
+        this.onlineList = new HashMap<>();
+        this.groupMap = new HashMap<>();
+        this.playerMap = new ConcurrentHashMap<>();
         this.initGroupMap();
         this.onReload();
     }
 
     private void initGroupMap() {
         for (ContaoGroup group : ContaoGroup.values()) {
-            this.groupMap.put(group, new HashSet<String>());
+            this.groupMap.put(group, new HashSet<>());
         }
     }
 
