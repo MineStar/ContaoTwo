@@ -18,30 +18,11 @@
 
 package de.minestar.contao2.core;
 
-import java.io.File;
-
-import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.PluginManager;
-import org.bukkit.scheduler.BukkitScheduler;
-
 import de.minestar.contao2.commands.list.cmdList;
 import de.minestar.contao2.commands.ppay.cmdPPay;
 import de.minestar.contao2.commands.ppay.cmdPayWeek;
 import de.minestar.contao2.commands.ppay.cmdSet;
-import de.minestar.contao2.commands.user.cmdAddProbeTime;
-import de.minestar.contao2.commands.user.cmdAddWarning;
-import de.minestar.contao2.commands.user.cmdAdmin;
-import de.minestar.contao2.commands.user.cmdDefault;
-import de.minestar.contao2.commands.user.cmdFree;
-import de.minestar.contao2.commands.user.cmdMod;
-import de.minestar.contao2.commands.user.cmdPay;
-import de.minestar.contao2.commands.user.cmdProbe;
-import de.minestar.contao2.commands.user.cmdRemoveWarning;
-import de.minestar.contao2.commands.user.cmdSearch;
-import de.minestar.contao2.commands.user.cmdStatus;
-import de.minestar.contao2.commands.user.cmdUnMod;
-import de.minestar.contao2.commands.user.cmdUser;
-import de.minestar.contao2.commands.user.cmdX;
+import de.minestar.contao2.commands.user.*;
 import de.minestar.contao2.listener.FakePlayerListener;
 import de.minestar.contao2.listener.PlayerListener;
 import de.minestar.contao2.listener.StatisticListener;
@@ -58,6 +39,11 @@ import de.minestar.minestarlibrary.AbstractCore;
 import de.minestar.minestarlibrary.annotations.UseStatistic;
 import de.minestar.minestarlibrary.commands.CommandList;
 import de.minestar.minestarlibrary.stats.StatisticHandler;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.PluginManager;
+import org.bukkit.scheduler.BukkitScheduler;
+
+import java.io.File;
 
 @UseStatistic
 public class Core extends AbstractCore {
@@ -147,19 +133,13 @@ public class Core extends AbstractCore {
                 new cmdStatus           ("/stats",      "",                             "",                         this.databaseManager, this.statisticManager),
 
                 new cmdUser         ("/user", "", "",
-                    new cmdAdmin        ("admin",       "<ingamename> <dd.mm.yyyy>",    "contao.rights.admin",      this.playerManager, this.databaseManager),
                     new cmdDefault      ("default",     "<ingamename>",                 "contao.rights.default",    this.playerManager),
                     new cmdFree         ("free",        "<ingamename>",                 "contao.rights.free",       this.playerManager, this.databaseManager),
-                    new cmdPay          ("pay",         "<ingamename> <dd.mm.yyyy>",    "contao.rights.pay",        this.playerManager, this.databaseManager),
-                    new cmdProbe        ("probe",       "<ingamename> <contao-id>",     "contao.rights.probe",      this.playerManager, this.databaseManager),
+                    new cmdProbe        ("probe",       "<ingamename> <contao-id> [offline]", "contao.rights.probe",      this.playerManager, this.databaseManager),
                     new cmdAddProbeTime ("probeadd",    "<PlayerName> <Days> [offline]","contao.rights.probeadd",   this.databaseManager),
                     new cmdSearch       ("search",      "<homepagename>",               "contao.rights.search",     this.databaseManager),
                     new cmdStatus       ("status",      "",                             "",                         this.databaseManager, this.statisticManager),
-                    new cmdAddWarning   ("awarn",       "<ingamename> <text> [offline]","contao.rights.awarn" ,     this.databaseManager),
-                    new cmdRemoveWarning("rwarn",       "<ingamename> <warningIndex>" , "contao.rights.rwarn",      this.databaseManager),
-                    new cmdX            ("x",           "<ingamename> <reason>",        "contao.rights.x",          this.playerManager),
-                    new cmdMod          ("mod",         "<ingamename>",                 "contao.rights.mod",        this.playerManager, this.databaseManager),
-                    new cmdUnMod        ("unmod",       "<ingamename>",                 "contao.rights.unmod",      this.playerManager, this.databaseManager)
+                    new cmdX            ("x",           "<ingamename> <reason>",        "contao.rights.x",          this.playerManager)
                 ),
                 
                 new cmdPPay         ("/ppay", "", "contao.ppay",

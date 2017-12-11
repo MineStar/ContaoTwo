@@ -65,13 +65,15 @@ public class cmdAddProbeTime extends AbstractCommand {
             OfflinePlayer offlinePlayer = PlayerUtils.getOfflinePlayer(playerName);
             if(offlinePlayer == null) {
                 ChatUtils.writeError(sender, pluginName, "Spiler '" + playerName + "' wurde nicht gefunden. War der Spieler schon einmal online?");
-                return;
             } else if(args.length > 2 && "offline".equals(args[2])) {
                 player = offlinePlayer.getPlayer();
             } else {
-                ChatUtils.writeError(sender, pluginName, "Spiler '" + playerName + "' ist offline. Kommando mit offline wiederholen.");
-                return;
+                ChatUtils.writeError(sender, pluginName, "Spieler '" + playerName + "' ist offline. Kommando mit offline wiederholen.");
             }
+        }
+
+        if(player == null) {
+            return;
         }
 
         UUID uuid = player.getUniqueId();

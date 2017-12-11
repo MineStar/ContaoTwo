@@ -26,13 +26,9 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import de.minestar.contao2.core.Core;
-import de.minestar.contao2.units.ContaoGroup;
-import de.minestar.contao2.units.MCUser;
-import de.minestar.contao2.units.PlayerWarnings;
-import de.minestar.contao2.units.Statistic;
+import de.minestar.contao2.units.*;
 import de.minestar.minestarlibrary.database.AbstractMySQLHandler;
 import de.minestar.minestarlibrary.utils.ConsoleUtils;
-import org.apache.commons.lang3.tuple.Triple;
 
 public class DatabaseManager extends AbstractMySQLHandler {
 
@@ -53,7 +49,7 @@ public class DatabaseManager extends AbstractMySQLHandler {
     private PreparedStatement checkAccount;
 //    private PreparedStatement selectGroup;
     private PreparedStatement selectGroups;
-    private PreparedStatement selectFinalGroup;
+    private PreparedStatement selectUserGroup;
 //    private PreparedStatement selectContaoId;
     private PreparedStatement selectForumIds;
 //    private PreparedStatement checkContaoId;
@@ -73,7 +69,7 @@ public class DatabaseManager extends AbstractMySQLHandler {
 //    private PreparedStatement deleteWarning;
 
     private PreparedStatement selectAllStatistics;
-//    private PreparedStatement selectAllWarnings;
+    private PreparedStatement selectAllWarnings;
     private PreparedStatement saveStatistics;
 
     private PreparedStatement selectUserStatistics;
@@ -93,11 +89,13 @@ public class DatabaseManager extends AbstractMySQLHandler {
     private final static String probeStartOptionStr = "userOption42";
     private final static String probeEndOptionStr = "userOption43";
     private final static String hasUsedFreeWeekOptionStr = "userOption45";
-    private final static String forumPayUserGroupId = "32";
+    private final static int forumPayUserGroupId = 32;
+    private final static int FORUM_FREEWEEK_PAYUSERGROUP_ID = 7;
 
     public final static int GROUP_ID_PROBE = 34;
     public final static int GROUP_ID_FREE = 33;
     public final static int GROUP_ID_PAY = 32;
+    public final static int GROUP_ID_FREEWEEK_PAY = 38;
     public final static int GROUP_ID_MOD = 37;
     public final static int GROUP_ID_ADMIN = 13;
     public final static int GROUP_ID_TMPBAN = 35;
@@ -140,7 +138,7 @@ public class DatabaseManager extends AbstractMySQLHandler {
 
         selectForumIds = con.prepareStatement("SELECT userID, "+minecraftNickOptionStr+" FROM wcf1_user_option_value WHERE "+minecraftNickOptionStr+" LIKE ?");
 
-        selectFinalGroup = con.prepareStatement("SELECT groupID, admin, mods, banned FROM user_group_final WHERE userID = ?");
+        selectUserGroup = con.prepareStatement("SELECT userOnlineGroupID FROM wcf1_user WHERE userID = ?");
 
         checkForumId = con.prepareStatement("SELECT 1 FROM wcf1_user WHERE userID = ? LIMIT 1");
 
@@ -160,7 +158,7 @@ public class DatabaseManager extends AbstractMySQLHandler {
 
 //        addWarning = null; //TODO con.prepareStatement("INSERT INTO mc_warning (mc_pay_id,reason,date,adminnickname) VALUES ((SELECT id FROM mc_pay WHERE minecraft_nick = ?), ?, STR_TO_DATE(?,'%d.%m.%Y %H:%i:%s'), ?)");
 
-//        selectAllWarnings = null; //TODO con.prepareStatement("SELECT minecraft_nick, mc_warning.reason, DATE_FORMAT(date, '%d.%m.%Y %H:%i:%s'),adminnickname FROM mc_warning,mc_pay WHERE mc_warning.mc_pay_id = mc_pay.id ORDER BY minecraft_nick,mc_warning.date");
+        selectAllWarnings =  con.prepareStatement("SELECT o."+minecraftUUIDOptionStr+" as "+minecraftUUIDOptionStr+", DATE_FORMAT(FROM_UNIXTIME(w.time), '%d.%m.%Y %H:%i:%s') AS 'startDate', w.reason as reason, u.username as adminNick FROM wcf1_user_option_value o, wcf1_user_infraction_warning w, wcf1_user u WHERE "+minecraftUUIDOptionStr+" IS NOT NULL AND o.userID = w.userID AND u.userID = w.judgeID");
 
         // deleteWarning = con.prepareStatement("DELETE FROM mc_warning WHERE mc_pay_id = (SELECT id FROM mc_pay WHERE minecraft_nick = ?) AND DATE_FORMAT(date,'%d.%m.%Y %H:%i:%s') = ?");
 
@@ -382,15 +380,12 @@ public class DatabaseManager extends AbstractMySQLHandler {
 
     public String getContaoGroup(int forumId) {
         try {
-            selectFinalGroup.setInt(1, forumId);
-            ResultSet result = selectFinalGroup.executeQuery();
+            selectUserGroup.setInt(1, forumId);
+            ResultSet result = selectUserGroup.executeQuery();
 
             if (result.next()) {
-                int forumGroup = result.getInt("groupID");
-                boolean admin = result.getBoolean("admin");
-                boolean mod = result.getBoolean("mods");
-                boolean banned = result.getBoolean("banned");
-                return getMCGroupName(forumGroup, admin, mod, banned);
+                int forumGroup = result.getInt("userOnlineGroupID");
+                return getMCGroupName(forumGroup);
             }
         } catch (Exception e) {
             ConsoleUtils.printException(e, Core.NAME, "Can't get ContaoGroupName from user_group_final! userID=" + forumId);
@@ -400,17 +395,10 @@ public class DatabaseManager extends AbstractMySQLHandler {
     }
 
     // GET MC GROUP FROM CONTAO-GROUPID
-    private String getMCGroupName(int groupID, boolean admin, boolean mod, boolean banned) {
-        if (banned)
-            return ContaoGroup.X.getName();
-        else if(admin)
-            return ContaoGroup.ADMIN.getName();
-        else if(mod)
-            return ContaoGroup.MOD.getName();
-        //Anything else
-        else if (groupID == GROUP_ID_FREE)
+    private String getMCGroupName(int groupID) {
+        if (groupID == GROUP_ID_FREE)
             return ContaoGroup.FREE.getName();
-        else if (groupID == GROUP_ID_PAY)
+        else if (groupID == GROUP_ID_PAY || groupID == GROUP_ID_FREEWEEK_PAY)
             return ContaoGroup.PAY.getName();
         else if (groupID == GROUP_ID_ADMIN)
             return ContaoGroup.ADMIN.getName();
@@ -613,23 +601,27 @@ public class DatabaseManager extends AbstractMySQLHandler {
 
     public HashMap<UUID, PlayerWarnings> loadAllWarnings() {
         HashMap<UUID, PlayerWarnings> warnings = new HashMap<>();
-        //TODO
-//        try {
-//            ResultSet result = selectAllWarnings.executeQuery();
-//            PlayerWarnings thisPlayer = null;
-//            String playerName = null;
-//            while (result.next()) {
-//                playerName = result.getString("minecraft_nick").toLowerCase();
-//                thisPlayer = warnings.get(playerName);
-//                if (thisPlayer == null) {
-//                    thisPlayer = new PlayerWarnings();
-//                    warnings.put(playerName, thisPlayer);
-//                }
-//                thisPlayer.addWarning(new MCWarning(result.getString(2), result.getString(3), result.getString(4)));
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
+        try {
+            ResultSet result = selectAllWarnings.executeQuery();
+            while (result.next()) {
+                UUID uuid;
+                String uuidStr = result.getString(minecraftUUIDOptionStr);
+                try {
+                    uuid = UUID.fromString(uuidStr);
+                } catch (IllegalArgumentException e) {
+                    ConsoleUtils.printException(e, Core.NAME, "Not a UUID!!!!!! uuid : " + uuidStr);
+                    continue;
+                }
+                PlayerWarnings thisPlayer = warnings.get(uuid);
+                if (thisPlayer == null) {
+                    thisPlayer = new PlayerWarnings();
+                    warnings.put(uuid, thisPlayer);
+                }
+                thisPlayer.addWarning(new MCWarning(result.getString("reason"), result.getString("startDate"), result.getString("adminNick")));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return warnings;
     }
 

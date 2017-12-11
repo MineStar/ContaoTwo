@@ -49,7 +49,7 @@ public class cmdProbe extends AbstractCommand {
 
     @Override
     public void execute(String[] args, Player player) {
-        //TODO
+        //TODO über userFinalGroupID in WCF1_user und wcf1_user_to_group
 //        addProbe(args, player);
     }
 
