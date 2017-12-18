@@ -138,10 +138,10 @@ public class PlayerListener implements Listener {
 //        }
 
         // SAVE OLD GROUP
-        this.oldGroups.put(event.getPlayer().getName(), ContaoGroup.getGroup(thisPlayer.getGroup()));
+        ContaoGroup oldGroup = ContaoGroup.getGroup(thisPlayer.getGroup());
+        this.oldGroups.put(event.getPlayer().getName(), oldGroup);
 
         // PERFORM CONTAOCHECK
-        String oldGroup = thisPlayer.getGroup();
         performContaoCheck(event, event.getPlayer(), oldGroup);
 
 //        this.databaseManager.performContaoCheck(thisPlayer.getBukkitPlayer().getUniqueId(), thisPlayer.getGroup());
@@ -233,9 +233,9 @@ public class PlayerListener implements Listener {
         this.onlineManager.updatePlayerList(null);
     }
 
-    private void performContaoCheck(PlayerLoginEvent event, Player player, String oldGroup) {
+    private void performContaoCheck(PlayerLoginEvent event, Player player, ContaoGroup oldGroup) {
         int userID = databaseManager.getForumId(player.getUniqueId());
-        String newGroup = databaseManager.getContaoGroup(userID);
+        ContaoGroup newGroup = databaseManager.getContaoGroup(userID);
         //TODO Pay User Check?
         if(!oldGroup.equals(newGroup)) {
             playerManager.updateGroupManagerGroup(event.getPlayer().getName(), newGroup);

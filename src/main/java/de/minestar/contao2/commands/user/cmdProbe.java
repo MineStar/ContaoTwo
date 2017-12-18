@@ -19,8 +19,11 @@
 package de.minestar.contao2.commands.user;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
 
 import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
@@ -49,106 +52,120 @@ public class cmdProbe extends AbstractCommand {
 
     @Override
     public void execute(String[] args, Player player) {
-        //TODO über userFinalGroupID in WCF1_user und wcf1_user_to_group
-//        addProbe(args, player);
+        addProbe(args, player);
     }
 
     @Override
     public void execute(String[] args, ConsoleCommandSender console) {
-        //TODO
-//        addProbe(args, console);
+        addProbe(args, console);
     }
 
-//    private void addProbe(String[] args, CommandSender sender) {
-//        // SET CONTAO GROUP
-//        String ingameName = PlayerUtils.getCorrectPlayerName(args[0]);
-//        if (ingameName == null) {
-//            ingameName = args[0];
-//            if (!timeMap.containsKey(ingameName) || timeMap.get(ingameName) < System.currentTimeMillis()) {
-//                ChatUtils.writeInfo(sender, pluginName, "WARNUNG: Der Spieler mit dem Namen '" + args[0] + "' ist offline. Befehl innerhalb der nächsten 10 Sekunden neu eingeben, falls der Name richtig war!");
-//                timeMap.put(ingameName, System.currentTimeMillis() + 10 * 1000);
-//                return;
-//            }
-//            timeMap.remove(ingameName);
-//        }
-//
-//        int contaoID = 0;
-//        try {
-//            contaoID = Integer.parseInt(args[1]);
-//        } catch (Exception e) {
-//            ChatUtils.writeError(sender, pluginName, args[1] + " ist keine Zahl!");
-//        }
-//
-//        Player newUser = PlayerUtils.getOnlinePlayer(ingameName);
-//
-//        // Degrade
-//        ContaoGroup group = playerManager.getGroup(ingameName);
-//        if (group != null) {
-//            if (group.equals(ContaoGroup.FREE) || group.equals(ContaoGroup.PAY) || group.equals(ContaoGroup.MOD) || group.equals(ContaoGroup.ADMIN)) {
-//                handleDegrade(ingameName, contaoID, sender, newUser);
-//                return;
-//            }
-//        }
-//
-//        if (!checkPlayer(ingameName, contaoID, sender, newUser))
-//            return;
-//
-//        // ADD USER TO MC-DB
-//        if (databaseManager.getIngameData(contaoID) == null)
-//            databaseManager.addProbe(ingameName, contaoID, "11.11.1111", sender.getName());
-//
-//        // CONTAO GRUPPE AUF PROBE SETZEN
-//        databaseManager.updateContaoGroup(ContaoGroup.PROBE, contaoID);
-//
-//        // PRINT INFO
-//        ChatUtils.writeSuccess(sender, pluginName, "Spieler '" + ingameName + "' ist nun Probeuser!");
-//        if (newUser != null) {
-//            PlayerUtils.sendSuccess(newUser, "Du bist nun Probeuser!");
-//            PlayerUtils.sendSuccess(newUser, "Herzlich Willkommen auf Minestar.de");
-//            PlayerUtils.sendSuccess(newUser, "Viel Spass im Probegebiet :)");
-//        }
-//        // UPDATE GROUPMANAGER-GROUP
-//        this.playerManager.updateGroupManagerGroup(ingameName, ContaoGroup.PROBE);
-//    }
-//
-//    private boolean checkPlayer(String ingameName, int contaoID, CommandSender sender, Player target) {
-//        // CONTAO-ID & MC-NICK IN 'mc_pay' = return
-//        if (databaseManager.checkIDInUserTable(contaoID) || databaseManager.isMCNickInUser(ingameName)) {
-//            ChatUtils.writeError(sender, pluginName, "Fehler: Minecraftnick oder ContaoID doppelt.");
-//            return false;
-//        }
-//
-//        // CONTAO-ACCOUNT INAKTIV = return
-//        if (!databaseManager.isForumAccountActive(contaoID)) {
-//            ChatUtils.writeError(sender, pluginName, "Fehler: Bestätigungsemail wurde noch nicht bestätigt.");
-//            ChatUtils.writeInfo(sender, pluginName, "Bitte dem User bescheid sagen das er bestätigen muss.");
-//            return false;
-//        }
-//
-//        // USER IS IN X
-//        if (target == null && playerManager.isOfflinePlayerInGroup(ingameName, ContaoGroup.X)) {
-//            ChatUtils.writeError(sender, pluginName, "Fehler: User ist in Gruppe X.");
-//            ChatUtils.writeInfo(sender, pluginName, "Er wurde bereits abgelehnt!");
-//            return false;
-//        } else if (target != null && playerManager.isInGroup(target, ContaoGroup.X)) {
-//            ChatUtils.writeError(sender, pluginName, "Fehler: User ist in Gruppe X.");
-//            ChatUtils.writeInfo(sender, pluginName, "Er wurde bereits abgelehnt!");
-//            return false;
-//        }
-//        return true;
-//    }
-//    private void handleDegrade(String ingameName, int contaoID, CommandSender sender, Player newUser) {
-//        databaseManager.degradeFree(ingameName);
-//
-//        // CONTAO GRUPPE AUF PROBE SETZEN
-//        databaseManager.updateContaoGroup(ContaoGroup.PROBE, contaoID);
-//
-//        // PRINT INFO
-//        ChatUtils.writeSuccess(sender, pluginName, "Spieler '" + ingameName + "' ist nun Probeuser!");
-//        if (newUser != null)
-//            PlayerUtils.sendMessage(newUser, ChatColor.RED, "Du bist nun Probeuser!");
-//
-//        // UPDATE GROUPMANAGER-GROUP
-//        this.playerManager.updateGroupManagerGroup(ingameName, ContaoGroup.PROBE);
-//    }
+    private void addProbe(String[] args, CommandSender sender) {
+        // SET CONTAO GROUP
+        String inputPlayerName = args[0];
+
+        Player player = PlayerUtils.getOnlinePlayer(inputPlayerName);
+        if(player == null) {
+            OfflinePlayer offlinePlayer = PlayerUtils.getOfflinePlayer(inputPlayerName);
+            if(offlinePlayer == null) {
+                ChatUtils.writeError(sender, pluginName, "Spiler '" + inputPlayerName + "' wurde nicht gefunden. War der Spieler schon einmal online?");
+            } else if(args.length > 2 && "offline".equals(args[2])) {
+                player = offlinePlayer.getPlayer();
+            } else {
+                ChatUtils.writeError(sender, pluginName, "Spieler '" + inputPlayerName + "' ist offline. Kommando mit offline wiederholen.");
+            }
+        }
+
+        if(player == null) {
+            return;
+        }
+
+        String ingameName = player.getName();
+
+        UUID uuid = player.getUniqueId();
+
+        int inputUserID;
+        try {
+            inputUserID = Integer.parseInt(args[1]);
+        } catch (Exception e) {
+            ChatUtils.writeError(sender, pluginName, args[1] + " ist keine Zahl!");
+            return;
+        }
+
+        if(!checkUser(inputUserID, sender, inputPlayerName, uuid)) {
+            return;
+        }
+
+
+        databaseManager.setToProbe(uuid);
+
+        // PRINT INFO
+        ChatUtils.writeSuccess(sender, pluginName, "Spieler '" + ingameName + "' ist nun Probeuser!");
+        if (player.isOnline()) {
+            PlayerUtils.sendSuccess(player, "Du bist nun Probeuser!");
+            PlayerUtils.sendSuccess(player, "Herzlich Willkommen auf Minestar.de");
+            PlayerUtils.sendSuccess(player, "Viel Spass im Probegebiet :)");
+        }
+        // UPDATE GROUPMANAGER-GROUP
+        this.playerManager.updateGroupManagerGroup(player.getName(), ContaoGroup.PROBE);
+    }
+
+    private boolean checkUser(int userID, CommandSender sender, String mcName, UUID uuid) {
+
+
+        // USER IS IN X
+        if (playerManager.isInGroup(mcName, ContaoGroup.X)) {
+            ChatUtils.writeError(sender, pluginName, "Fehler: User ist in Gruppe X.");
+            ChatUtils.writeInfo(sender, pluginName, "Er wurde bereits abgelehnt!");
+            return false;
+        }
+
+        ContaoGroup contaoGroup = databaseManager.getContaoGroup(userID);
+
+        if(!ContaoGroup.DEFAULT.equals(contaoGroup) && !ContaoGroup.FREE.equals(contaoGroup)) {
+            ChatUtils.writeError(sender, pluginName, "Spieler '" + mcName + "' ist weder Free noch Default! Aktuelle Gruppe: " + contaoGroup);
+            return false;
+        }
+
+        HashMap<Integer, String> forumIDs = databaseManager.getForumIDs(mcName);
+
+        if(forumIDs == null || forumIDs.isEmpty()) {
+            ChatUtils.writeError(sender, pluginName, "Fehler: MinecraftNick nicht gefunden.");
+            return false;
+        }
+        else if(forumIDs.size() > 1) {
+            ChatUtils.writeError(sender, pluginName, "Fehler: Mehrere ForenAccounts mit gleichem MinecraftNick gefunden.");
+            return false;
+        }
+        else if(!forumIDs.containsKey(userID)) {
+            ChatUtils.writeError(sender, pluginName, "Fehler: MCNick gefunden, aber unter anderen ForenIDs.");
+            for(Integer i : forumIDs.keySet()) {
+                ChatUtils.writeError(sender, pluginName, Integer.toString(i));
+            }
+            return false;
+        }
+
+        if (!databaseManager.isForumAccountActive(userID)) {
+            ChatUtils.writeError(sender, pluginName, "Fehler: Bestätigungsemail wurde noch nicht bestätigt.");
+            ChatUtils.writeInfo(sender, pluginName, "Bitte dem User bescheid sagen das er bestätigen muss.");
+            return false;
+        }
+
+
+        List<String> forumNames = databaseManager.getForumNames(uuid);
+        if(forumNames == null) {
+            ChatUtils.writeInfo(sender, pluginName, "Fehler: Konnte nicht prüfen ob UUID bereits eingetragen ist.");
+            return false;
+        }
+
+        if(!forumNames.isEmpty()) {
+            ChatUtils.writeError(sender, pluginName, "Fehler: UUID ist bereits für folgende ForenAccounts hinterlegt.");
+            for(String dbName : forumNames) {
+                ChatUtils.writeError(sender, pluginName, dbName);
+            }
+            return false;
+        }
+
+        return true;
+    }
 }

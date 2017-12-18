@@ -86,15 +86,6 @@ public class StatisticManager implements Runnable {
         return warnings.get(playerUUID);
     }
 
-    public void addWarning(UUID playerUUID, MCWarning warning) {
-        PlayerWarnings thisPlayer = warnings.get(playerUUID);
-        if (thisPlayer == null) {
-            thisPlayer = new PlayerWarnings();
-            warnings.put(playerUUID, thisPlayer);
-        }
-        thisPlayer.addWarning(warning);
-    }
-
     public void printWarnings(Player player) {
         PlayerWarnings thisWarnings = this.getWarnings(player.getUniqueId());
         if (thisWarnings != null && thisWarnings.getWarnings().size() > 0) {

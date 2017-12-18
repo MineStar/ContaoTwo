@@ -27,7 +27,6 @@ import org.bukkit.entity.Player;
 
 import de.minestar.contao2.core.Core;
 import de.minestar.contao2.manager.DatabaseManager;
-import de.minestar.contao2.units.MCUser;
 import de.minestar.minestarlibrary.commands.AbstractCommand;
 import de.minestar.minestarlibrary.utils.ChatUtils;
 
@@ -54,9 +53,9 @@ public class cmdSearch extends AbstractCommand {
     private void searchUser(String name, CommandSender sender) {
 
         // GET INGAME-NAME AND CONTAO-ID
-        HashMap<Integer, String> userMap = databaseManager.getForumIDs(name);
+        HashMap<Integer, String> userMap = databaseManager.getForumIDsLike(name);
         if (userMap.values().size() < 1) {
-            ChatUtils.writeError(sender, pluginName, "Kein Homepageaccount mit eingetragenem Nick gefunden!");
+            ChatUtils.writeError(sender, pluginName, "Kein ForenAccount mit eingetragenem Nick gefunden!");
             return;
         }
 
@@ -74,7 +73,7 @@ public class cmdSearch extends AbstractCommand {
                 text = " | Kein PayUser";
             }
 
-            ChatUtils.writeInfo(sender, "UserID : " + userID + " | ForumName: " + forumName + " | Eingetragener Nick " + mcNick + text);
+            ChatUtils.writeInfo(sender, "UserID : " + userID + " | ForumName: " + forumName + " | Eingetragener Nick: " + mcNick + text);
         }
     }
 }

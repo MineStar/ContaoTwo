@@ -18,6 +18,7 @@
 
 package de.minestar.contao2.commands.user;
 
+import de.minestar.contao2.units.ContaoGroup;
 import de.minestar.minestarlibrary.utils.PlayerUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -83,7 +84,8 @@ public class cmdAddProbeTime extends AbstractCommand {
             return;
         }
 
-        if (!databaseManager.isProbeMember(uuid)) {
+        ContaoGroup group = databaseManager.getContaoGroup(uuid);
+        if (!ContaoGroup.PROBE.equals(group)) {
             ChatUtils.writeError(sender, pluginName, "Spieler ist kein Probe user!");
             return;
         }

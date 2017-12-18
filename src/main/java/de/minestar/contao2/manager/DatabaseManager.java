@@ -48,10 +48,11 @@ public class DatabaseManager extends AbstractMySQLHandler {
 //    private PreparedStatement selectMCPayById;
     private PreparedStatement checkAccount;
 //    private PreparedStatement selectGroup;
-    private PreparedStatement selectGroups;
+//    private PreparedStatement selectGroup;
     private PreparedStatement selectUserGroup;
 //    private PreparedStatement selectContaoId;
     private PreparedStatement selectForumIds;
+    private PreparedStatement selectForumIdsLike;
 //    private PreparedStatement checkContaoId;
     private PreparedStatement checkForumId;
 //    private PreparedStatement checkMCNick;
@@ -62,8 +63,7 @@ public class DatabaseManager extends AbstractMySQLHandler {
     private PreparedStatement isInProbation;
     private PreparedStatement deleteProbeStatus;
     private PreparedStatement addProbeDate;
-    private PreparedStatement isProbeMember;
-    private PreparedStatement convertFreeToProbe;
+    private PreparedStatement setProbeValues;
 
 //    private PreparedStatement addWarning;
 //    private PreparedStatement deleteWarning;
@@ -79,8 +79,9 @@ public class DatabaseManager extends AbstractMySQLHandler {
 
     private PreparedStatement selectForumName;
     private PreparedStatement selectForumIdByUUID;
+    private PreparedStatement selectForumNameyUUID;
 
-    private PreparedStatement promoteProbeToFree;
+    private PreparedStatement updateOnlineGroupID;
 
     private final static String minecraftNickOptionStr = "userOption7";
     private final static String minecraftUUIDOptionStr = "userOption39";
@@ -126,23 +127,27 @@ public class DatabaseManager extends AbstractMySQLHandler {
 
         removeGroup = con.prepareStatement("DELETE FROM wcf1_user_to_group WHERE userID=? AND groupID=?");
 
+        addGroup = con.prepareStatement("INSERT INTO wcf1_user_to_group (userID, groupID) VALUES ?, ?");
+
         selectMCPPlayerByUUID = con.prepareStatement("SELECT "+minecraftUUIDOptionStr+", userID FROM wcf1_user_option_value WHERE " + minecraftUUIDOptionStr + " = ? LIMIT 1");
 
         selectMCPlayerByForumId = con.prepareStatement("SELECT "+minecraftUUIDOptionStr+", userID FROM wcf1_user_option_value WHERE userID = ? LIMIT 1");
 
         getPayEndDateByForumId = con.prepareStatement("SELECT date(endDate) FROM wcf1_paid_subscription_user WHERE userID = ? AND isActive = 1 AND subscriptionID in (SELECT subscriptionID FROM wcf1_paid_subscription where groupIDs = "+forumPayUserGroupId+") LIMIT 1");
 
-        checkAccount = con.prepareStatement("SELECT banned FROM wcf1_user WHERE userID = ? LIMIT 1");
+        checkAccount = con.prepareStatement("SELECT activationCode = 0 FROM wcf1_user WHERE userID = ? LIMIT 1");
 
-        selectGroups = con.prepareStatement("SELECT groupID FROM wcf1_user_to_group WHERE userID = ?");
+        selectForumIds = con.prepareStatement("SELECT userID, "+minecraftNickOptionStr+" FROM wcf1_user_option_value WHERE "+minecraftNickOptionStr+" = ?");
 
-        selectForumIds = con.prepareStatement("SELECT userID, "+minecraftNickOptionStr+" FROM wcf1_user_option_value WHERE "+minecraftNickOptionStr+" LIKE ?");
+        selectForumIdsLike = con.prepareStatement("SELECT userID, "+minecraftNickOptionStr+" FROM wcf1_user_option_value WHERE "+minecraftNickOptionStr+" LIKE ?");
 
         selectUserGroup = con.prepareStatement("SELECT userOnlineGroupID FROM wcf1_user WHERE userID = ?");
 
         checkForumId = con.prepareStatement("SELECT 1 FROM wcf1_user WHERE userID = ? LIMIT 1");
 
         selectForumIdByUUID = con.prepareStatement("SELECT userID FROM wcf1_user_option_value WHERE " + minecraftUUIDOptionStr + " = ?");
+
+        selectForumNameyUUID = con.prepareStatement("SELECT username FROM wcf1_user_option_value WHERE " + minecraftUUIDOptionStr + " = ?");
 
         checkMCUUID = con.prepareStatement("SELECT 1 FROM wcf1_user_option_value WHERE "+minecraftUUIDOptionStr+" = ? LIMIT 1");
 
@@ -152,9 +157,9 @@ public class DatabaseManager extends AbstractMySQLHandler {
 
         deleteProbeStatus = con.prepareStatement("UPDATE wcf1_user_option_value SET "+probeEndOptionStr+" = NULL WHERE "+minecraftUUIDOptionStr+" = ?");
 
-        convertFreeToProbe = con.prepareStatement("UPDATE wcf1_user_option_value SET "+probeEndOptionStr+" = ADDDATE(NOW(), INTERVAL " + PROBE_TIME + " DAY) WHERE minecraft_nick = ?");
+        addProbeDate = con.prepareStatement("UPDATE wcf1_user_option_value SET "+probeEndOptionStr+" = ADDDATE("+probeEndOptionStr+", INTERVAL ? DAY) WHERE userID = ?");
 
-        addProbeDate = con.prepareStatement("UPDATE wcf1_user_option_value SET probeEndDate = ADDDATE("+probeEndOptionStr+", INTERVAL ? DAY) WHERE userID = ?");
+        setProbeValues = con.prepareStatement("UPDATE wcf1_user_option_value SET "+probeStartOptionStr+" = ?, "+probeEndOptionStr+" = ?  WHERE userID = ?");
 
 //        addWarning = null; //TODO con.prepareStatement("INSERT INTO mc_warning (mc_pay_id,reason,date,adminnickname) VALUES ((SELECT id FROM mc_pay WHERE minecraft_nick = ?), ?, STR_TO_DATE(?,'%d.%m.%Y %H:%i:%s'), ?)");
 
@@ -162,9 +167,7 @@ public class DatabaseManager extends AbstractMySQLHandler {
 
         // deleteWarning = con.prepareStatement("DELETE FROM mc_warning WHERE mc_pay_id = (SELECT id FROM mc_pay WHERE minecraft_nick = ?) AND DATE_FORMAT(date,'%d.%m.%Y %H:%i:%s') = ?");
 
-        isProbeMember = con.prepareStatement("SELECT 1 FROM wcf1_user_option_value WHERE "+minecraftUUIDOptionStr+" = ? AND "+probeEndOptionStr+" IS NULL");
-
-        isInProbation = con.prepareStatement("SELECT 1 FROM mc_pay WHERE "+minecraftUUIDOptionStr+" = ? AND DATEDIFF(NOW(),probeEndDate) < 0");
+        isInProbation = con.prepareStatement("SELECT 1 FROM wcf1_user_option_value WHERE "+minecraftUUIDOptionStr+" = ? AND DATEDIFF(NOW(),probeEndDate) < 0");
 
         selectAllStatistics = con.prepareStatement("SELECT "+minecraftUUIDOptionStr+", "+minecraftTotalBreakOptionStr+", "+minecraftTotalPlacedOptionStr+" FROM wcf1_user_option_value where "+minecraftUUIDOptionStr+" IS NOT NULL");
 
@@ -179,6 +182,8 @@ public class DatabaseManager extends AbstractMySQLHandler {
         setFreeWeekUsed = con.prepareStatement("UPDATE wcf1_user_option_value SET "+hasUsedFreeWeekOptionStr+" = 1 WHERE "+minecraftUUIDOptionStr+" = ?");
 
         selectForumName = con.prepareStatement("SELECT username FROM wcf1_user WHERE userID = ?");
+
+        updateOnlineGroupID = con.prepareStatement("UPDATE wcf1_user SET userOnlineGroupID = ? WHERE userID = ?");
     }
 
     public boolean hasUsedFreeWeek(UUID playerUUID) {
@@ -235,17 +240,39 @@ public class DatabaseManager extends AbstractMySQLHandler {
 //        }
 //    }
 
-    // SET CONTAO-GROUP IN 'tl_member'
-    public void updateContaoGroup(ContaoGroup group, int contaoID) {
-        //TODO
-        // UPDATE tl_member SET groups = ? WHERE ID = ?
-//        try {
-//            updateGroup.setInt(1, group.groupID());
-//            updateGroup.setInt(2, contaoID);
-//            updateGroup.executeUpdate();
-//        } catch (Exception e) {
-//            ConsoleUtils.printException(e, Core.NAME, "Can't update Contao Member Group! GroupManagerGroup=" + group.getName() + ",ContaoGroupString=" + group.groupID() + ",ContaoID=" + contaoID);
-//        }
+    public boolean updateuserOnlineGroupID(int forumID, ContaoGroup group) {
+
+        try {
+            updateOnlineGroupID.setInt(1, group.groupID());
+            updateOnlineGroupID.setInt(2, forumID);
+            int results = updateOnlineGroupID.executeUpdate();
+            return results > 0;
+        } catch (Exception e) {
+            ConsoleUtils.printException(e, Core.NAME, "Can't update Forum Member Group! GroupManagerGroup=" + group.getName() + ",ContaoGroupID=" + group.groupID() + ",userID=" + forumID);
+            return false;
+        }
+    }
+
+    public void removeGroup(int forumID, ContaoGroup group) {
+
+        try {
+            removeGroup.setInt(1, group.groupID());
+            removeGroup.setInt(2, forumID);
+            removeGroup.executeUpdate();
+        } catch (Exception e) {
+            ConsoleUtils.printException(e, Core.NAME, "Can't remove Forum Member Group! GroupManagerGroup=" + group.getName() + ",ContaoGroupID=" + group.groupID() + ",userID=" + forumID);
+        }
+    }
+
+    public void addGroup(ContaoGroup group, int forumID) {
+
+        try {
+            addGroup.setInt(1, forumID);
+            addGroup.setInt(2, group.groupID());
+            addGroup.executeUpdate();
+        } catch (Exception e) {
+            ConsoleUtils.printException(e, Core.NAME, "Can't add Forum Member Group! GroupManagerGroup=" + group.getName() + ",ContaoGroupID=" + group.groupID() + ",userID=" + forumID);
+        }
     }
 
     //TODO REMOVEME KILLME
@@ -366,7 +393,6 @@ public class DatabaseManager extends AbstractMySQLHandler {
     // IS ACCOUNT ACTIVATED
     public boolean isForumAccountActive(int forumId) {
 
-        // SELECT disable FROM tl_member WHERE id = ? LIMIT 1
         try {
             checkAccount.setInt(1, forumId);
             ResultSet result = checkAccount.executeQuery();
@@ -378,7 +404,7 @@ public class DatabaseManager extends AbstractMySQLHandler {
         return false;
     }
 
-    public String getContaoGroup(int forumId) {
+    public ContaoGroup getContaoGroup(int forumId) {
         try {
             selectUserGroup.setInt(1, forumId);
             ResultSet result = selectUserGroup.executeQuery();
@@ -394,37 +420,41 @@ public class DatabaseManager extends AbstractMySQLHandler {
         return null;
     }
 
+    public ContaoGroup getContaoGroup(UUID uuid) {
+        int forumID = getForumId(uuid);
+        return getContaoGroup(forumID);
+    }
+
     // GET MC GROUP FROM CONTAO-GROUPID
-    private String getMCGroupName(int groupID) {
+    private ContaoGroup getMCGroupName(int groupID) {
         if (groupID == GROUP_ID_FREE)
-            return ContaoGroup.FREE.getName();
+            return ContaoGroup.FREE;
         else if (groupID == GROUP_ID_PAY || groupID == GROUP_ID_FREEWEEK_PAY)
-            return ContaoGroup.PAY.getName();
+            return ContaoGroup.PAY;
         else if (groupID == GROUP_ID_ADMIN)
-            return ContaoGroup.ADMIN.getName();
+            return ContaoGroup.ADMIN;
         else if (groupID == GROUP_ID_PROBE)
-            return ContaoGroup.PROBE.getName();
+            return ContaoGroup.PROBE;
         else if (groupID == GROUP_ID_MOD)
-            return ContaoGroup.MOD.getName();
+            return ContaoGroup.MOD;
         else if(groupID == GROUP_ID_TMPBAN || groupID == GROUP_ID_PERMBAN)
-            return ContaoGroup.X.getName();
-        return ContaoGroup.DEFAULT.getName();
+            return ContaoGroup.X;
+        return ContaoGroup.DEFAULT;
     }
 
     // GET CONTAO ID
-    public HashMap<Integer, String> getForumIDs(String username) {
+    public HashMap<Integer, String> getForumIDsLike(String username) {
 
-        // SELECT id, username FROM tl_member WHERE username LIKE %?%
         HashMap<Integer, String> map = new HashMap<Integer, String>();
 
         try {
-            selectForumIds.setString(1, "%" + username + "%");
-            ResultSet result = selectForumIds.executeQuery();
+            selectForumIdsLike.setString(1, "%" + username + "%");
+            ResultSet result = selectForumIdsLike.executeQuery();
             while (result.next())
-                map.put(result.getInt("id"), result.getString(minecraftNickOptionStr));
+                map.put(result.getInt("userID"), result.getString(minecraftNickOptionStr));
 
         } catch (Exception e) {
-            ConsoleUtils.printException(e, Core.NAME, "Can't get ForumID from tl_member! Minecraft Nick=" + username);
+            ConsoleUtils.printException(e, Core.NAME, "Can't get ForumID from wcf1_user_option_value! Minecraft Nick=" + username);
         }
 
         return map;
@@ -486,8 +516,6 @@ public class DatabaseManager extends AbstractMySQLHandler {
 
     public boolean addProbeTime(int days, UUID playerUUID) {
 
-        // UPDATE mc_pay SET probeEndDate = ADDDATE(probeEndDate, INTERVAL ?
-        // DAY) WHERE minecraft_nick = ?
         try {
             addProbeDate.setInt(1, days);
             addProbeDate.setString(2, playerUUID.toString());
@@ -509,18 +537,6 @@ public class DatabaseManager extends AbstractMySQLHandler {
 //            ConsoleUtils.printException(e, Core.NAME, "Can't delete probe status by setting probeEndDate to NULL! PlayerName=" + playerName);
 //        }
 //    }
-
-    public boolean isProbeMember(UUID playerUUID) {
-
-        try {
-            isProbeMember.setString(1, playerUUID.toString());
-            return !isProbeMember.executeQuery().next();
-        } catch (Exception e) {
-            ConsoleUtils.printException(e, Core.NAME, "Can't check whether player is probe member! UUID=" + playerUUID);
-        }
-
-        return false;
-    }
 
 //    public boolean isInProbation(UUID playerUUID) {
 //
@@ -547,36 +563,7 @@ public class DatabaseManager extends AbstractMySQLHandler {
 
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
 
-//    public boolean addWarning(UUID playerUUID, String reason, String adminName) {
-//
-//        //TODO
-////        String date = dateFormat.format(new Date());
-////        sManager.addWarning(playerName, new MCWarning(reason, date, adminName));
-////
-////        try {
-////            addWarning.setString(1, playerName);
-////            addWarning.setString(2, reason);
-////            addWarning.setString(3, date);
-////            addWarning.setString(4, adminName);
-////            return addWarning.executeUpdate() == 1;
-////        } catch (Exception e) {
-////            ConsoleUtils.printException(e, Core.NAME, "Can't add a warning to a player! PlayerName=" + playerName + ",adminName=" + adminName + ",text=" + reason);
-////        }
-//
-//        return false;
-//    }
-
-//    public boolean removeWarning(UUID playerUUID, String date) {
-//        //TODO
-//        try {
-//            deleteWarning.setString(1, playerName);
-//            deleteWarning.setString(2, date);
-//            return deleteWarning.executeUpdate() == 1;
-//        } catch (Exception e) {
-//            ConsoleUtils.printException(e, Core.NAME, "Can't remove a warning from mc_pay! PlayerName=" + playerName + ",WarningDate=" + date);
-//        }
-//        return false;
-//    }
+    private static final SimpleDateFormat probeDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
     public HashMap<UUID, Statistic> loadAllStatistics() {
         HashMap<UUID, Statistic> statistics = new HashMap<>();
@@ -775,6 +762,79 @@ public class DatabaseManager extends AbstractMySQLHandler {
         }
         return null;
     }
+
+    public boolean setToProbe(UUID uuid) {
+        int userID = getForumId(uuid);
+        if(userID == -1)
+            return false;
+
+        ContaoGroup oldGroup = getContaoGroup(userID);
+
+        if(ContaoGroup.FREE.equals(oldGroup)) {
+            removeGroup(userID, ContaoGroup.FREE);
+        }
+        if(!updateuserOnlineGroupID(userID, ContaoGroup.PROBE))
+            return false;
+
+        GregorianCalendar cal = new GregorianCalendar();
+        String probeStart = probeDateFormat.format(cal);
+
+        cal.add(Calendar.DAY_OF_MONTH, PROBE_TIME);
+        String probeEnd = probeDateFormat.format(cal);
+
+
+        if(!setProbeValues(userID, probeStart, probeEnd))
+            return false;
+
+        return true;
+    }
+
+    private boolean setProbeValues(int userID, String probeStart, String probeEnd) {
+        try {
+            setProbeValues.setString(1, probeStart);
+            setProbeValues.setString(2, probeEnd);
+            setProbeValues.setInt(3, userID);
+            int res = setProbeValues.executeUpdate();
+            if(res > 0) {
+                return true;
+            }
+        } catch (Exception e) {
+            ConsoleUtils.printException(e, Core.NAME, "Can't set probe dates to database! forumID=" + userID + ",probeStart=" + probeStart + ",probeEnd=" + probeEnd);
+        }
+        return false;
+    }
+
+    public HashMap<Integer, String> getForumIDs(String mcNick) {
+        HashMap<Integer, String> map = new HashMap<Integer, String>();
+
+        try {
+            selectForumIds.setString(1, mcNick );
+            ResultSet result = selectForumIds.executeQuery();
+            while (result.next())
+                map.put(result.getInt("userID"), result.getString(minecraftNickOptionStr));
+
+        } catch (Exception e) {
+            ConsoleUtils.printException(e, Core.NAME, "Can't get ForumID from wcf1_user_option_value! Minecraft Nick=" + mcNick);
+        }
+
+        return map;
+    }
+
+    public List<String> getForumNames(UUID playerUUID) {
+        List<String> forumIDs = new ArrayList<>();
+        try {
+            selectForumNameyUUID.setString(1, playerUUID.toString());
+            ResultSet result = selectForumNameyUUID.executeQuery();
+            while(result.next()) {
+                forumIDs.add(result.getString("username"));
+            }
+        } catch (Exception e) {
+            ConsoleUtils.printException(e, Core.NAME, "Can't find forum name for playerUUID! playerUUID=" + playerUUID);
+            return null;
+        }
+        return forumIDs;
+    }
+
 
 //    public boolean updateMCNick(String oldPlayer, String newPlayer) {
 //        try {
