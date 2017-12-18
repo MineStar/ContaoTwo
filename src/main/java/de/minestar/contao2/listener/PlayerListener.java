@@ -73,7 +73,6 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onPlayerChangeNick(PlayerChangedNameEvent event) {
         this.playerManager.refresh();
-        this.statisticManager.refresh();
 
         Player player = PlayerUtils.getOnlinePlayer(event.getCommandSender());
         if (player != null) {

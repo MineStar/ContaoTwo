@@ -48,7 +48,7 @@ import java.io.File;
 @UseStatistic
 public class Core extends AbstractCore {
 
-    public static final String NAME = "ContaoTwo";
+    public static final String NAME = "UserMgmt";
 
     public Core() {
         super(NAME);
