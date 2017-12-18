@@ -124,6 +124,9 @@ public class cmdProbe extends AbstractCommand {
         }
         else if(forumIDs.size() > 1) {
             ChatUtils.writeError(sender, pluginName, "Fehler: Mehrere ForenAccounts mit gleichem MinecraftNick gefunden.");
+            for(Integer i : forumIDs.keySet()) {
+                ChatUtils.writeInfo(sender, pluginName, Integer.toString(i));
+            }
             return false;
         }
         else if(!forumIDs.containsKey(userID)) {
@@ -141,16 +144,16 @@ public class cmdProbe extends AbstractCommand {
         }
 
 
-        List<String> forumNames = databaseManager.getForumNames(uuid);
-        if(forumNames == null) {
+        List<Integer> forumIDsForUUID = databaseManager.getForumIds(uuid);
+        if(forumIDsForUUID == null) {
             ChatUtils.writeError(sender, pluginName, "Fehler: Konnte nicht prüfen ob UUID bereits eingetragen ist.");
             return false;
         }
 
-        if(!forumNames.isEmpty()) {
+        if(forumIDsForUUID.size() > 2 || !forumIDs.containsKey(userID)) {
             ChatUtils.writeError(sender, pluginName, "Fehler: UUID ist bereits für folgende ForenAccounts hinterlegt.");
-            for(String dbName : forumNames) {
-                ChatUtils.writeInfo(sender, pluginName, dbName);
+            for(Integer i : forumIDsForUUID) {
+                ChatUtils.writeInfo(sender, pluginName, Integer.toString(i));
             }
             return false;
         }

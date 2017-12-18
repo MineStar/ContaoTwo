@@ -79,7 +79,6 @@ public class DatabaseManager extends AbstractMySQLHandler {
 
     private PreparedStatement selectForumName;
     private PreparedStatement selectForumIdByUUID;
-    private PreparedStatement selectForumNameyUUID;
 
     private PreparedStatement updateOnlineGroupID;
 
@@ -145,8 +144,6 @@ public class DatabaseManager extends AbstractMySQLHandler {
         checkForumId = con.prepareStatement("SELECT 1 FROM wcf1_user WHERE userID = ? LIMIT 1");
 
         selectForumIdByUUID = con.prepareStatement("SELECT userID FROM wcf1_user_option_value WHERE " + minecraftUUIDOptionStr + " = ?");
-
-        selectForumNameyUUID = con.prepareStatement("SELECT u.username FROM wcf1_user u, wcf1_user_option_value o WHERE o." + minecraftUUIDOptionStr + " = ?  AND u.userID = o.userID");
 
         checkMCUUID = con.prepareStatement("SELECT 1 FROM wcf1_user_option_value WHERE " + minecraftUUIDOptionStr + " = ? LIMIT 1");
 
@@ -815,25 +812,24 @@ public class DatabaseManager extends AbstractMySQLHandler {
         return map;
     }
 
-    public List<String> getForumNames(UUID playerUUID) {
-        List<String> forumIDs = new ArrayList<>();
-        try {
-            selectForumNameyUUID.setString(1, playerUUID.toString());
-            ResultSet result = selectForumNameyUUID.executeQuery();
-            while (result.next()) {
-                forumIDs.add(result.getString("username"));
-            }
-        } catch (Exception e) {
-            ConsoleUtils.printException(e, Core.NAME, "Can't find forum name for playerUUID! playerUUID=" + playerUUID);
-            return null;
-        }
-        return forumIDs;
-    }
-
     public void setUserFree(int userID) {
         removeGroup(userID, ContaoGroup.PROBE);
         addGroup(ContaoGroup.FREE, userID);
         updateuserOnlineGroupID(userID, ContaoGroup.FREE);
     }
 
+    public List<Integer> getForumIds(UUID playerUUID) {
+        List<Integer> userIDS = new ArrayList<>();
+        try {
+            selectForumIdByUUID.setString(1, playerUUID.toString());
+            ResultSet result = selectForumIdByUUID.executeQuery();
+            while (result.next()) {
+                userIDS.add(result.getInt("userID"));
+            }
+        } catch (Exception e) {
+            ConsoleUtils.printException(e, Core.NAME, "Can't find userIDs for playerUUID! playerUUID=" + playerUUID);
+            return null;
+        }
+        return userIDS;
+    }
 }
