@@ -153,7 +153,7 @@ public class DatabaseManager extends AbstractMySQLHandler {
 
         deleteProbeStatus = con.prepareStatement("UPDATE wcf1_user_option_value SET " + probeEndOptionStr + " = NULL WHERE " + minecraftUUIDOptionStr + " = ?");
 
-        addProbeDate = con.prepareStatement("UPDATE wcf1_user_option_value SET " + probeEndOptionStr + " = ADDDATE(" + probeEndOptionStr + ", INTERVAL ? DAY) WHERE userID = ?");
+        addProbeDate = con.prepareStatement("UPDATE wcf1_user_option_value SET " + probeEndOptionStr + " = ADDDATE(" + probeEndOptionStr + ", INTERVAL ? DAY) WHERE "+minecraftUUIDOptionStr+" = ?");
 
         setProbeValues = con.prepareStatement("UPDATE wcf1_user_option_value SET " + minecraftUUIDOptionStr + " = ?, " + probeStartOptionStr + " = ?, " + probeEndOptionStr + " = ?, " + freischaltAdminNick + " = ?  WHERE userID = ?");
 
@@ -522,7 +522,12 @@ public class DatabaseManager extends AbstractMySQLHandler {
         try {
             addProbeDate.setInt(1, days);
             addProbeDate.setString(2, playerUUID.toString());
-            return addProbeDate.executeUpdate() > 0;
+            if(addProbeDate.executeUpdate() > 0){
+                return true;
+            } else {
+                ConsoleUtils.printError(Core.NAME, "No results from updating probeEndDate in wcf1_user_options! UUID=" + playerUUID + ",Days=" + days);
+            }
+
         } catch (Exception e) {
             ConsoleUtils.printException(e, Core.NAME, "Can't update probeEndDate in wcf1_user_options! UUID=" + playerUUID + ",Days=" + days);
         }
