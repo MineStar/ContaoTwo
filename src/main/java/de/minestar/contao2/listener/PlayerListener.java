@@ -240,11 +240,13 @@ public class PlayerListener implements Listener {
             playerManager.updateGroupManagerGroup(event.getPlayer().getName(), newGroup);
             ConsoleUtils.printWarning(Core.NAME, "Player '" + event.getPlayer().getName() + "' has a different forum( " + newGroup + " ) and groupmanager( " + oldGroup + " )-group!");
         }
-        else if(oldGroup.equals(ContaoGroup.PROBE.getName())) {
+        else if(oldGroup.equals(ContaoGroup.PROBE)) {
             if(databaseManager.canBeFree(userID)) {
                 playerManager.updateGroupManagerGroup(event.getPlayer().getName(), ContaoGroup.FREE);
-                //TODO Zurückschreiben in DB?
+
+                databaseManager.setUserFree(userID);
             }
         }
     }
+
 }
