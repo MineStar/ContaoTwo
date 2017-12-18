@@ -89,6 +89,7 @@ public class DatabaseManager extends AbstractMySQLHandler {
     private final static String minecraftTotalPlacedOptionStr = "userOption41";
     private final static String probeStartOptionStr = "userOption42";
     private final static String probeEndOptionStr = "userOption43";
+    private final static String freischaltAdminNick = "userOption44";
     private final static String hasUsedFreeWeekOptionStr = "userOption45";
     private final static int forumPayUserGroupId = 32;
     private final static int FORUM_FREEWEEK_PAYUSERGROUP_ID = 7;
@@ -123,11 +124,9 @@ public class DatabaseManager extends AbstractMySQLHandler {
 //
 //         updateMCNick = con.prepareStatement("UPDATE mc_pay SET minecraft_nick = ? WHERE minecraft_nick = ?");
 
-        addGroup = con.prepareStatement("INSERT INTO wcf1_user_to_group (userID, groupID) VALUES(?, ?)");
+        addGroup = con.prepareStatement("INSERT INTO wcf1_user_to_group (userID, groupID) VALUES (?, ?)");
 
         removeGroup = con.prepareStatement("DELETE FROM wcf1_user_to_group WHERE userID=? AND groupID=?");
-
-        addGroup = con.prepareStatement("INSERT INTO wcf1_user_to_group (userID, groupID) VALUES ?, ?");
 
         selectMCPPlayerByUUID = con.prepareStatement("SELECT "+minecraftUUIDOptionStr+", userID FROM wcf1_user_option_value WHERE " + minecraftUUIDOptionStr + " = ? LIMIT 1");
 
@@ -147,7 +146,7 @@ public class DatabaseManager extends AbstractMySQLHandler {
 
         selectForumIdByUUID = con.prepareStatement("SELECT userID FROM wcf1_user_option_value WHERE " + minecraftUUIDOptionStr + " = ?");
 
-        selectForumNameyUUID = con.prepareStatement("SELECT username FROM wcf1_user_option_value WHERE " + minecraftUUIDOptionStr + " = ?");
+        selectForumNameyUUID = con.prepareStatement("SELECT u.username FROM wcf1_user u, wcf1_user_option_value o WHERE o." + minecraftUUIDOptionStr + " = ?  AND u.userID = o.userID");
 
         checkMCUUID = con.prepareStatement("SELECT 1 FROM wcf1_user_option_value WHERE "+minecraftUUIDOptionStr+" = ? LIMIT 1");
 
@@ -159,7 +158,7 @@ public class DatabaseManager extends AbstractMySQLHandler {
 
         addProbeDate = con.prepareStatement("UPDATE wcf1_user_option_value SET "+probeEndOptionStr+" = ADDDATE("+probeEndOptionStr+", INTERVAL ? DAY) WHERE userID = ?");
 
-        setProbeValues = con.prepareStatement("UPDATE wcf1_user_option_value SET "+probeStartOptionStr+" = ?, "+probeEndOptionStr+" = ?  WHERE userID = ?");
+        setProbeValues = con.prepareStatement("UPDATE wcf1_user_option_value SET "+minecraftUUIDOptionStr+" = ?, "+probeStartOptionStr+" = ?, "+probeEndOptionStr+" = ?, "+freischaltAdminNick+" = ?  WHERE userID = ?");
 
 //        addWarning = null; //TODO con.prepareStatement("INSERT INTO mc_warning (mc_pay_id,reason,date,adminnickname) VALUES ((SELECT id FROM mc_pay WHERE minecraft_nick = ?), ?, STR_TO_DATE(?,'%d.%m.%Y %H:%i:%s'), ?)");
 
@@ -246,11 +245,15 @@ public class DatabaseManager extends AbstractMySQLHandler {
             updateOnlineGroupID.setInt(1, group.groupID());
             updateOnlineGroupID.setInt(2, forumID);
             int results = updateOnlineGroupID.executeUpdate();
-            return results > 0;
+            if(results > 0) {
+                return true;
+            } else {
+                ConsoleUtils.printError(Core.NAME, "No result from updting! ContaoGroup=" + group.getName() + ",ContaoGroupID=" + group.groupID() + ",userID=" + forumID);
+            }
         } catch (Exception e) {
             ConsoleUtils.printException(e, Core.NAME, "Can't update Forum Member Group! GroupManagerGroup=" + group.getName() + ",ContaoGroupID=" + group.groupID() + ",userID=" + forumID);
-            return false;
         }
+        return false;
     }
 
     public void removeGroup(int forumID, ContaoGroup group) {
@@ -264,15 +267,19 @@ public class DatabaseManager extends AbstractMySQLHandler {
         }
     }
 
-    public void addGroup(ContaoGroup group, int forumID) {
+    public boolean addGroup(ContaoGroup group, int forumID) {
 
         try {
             addGroup.setInt(1, forumID);
             addGroup.setInt(2, group.groupID());
-            addGroup.executeUpdate();
+            int res = addGroup.executeUpdate();
+            if(res > 0) {
+                return true;
+            }
         } catch (Exception e) {
             ConsoleUtils.printException(e, Core.NAME, "Can't add Forum Member Group! GroupManagerGroup=" + group.getName() + ",ContaoGroupID=" + group.groupID() + ",userID=" + forumID);
         }
+        return false;
     }
 
     //TODO REMOVEME KILLME
@@ -396,7 +403,7 @@ public class DatabaseManager extends AbstractMySQLHandler {
         try {
             checkAccount.setInt(1, forumId);
             ResultSet result = checkAccount.executeQuery();
-            return result.next() && !result.getBoolean(1);
+            return result.next() && result.getBoolean(1);
         } catch (Exception e) {
             ConsoleUtils.printException(e, Core.NAME, "Can't check whether ForumAccount is active! forumId=" + forumId);
         }
@@ -417,7 +424,7 @@ public class DatabaseManager extends AbstractMySQLHandler {
             ConsoleUtils.printException(e, Core.NAME, "Can't get ContaoGroupName from user_group_final! userID=" + forumId);
         }
 
-        return null;
+        return ContaoGroup.DEFAULT;
     }
 
     public ContaoGroup getContaoGroup(UUID uuid) {
@@ -519,7 +526,7 @@ public class DatabaseManager extends AbstractMySQLHandler {
         try {
             addProbeDate.setInt(1, days);
             addProbeDate.setString(2, playerUUID.toString());
-            return addProbeDate.executeUpdate() == 1;
+            return addProbeDate.executeUpdate() > 0;
         } catch (Exception e) {
             ConsoleUtils.printException(e, Core.NAME, "Can't update probeEndDate in wcf1_user_options! UUID=" + playerUUID + ",Days=" + days);
         }
@@ -563,7 +570,6 @@ public class DatabaseManager extends AbstractMySQLHandler {
 
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
 
-    private static final SimpleDateFormat probeDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
     public HashMap<UUID, Statistic> loadAllStatistics() {
         HashMap<UUID, Statistic> statistics = new HashMap<>();
@@ -763,37 +769,27 @@ public class DatabaseManager extends AbstractMySQLHandler {
         return null;
     }
 
-    public boolean setToProbe(UUID uuid) {
-        int userID = getForumId(uuid);
-        if(userID == -1)
-            return false;
+    public boolean setProbeValues(int userID, String adminNick, UUID uuid) {
 
-        ContaoGroup oldGroup = getContaoGroup(userID);
-
-        if(ContaoGroup.FREE.equals(oldGroup)) {
-            removeGroup(userID, ContaoGroup.FREE);
-        }
-        if(!updateuserOnlineGroupID(userID, ContaoGroup.PROBE))
-            return false;
+        final SimpleDateFormat probeDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
         GregorianCalendar cal = new GregorianCalendar();
-        String probeStart = probeDateFormat.format(cal);
+        String probeStart = probeDateFormat.format(cal.getTime());
 
         cal.add(Calendar.DAY_OF_MONTH, PROBE_TIME);
-        String probeEnd = probeDateFormat.format(cal);
+        String probeEnd = probeDateFormat.format(cal.getTime());
 
+        return setProbeValues(userID, probeStart, probeEnd,  adminNick, uuid);
 
-        if(!setProbeValues(userID, probeStart, probeEnd))
-            return false;
-
-        return true;
     }
 
-    private boolean setProbeValues(int userID, String probeStart, String probeEnd) {
+    private boolean setProbeValues(int userID, String probeStart, String probeEnd, String adminNick, UUID uuid) {
         try {
-            setProbeValues.setString(1, probeStart);
-            setProbeValues.setString(2, probeEnd);
-            setProbeValues.setInt(3, userID);
+            setProbeValues.setString(1, uuid.toString());
+            setProbeValues.setString(2, probeStart);
+            setProbeValues.setString(3, probeEnd);
+            setProbeValues.setString(4, adminNick);
+            setProbeValues.setInt(5, userID);
             int res = setProbeValues.executeUpdate();
             if(res > 0) {
                 return true;

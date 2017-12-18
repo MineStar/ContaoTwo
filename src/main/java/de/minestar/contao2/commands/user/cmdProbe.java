@@ -18,9 +18,7 @@
 
 package de.minestar.contao2.commands.user;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
@@ -38,7 +36,7 @@ import de.minestar.minestarlibrary.utils.PlayerUtils;
 
 public class cmdProbe extends AbstractCommand {
 
-    private HashMap<String, Long> timeMap = new HashMap<String, Long>();
+    private HashMap<String, Long> timeMap = new HashMap<>();
 
     private PlayerManager playerManager;
     private DatabaseManager databaseManager;
@@ -66,21 +64,9 @@ public class cmdProbe extends AbstractCommand {
 
         Player player = PlayerUtils.getOnlinePlayer(inputPlayerName);
         if(player == null) {
-            OfflinePlayer offlinePlayer = PlayerUtils.getOfflinePlayer(inputPlayerName);
-            if(offlinePlayer == null) {
-                ChatUtils.writeError(sender, pluginName, "Spiler '" + inputPlayerName + "' wurde nicht gefunden. War der Spieler schon einmal online?");
-            } else if(args.length > 2 && "offline".equals(args[2])) {
-                player = offlinePlayer.getPlayer();
-            } else {
-                ChatUtils.writeError(sender, pluginName, "Spieler '" + inputPlayerName + "' ist offline. Kommando mit offline wiederholen.");
-            }
-        }
-
-        if(player == null) {
+            ChatUtils.writeError(sender, pluginName, "Spieler '" + inputPlayerName + "' ist nicht online. Offline Beförderungen aktuell nicht möglich.");
             return;
         }
-
-        String ingameName = player.getName();
 
         UUID uuid = player.getUniqueId();
 
@@ -97,10 +83,13 @@ public class cmdProbe extends AbstractCommand {
         }
 
 
-        databaseManager.setToProbe(uuid);
+        if(!setToProbe(sender, inputUserID, uuid)) {
+            ChatUtils.writeError(sender, pluginName, "User konnte nicht zum ProbeUser befördert werden.");
+            return;
+        }
 
         // PRINT INFO
-        ChatUtils.writeSuccess(sender, pluginName, "Spieler '" + ingameName + "' ist nun Probeuser!");
+        ChatUtils.writeSuccess(sender, pluginName, "Spieler '" + inputPlayerName + "' ist nun Probeuser!");
         if (player.isOnline()) {
             PlayerUtils.sendSuccess(player, "Du bist nun Probeuser!");
             PlayerUtils.sendSuccess(player, "Herzlich Willkommen auf Minestar.de");
@@ -140,7 +129,7 @@ public class cmdProbe extends AbstractCommand {
         else if(!forumIDs.containsKey(userID)) {
             ChatUtils.writeError(sender, pluginName, "Fehler: MCNick gefunden, aber unter anderen ForenIDs.");
             for(Integer i : forumIDs.keySet()) {
-                ChatUtils.writeError(sender, pluginName, Integer.toString(i));
+                ChatUtils.writeInfo(sender, pluginName, Integer.toString(i));
             }
             return false;
         }
@@ -154,15 +143,46 @@ public class cmdProbe extends AbstractCommand {
 
         List<String> forumNames = databaseManager.getForumNames(uuid);
         if(forumNames == null) {
-            ChatUtils.writeInfo(sender, pluginName, "Fehler: Konnte nicht prüfen ob UUID bereits eingetragen ist.");
+            ChatUtils.writeError(sender, pluginName, "Fehler: Konnte nicht prüfen ob UUID bereits eingetragen ist.");
             return false;
         }
 
         if(!forumNames.isEmpty()) {
             ChatUtils.writeError(sender, pluginName, "Fehler: UUID ist bereits für folgende ForenAccounts hinterlegt.");
             for(String dbName : forumNames) {
-                ChatUtils.writeError(sender, pluginName, dbName);
+                ChatUtils.writeInfo(sender, pluginName, dbName);
             }
+            return false;
+        }
+
+        return true;
+    }
+
+
+    public boolean setToProbe(CommandSender sender, int forumID, UUID uuid) {
+
+        if (databaseManager.isMCUUIDInUser(uuid)){
+            ContaoGroup oldGroup = databaseManager.getContaoGroup(forumID);
+
+            if (!ContaoGroup.DEFAULT.equals(oldGroup)) {
+                databaseManager.removeGroup(forumID, ContaoGroup.FREE);
+            }
+        }
+
+
+        if(!databaseManager.addGroup(ContaoGroup.PROBE, forumID)) {
+            ChatUtils.writeError(sender, pluginName, "Fehler: UserGruppe konnte nicht hinzugefügt werden.");
+            return false;
+        }
+
+        if (!databaseManager.updateuserOnlineGroupID(forumID, ContaoGroup.PROBE)) {
+            ChatUtils.writeError(sender, pluginName, "Fehler: UserGruppe konnte nicht gesetzt werden.");
+            return false;
+        }
+
+
+        if(!databaseManager.setProbeValues(forumID, sender.getName(), uuid)) {
+            ChatUtils.writeError(sender, pluginName, "Fehler: ProbeDaten konnte nicht gesetzt werden.");
             return false;
         }
 

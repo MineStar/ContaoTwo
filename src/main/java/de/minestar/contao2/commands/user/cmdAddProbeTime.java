@@ -31,9 +31,12 @@ import de.minestar.contao2.manager.DatabaseManager;
 import de.minestar.minestarlibrary.commands.AbstractCommand;
 import de.minestar.minestarlibrary.utils.ChatUtils;
 
+import java.util.HashMap;
 import java.util.UUID;
 
 public class cmdAddProbeTime extends AbstractCommand {
+
+    private HashMap<String, Long> timeMap = new HashMap<>();
 
     private DatabaseManager databaseManager;
 
@@ -53,7 +56,7 @@ public class cmdAddProbeTime extends AbstractCommand {
     }
 
     private void addProbeTime(String[] args, CommandSender sender) {
-        String playerName = args[0];
+        String inputPlayerName = args[0];
         // second argument is not a number
         if (args.length < 2 && !args[1].matches("\\d*")) {
             ChatUtils.writeError(sender, pluginName, getHelpMessage());
@@ -61,15 +64,17 @@ public class cmdAddProbeTime extends AbstractCommand {
         }
         int additionalDays = Integer.parseInt(args[1]);
 
-        Player player = PlayerUtils.getOnlinePlayer(playerName);
+        OfflinePlayer player = PlayerUtils.getOnlinePlayer(inputPlayerName);
         if(player == null) {
-            OfflinePlayer offlinePlayer = PlayerUtils.getOfflinePlayer(playerName);
+            OfflinePlayer offlinePlayer = PlayerUtils.getOfflinePlayer(inputPlayerName);
             if(offlinePlayer == null) {
-                ChatUtils.writeError(sender, pluginName, "Spiler '" + playerName + "' wurde nicht gefunden. War der Spieler schon einmal online?");
-            } else if(args.length > 2 && "offline".equals(args[2])) {
-                player = offlinePlayer.getPlayer();
+                ChatUtils.writeError(sender, pluginName, "Spieler '" + inputPlayerName + "' wurde nicht gefunden. War der Spieler schon einmal online?");
+            } else if(timeMap.containsKey(inputPlayerName) && System.currentTimeMillis() - timeMap.get(inputPlayerName) < 1000 * 60 * 15) {
+                timeMap.remove(inputPlayerName);
+                player = offlinePlayer;
             } else {
-                ChatUtils.writeError(sender, pluginName, "Spieler '" + playerName + "' ist offline. Kommando mit offline wiederholen.");
+                timeMap.put(inputPlayerName, System.currentTimeMillis());
+                ChatUtils.writeError(sender, pluginName, "Spieler '" + inputPlayerName + "' ist offline. Kommando innerhalb von 15 Sekunden widerholen wenn du es trotzdem ausführen möchtest.");
             }
         }
 
@@ -80,7 +85,7 @@ public class cmdAddProbeTime extends AbstractCommand {
         UUID uuid = player.getUniqueId();
 
         if (!databaseManager.isMCUUIDInUser(uuid)) {
-            ChatUtils.writeError(sender, pluginName, "Spieler '" + playerName + "' nicht gefunden!");
+            ChatUtils.writeError(sender, pluginName, "Spieler '" + inputPlayerName + "' nicht gefunden!");
             return;
         }
 
@@ -91,7 +96,7 @@ public class cmdAddProbeTime extends AbstractCommand {
         }
 
         if (databaseManager.addProbeTime(additionalDays, uuid))
-            ChatUtils.writeSuccess(sender, pluginName, "Probezeit für Spieler '" + playerName + "' verlängert!");
+            ChatUtils.writeSuccess(sender, pluginName, "Probezeit für Spieler '" + inputPlayerName + "' verlängert!");
         else
             ChatUtils.writeError(sender, pluginName, "Fehler beim Verlängern der Probezeit!");
 
