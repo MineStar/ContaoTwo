@@ -34,7 +34,7 @@ public class cmdList extends AbstractExtendedCommand {
     private PlayerManager playerManager;
 
     public cmdList(String syntax, String arguments, String node, PlayerManager pManager) {
-        super(Core.NAME, syntax, arguments, node);
+        super(Core.LOG_NAME, syntax, arguments, node);
         this.description = "List players";
         this.playerManager = pManager;
     }

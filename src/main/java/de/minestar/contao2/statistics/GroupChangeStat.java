@@ -47,7 +47,7 @@ public class GroupChangeStat implements Statistic {
 
     @Override
     public String getPluginName() {
-        return Core.NAME;
+        return Core.LOG_NAME;
     }
 
     @Override

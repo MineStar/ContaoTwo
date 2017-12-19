@@ -49,6 +49,7 @@ import java.io.File;
 public class Core extends AbstractCore {
 
     public static final String NAME = "ContaoTwo";
+    public static final String LOG_NAME = "UserMgmt";
 
     public Core() {
         super(NAME);

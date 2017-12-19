@@ -41,7 +41,7 @@ public class cmdPayWeek extends AbstractExtendedCommand {
     private DatabaseManager databaseManager;
 
     public cmdPayWeek(String syntax, String arguments, String node, PlayerManager pManager, DatabaseManager databaseManager) {
-        super(Core.NAME, syntax, arguments, node);
+        super(Core.LOG_NAME, syntax, arguments, node);
         this.description = "Use your free payweek (only new FreeUsers)";
         this.playerManager = pManager;
         this.databaseManager = databaseManager;
@@ -54,20 +54,20 @@ public class cmdPayWeek extends AbstractExtendedCommand {
 //
 //        // ONLY FREEUSERS CAN USE THIS COMMAND
 //        if (!msPlayer.getMinestarGroup().equals(MinestarGroup.FREE)) {
-//            PlayerUtils.sendError(player, Core.NAME, "Free-User only!");
+//            PlayerUtils.sendError(player, Core.LOG_NAME, "Free-User only!");
 //            return;
 //        }
 //
 //        // GET CONTAOUSER
 //        MCUser user = databaseManager.getIngameData(player.getName());
 //        if (user == null) {
-//            PlayerUtils.sendError(player, Core.NAME, "Fehler: Minecraftnick nicht gefunden");
+//            PlayerUtils.sendError(player, Core.LOG_NAME, "Fehler: Minecraftnick nicht gefunden");
 //            return;
 //        }
 //
 //        // GUTSCHEIN EINGEL�ST?
 //        if (this.databaseManager.hasUsedFreeWeek(player.getName())) {
-//            PlayerUtils.sendError(player, Core.NAME, "Du hast deinen Gutschein bereits eingelöst!");
+//            PlayerUtils.sendError(player, Core.LOG_NAME, "Du hast deinen Gutschein bereits eingelöst!");
 //            return;
 //        }
 //

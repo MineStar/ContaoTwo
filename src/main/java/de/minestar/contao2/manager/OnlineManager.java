@@ -113,7 +113,7 @@ public class OnlineManager extends AbstractMySQLHandler {
             updateServer.executeUpdate();
         }
         catch (Exception e) {
-            ConsoleUtils.printException(e, Core.NAME, "Something went wrong");
+            ConsoleUtils.printException(e, Core.LOG_NAME, "Something went wrong");
         }
     }
 }

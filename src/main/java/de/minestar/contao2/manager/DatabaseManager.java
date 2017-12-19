@@ -196,7 +196,7 @@ public class DatabaseManager extends AbstractMySQLHandler {
             }
             return true;
         } catch (Exception e) {
-            ConsoleUtils.printException(e, Core.NAME, "Can't fetch results for hasUsedFreeWeek! PlayerName=" + playerUUID);
+            ConsoleUtils.printException(e, Core.LOG_NAME, "Can't fetch results for hasUsedFreeWeek! PlayerName=" + playerUUID);
         }
         return true;
     }
@@ -206,7 +206,7 @@ public class DatabaseManager extends AbstractMySQLHandler {
             setFreeWeekUsed.setString(1, playerUUID.toString());
             setFreeWeekUsed.executeUpdate();
         } catch (Exception e) {
-            ConsoleUtils.printException(e, Core.NAME, "Can't update hasUsedFreeWeek! PlayerUUID=" + playerUUID);
+            ConsoleUtils.printException(e, Core.LOG_NAME, "Can't update hasUsedFreeWeek! PlayerUUID=" + playerUUID);
         }
     }
 
@@ -224,7 +224,7 @@ public class DatabaseManager extends AbstractMySQLHandler {
 //            insertMCPay.setBoolean(5, false);
 //            insertMCPay.executeUpdate();
 //        } catch (Exception e) {
-//            ConsoleUtils.printException(e, Core.NAME, "Can't insert data in the mc_pay table! PlayerName=" + playerName + ",ContaoID=" + contaoID + ",ExpDate=" + expDate + ",modPlayer=" + modPlayer);
+//            ConsoleUtils.printException(e, Core.LOG_NAME, "Can't insert data in the mc_pay table! PlayerName=" + playerName + ",ContaoID=" + contaoID + ",ExpDate=" + expDate + ",modPlayer=" + modPlayer);
 //        }
 //    }
 
@@ -237,7 +237,7 @@ public class DatabaseManager extends AbstractMySQLHandler {
 //            updateExpireDate.setInt(2, contaoID);
 //            updateExpireDate.executeUpdate();
 //        } catch (Exception e) {
-//            ConsoleUtils.printException(e, Core.NAME, "Can't update expire date! Date=" + date + ",ContaoID=" + contaoID);
+//            ConsoleUtils.printException(e, Core.LOG_NAME, "Can't update expire date! Date=" + date + ",ContaoID=" + contaoID);
 //        }
 //    }
 
@@ -250,10 +250,10 @@ public class DatabaseManager extends AbstractMySQLHandler {
             if (results > 0) {
                 return true;
             } else {
-                ConsoleUtils.printError(Core.NAME, "No result from updting! ContaoGroup=" + group.getName() + ",ContaoGroupID=" + group.groupID() + ",userID=" + forumID);
+                ConsoleUtils.printError(Core.LOG_NAME, "No result from updting! ContaoGroup=" + group.getName() + ",ContaoGroupID=" + group.groupID() + ",userID=" + forumID);
             }
         } catch (Exception e) {
-            ConsoleUtils.printException(e, Core.NAME, "Can't update Forum Member Group! GroupManagerGroup=" + group.getName() + ",ContaoGroupID=" + group.groupID() + ",userID=" + forumID);
+            ConsoleUtils.printException(e, Core.LOG_NAME, "Can't update Forum Member Group! GroupManagerGroup=" + group.getName() + ",ContaoGroupID=" + group.groupID() + ",userID=" + forumID);
         }
         return false;
     }
@@ -267,10 +267,10 @@ public class DatabaseManager extends AbstractMySQLHandler {
             if(res > 0) {
                 return true;
             } else {
-                ConsoleUtils.printError(Core.NAME, "No result from removing Group! ContaoGroup=" + group.getName() + ",ContaoGroupID=" + group.groupID() + ",userID=" + forumID);
+                ConsoleUtils.printError(Core.LOG_NAME, "No result from removing Group! ContaoGroup=" + group.getName() + ",ContaoGroupID=" + group.groupID() + ",userID=" + forumID);
             }
         } catch (Exception e) {
-            ConsoleUtils.printException(e, Core.NAME, "Can't remove Forum Member Group! GroupManagerGroup=" + group.getName() + ",ContaoGroupID=" + group.groupID() + ",userID=" + forumID);
+            ConsoleUtils.printException(e, Core.LOG_NAME, "Can't remove Forum Member Group! GroupManagerGroup=" + group.getName() + ",ContaoGroupID=" + group.groupID() + ",userID=" + forumID);
         }
         return false;
     }
@@ -285,7 +285,7 @@ public class DatabaseManager extends AbstractMySQLHandler {
                 return true;
             }
         } catch (Exception e) {
-            ConsoleUtils.printException(e, Core.NAME, "Can't add Forum Member Group! GroupManagerGroup=" + group.getName() + ",ContaoGroupID=" + group.groupID() + ",userID=" + forumID);
+            ConsoleUtils.printException(e, Core.LOG_NAME, "Can't add Forum Member Group! GroupManagerGroup=" + group.getName() + ",ContaoGroupID=" + group.groupID() + ",userID=" + forumID);
         }
         return false;
     }
@@ -307,7 +307,7 @@ public class DatabaseManager extends AbstractMySQLHandler {
                 return null;
             }
         } catch (Exception e) {
-            ConsoleUtils.printException(e, Core.NAME, "Can't select MCUser from wcf1_user_option_value by name! PlayerUUID=" + playerUUID);
+            ConsoleUtils.printException(e, Core.LOG_NAME, "Can't select MCUser from wcf1_user_option_value by name! PlayerUUID=" + playerUUID);
             return null;
         }
 
@@ -320,7 +320,7 @@ public class DatabaseManager extends AbstractMySQLHandler {
                 return null;
             }
         } catch (Exception e) {
-            ConsoleUtils.printException(e, Core.NAME, "Can't select PayEndDate from wcf1_paid_subscription by forumId! forumId=" + forumID);
+            ConsoleUtils.printException(e, Core.LOG_NAME, "Can't select PayEndDate from wcf1_paid_subscription by forumId! forumId=" + forumID);
             return null;
         }
 
@@ -337,7 +337,7 @@ public class DatabaseManager extends AbstractMySQLHandler {
                 forumName = result.getString("username");
             }
         } catch (Exception e) {
-            ConsoleUtils.printException(e, Core.NAME, "Can't find forum name for forumId! forumID=" + forumID);
+            ConsoleUtils.printException(e, Core.LOG_NAME, "Can't find forum name for forumId! forumID=" + forumID);
             return null;
         }
         return forumName;
@@ -353,7 +353,7 @@ public class DatabaseManager extends AbstractMySQLHandler {
                 userID = result.getInt("userID");
             }
         } catch (Exception e) {
-            ConsoleUtils.printException(e, Core.NAME, "Can't find forum id for playerUUID! playerUUID=" + playerUUID);
+            ConsoleUtils.printException(e, Core.LOG_NAME, "Can't find forum id for playerUUID! playerUUID=" + playerUUID);
             return -1;
         }
         return userID;
@@ -374,7 +374,7 @@ public class DatabaseManager extends AbstractMySQLHandler {
 //                return null;
 //            }
 //        } catch (Exception e) {
-//            ConsoleUtils.printException(e, Core.NAME, "Can't select MCUser from wcf1_user_option_value by name! PlayerUUID=" + playerUUID);
+//            ConsoleUtils.printException(e, Core.LOG_NAME, "Can't select MCUser from wcf1_user_option_value by name! PlayerUUID=" + playerUUID);
 //            return null;
 //        }
 //
@@ -398,7 +398,7 @@ public class DatabaseManager extends AbstractMySQLHandler {
                 return null;
             }
         } catch (Exception e) {
-            ConsoleUtils.printException(e, Core.NAME, "Can't select PayEndDate from wcf1_paid_subscription by forumId! forumId=" + forumID);
+            ConsoleUtils.printException(e, Core.LOG_NAME, "Can't select PayEndDate from wcf1_paid_subscription by forumId! forumId=" + forumID);
             return null;
         }
     }
@@ -411,7 +411,7 @@ public class DatabaseManager extends AbstractMySQLHandler {
             ResultSet result = checkAccount.executeQuery();
             return result.next() && result.getBoolean(1);
         } catch (Exception e) {
-            ConsoleUtils.printException(e, Core.NAME, "Can't check whether ForumAccount is active! forumId=" + forumId);
+            ConsoleUtils.printException(e, Core.LOG_NAME, "Can't check whether ForumAccount is active! forumId=" + forumId);
         }
 
         return false;
@@ -426,10 +426,10 @@ public class DatabaseManager extends AbstractMySQLHandler {
                 int forumGroup = result.getInt("userOnlineGroupID");
                 return getMCGroupName(forumGroup);
             } else {
-                ConsoleUtils.printError(Core.NAME, "Can't get ContaoGroupName from user_group_final! userID=" + forumId);
+                ConsoleUtils.printError(Core.LOG_NAME, "Can't get ContaoGroupName from user_group_final! userID=" + forumId);
             }
         } catch (Exception e) {
-            ConsoleUtils.printException(e, Core.NAME, "Can't get ContaoGroupName from user_group_final! userID=" + forumId);
+            ConsoleUtils.printException(e, Core.LOG_NAME, "Can't get ContaoGroupName from user_group_final! userID=" + forumId);
         }
 
         return null;
@@ -469,7 +469,7 @@ public class DatabaseManager extends AbstractMySQLHandler {
                 map.put(result.getInt("userID"), result.getString(minecraftNickOptionStr));
 
         } catch (Exception e) {
-            ConsoleUtils.printException(e, Core.NAME, "Can't get ForumID from wcf1_user_option_value! Minecraft Nick=" + username);
+            ConsoleUtils.printException(e, Core.LOG_NAME, "Can't get ForumID from wcf1_user_option_value! Minecraft Nick=" + username);
         }
 
         return map;
@@ -482,7 +482,7 @@ public class DatabaseManager extends AbstractMySQLHandler {
             checkForumId.setInt(1, id);
             return checkForumId.executeQuery().next();
         } catch (Exception e) {
-            ConsoleUtils.printException(e, Core.NAME, "Can't check wether userID is existing! userID=" + id);
+            ConsoleUtils.printException(e, Core.LOG_NAME, "Can't check wether userID is existing! userID=" + id);
         }
 
         return false;
@@ -495,7 +495,7 @@ public class DatabaseManager extends AbstractMySQLHandler {
             checkMCNick.setString(1, name);
             return checkMCNick.executeQuery().next();
         } catch (Exception e) {
-            ConsoleUtils.printException(e, Core.NAME, "Can't check whether playerName is in wcf1_user_option! Name=" + name);
+            ConsoleUtils.printException(e, Core.LOG_NAME, "Can't check whether playerName is in wcf1_user_option! Name=" + name);
         }
 
         return false;
@@ -508,7 +508,7 @@ public class DatabaseManager extends AbstractMySQLHandler {
             checkMCUUID.setString(1, uuid.toString());
             return checkMCUUID.executeQuery().next();
         } catch (Exception e) {
-            ConsoleUtils.printException(e, Core.NAME, "Can't check whether UUID is in wcf1_user_option! UUID=" + uuid);
+            ConsoleUtils.printException(e, Core.LOG_NAME, "Can't check whether UUID is in wcf1_user_option! UUID=" + uuid);
         }
 
         return false;
@@ -523,7 +523,7 @@ public class DatabaseManager extends AbstractMySQLHandler {
             } else
                 return null;
         } catch (Exception e) {
-            ConsoleUtils.printException(e, Core.NAME, "Can't select dates from wcf1_user_option_value! playerUUID=" + playerUUID);
+            ConsoleUtils.printException(e, Core.LOG_NAME, "Can't select dates from wcf1_user_option_value! playerUUID=" + playerUUID);
         }
 
         return null;
@@ -537,11 +537,11 @@ public class DatabaseManager extends AbstractMySQLHandler {
             if(addProbeDate.executeUpdate() > 0){
                 return true;
             } else {
-                ConsoleUtils.printError(Core.NAME, "No results from updating probeEndDate in wcf1_user_options! UUID=" + playerUUID + ",Days=" + days);
+                ConsoleUtils.printError(Core.LOG_NAME, "No results from updating probeEndDate in wcf1_user_options! UUID=" + playerUUID + ",Days=" + days);
             }
 
         } catch (Exception e) {
-            ConsoleUtils.printException(e, Core.NAME, "Can't update probeEndDate in wcf1_user_options! UUID=" + playerUUID + ",Days=" + days);
+            ConsoleUtils.printException(e, Core.LOG_NAME, "Can't update probeEndDate in wcf1_user_options! UUID=" + playerUUID + ",Days=" + days);
         }
 
         return false;
@@ -554,7 +554,7 @@ public class DatabaseManager extends AbstractMySQLHandler {
 //            deleteProbeStatus.setString(1, playerName);
 //            deleteProbeStatus.executeUpdate();
 //        } catch (Exception e) {
-//            ConsoleUtils.printException(e, Core.NAME, "Can't delete probe status by setting probeEndDate to NULL! PlayerName=" + playerName);
+//            ConsoleUtils.printException(e, Core.LOG_NAME, "Can't delete probe status by setting probeEndDate to NULL! PlayerName=" + playerName);
 //        }
 //    }
 
@@ -564,7 +564,7 @@ public class DatabaseManager extends AbstractMySQLHandler {
             isInProbation.setString(1, playerUUID.toString());
             return isInProbation.executeQuery().next();
         } catch (Exception e) {
-            ConsoleUtils.printException(e, Core.NAME, "Can't check whether player is in probation time! PlayerUUID=" + playerUUID.toString());
+            ConsoleUtils.printException(e, Core.LOG_NAME, "Can't check whether player is in probation time! PlayerUUID=" + playerUUID.toString());
         }
         return false;
     }
@@ -575,7 +575,7 @@ public class DatabaseManager extends AbstractMySQLHandler {
 //            convertFreeToProbe.setString(1, playerName);
 //            return convertFreeToProbe.executeUpdate() == 1;
 //        } catch (Exception e) {
-//            ConsoleUtils.printException(e, Core.NAME, "Can't degrade a free user to probe user! PlayerName=" + playerName);
+//            ConsoleUtils.printException(e, Core.LOG_NAME, "Can't degrade a free user to probe user! PlayerName=" + playerName);
 //        }
 //
 //        return false;
@@ -594,7 +594,7 @@ public class DatabaseManager extends AbstractMySQLHandler {
                 try {
                     uuid = UUID.fromString(uuidStr);
                 } catch (IllegalArgumentException e) {
-                    ConsoleUtils.printException(e, Core.NAME, "Not a UUID!!!!!! uuid : " + uuidStr);
+                    ConsoleUtils.printException(e, Core.LOG_NAME, "Not a UUID!!!!!! uuid : " + uuidStr);
                     continue;
                 }
                 statistics.put(uuid, new Statistic(result.getInt(minecraftTotalPlacedOptionStr), result.getInt(minecraftTotalBreakOptionStr)));
@@ -615,7 +615,7 @@ public class DatabaseManager extends AbstractMySQLHandler {
                 try {
                     uuid = UUID.fromString(uuidStr);
                 } catch (IllegalArgumentException e) {
-                    ConsoleUtils.printException(e, Core.NAME, "Not a UUID!!!!!! uuid : " + uuidStr);
+                    ConsoleUtils.printException(e, Core.LOG_NAME, "Not a UUID!!!!!! uuid : " + uuidStr);
                     continue;
                 }
                 PlayerWarnings thisPlayer = warnings.get(uuid);
@@ -638,7 +638,7 @@ public class DatabaseManager extends AbstractMySQLHandler {
             saveStatistics.setString(3, playerUUID.toString());
             saveStatistics.executeUpdate();
         } catch (Exception e) {
-            ConsoleUtils.printException(e, Core.NAME, "Can't store statistics to database! playerUUID=" + playerUUID + ",totalPlaced=" + totalPlaced + ",totalBreak=" + totalBreak);
+            ConsoleUtils.printException(e, Core.LOG_NAME, "Can't store statistics to database! playerUUID=" + playerUUID + ",totalPlaced=" + totalPlaced + ",totalBreak=" + totalBreak);
         }
     }
 
@@ -661,7 +661,7 @@ public class DatabaseManager extends AbstractMySQLHandler {
 //        if (!contaoGroup.equalsIgnoreCase(group)) {
 //            String oldGroup = group;
 //            group = playerManager.updateGroupManagerGroup(playerName, contaoGroup);
-//            ConsoleUtils.printWarning(Core.NAME, "Player '" + playerName + "'(MCNick is '" + user.getNickname() + "' ) has a different contao( " + contaoGroup + " ) and groupmanager( " + oldGroup + " )-group!");
+//            ConsoleUtils.printWarning(Core.LOG_NAME, "Player '" + playerName + "'(MCNick is '" + user.getNickname() + "' ) has a different contao( " + contaoGroup + " ) and groupmanager( " + oldGroup + " )-group!");
 //        }
 //
 //        // Check if paytime is expired
@@ -694,9 +694,9 @@ public class DatabaseManager extends AbstractMySQLHandler {
 //
 //            setExpDateInMCTable("11.11.1111", user.getUserID());
 //            updateContaoGroup(ContaoGroup.FREE, user.getUserID());
-//            ConsoleUtils.printInfo(Core.NAME, "Player '" + playerName + "'s Payaccount has expired! Moving to free member!");
+//            ConsoleUtils.printInfo(Core.LOG_NAME, "Player '" + playerName + "'s Payaccount has expired! Moving to free member!");
 //        } catch (ParseException e) {
-//            ConsoleUtils.printException(e, Core.NAME, "Can't parse expire date! PlayerName=" + playerName + ",Date=" + user.getExpDate());
+//            ConsoleUtils.printException(e, Core.LOG_NAME, "Can't parse expire date! PlayerName=" + playerName + ",Date=" + user.getExpDate());
 //        }
 //    }
 
@@ -722,7 +722,7 @@ public class DatabaseManager extends AbstractMySQLHandler {
 
             }
         } catch (Exception e) {
-            ConsoleUtils.printException(e, Core.NAME, "Can't find forum name for forumId! forumID=" + forumID);
+            ConsoleUtils.printException(e, Core.LOG_NAME, "Can't find forum name for forumId! forumID=" + forumID);
             return false;
         }
         return false;
@@ -751,7 +751,7 @@ public class DatabaseManager extends AbstractMySQLHandler {
 //            playerManager.updateGroupManagerGroup(playerName, ContaoGroup.FREE);
 //            updateContaoGroup(ContaoGroup.FREE, user.getUserID());
 //        } catch (Exception e) {
-//            ConsoleUtils.printException(e, Core.NAME, "Can't check probe user whether he can be a free member! PlayerName=" + playerName);
+//            ConsoleUtils.printException(e, Core.LOG_NAME, "Can't check probe user whether he can be a free member! PlayerName=" + playerName);
 //        }
 //    }
 
@@ -790,7 +790,7 @@ public class DatabaseManager extends AbstractMySQLHandler {
                 return new Statistic(result.getInt(minecraftTotalPlacedOptionStr), result.getInt(minecraftTotalBreakOptionStr));
             }
         } catch (Exception e) {
-            ConsoleUtils.printException(e, Core.NAME, "Can't find statistics for User! uuid=" + playerUUID);
+            ConsoleUtils.printException(e, Core.LOG_NAME, "Can't find statistics for User! uuid=" + playerUUID);
         }
         return null;
     }
@@ -826,7 +826,7 @@ public class DatabaseManager extends AbstractMySQLHandler {
                 return true;
             }
         } catch (Exception e) {
-            ConsoleUtils.printException(e, Core.NAME, "Can't set probe dates to database! forumID=" + userID + ",probeStart=" + probeStart + ",probeEnd=" + probeEnd);
+            ConsoleUtils.printException(e, Core.LOG_NAME, "Can't set probe dates to database! forumID=" + userID + ",probeStart=" + probeStart + ",probeEnd=" + probeEnd);
         }
         return false;
     }
@@ -841,7 +841,7 @@ public class DatabaseManager extends AbstractMySQLHandler {
                 map.put(result.getInt("userID"), result.getString(minecraftNickOptionStr));
 
         } catch (Exception e) {
-            ConsoleUtils.printException(e, Core.NAME, "Can't get ForumID from wcf1_user_option_value! Minecraft Nick=" + mcNick);
+            ConsoleUtils.printException(e, Core.LOG_NAME, "Can't get ForumID from wcf1_user_option_value! Minecraft Nick=" + mcNick);
         }
 
         return map;
@@ -870,10 +870,10 @@ public class DatabaseManager extends AbstractMySQLHandler {
             if(setProbeEndDate.executeUpdate() > 0){
                 return true;
             } else {
-                ConsoleUtils.printError(Core.NAME, "No results from updating probeEndDate in wcf1_user_options! userID=" + userID + ",probeEndDate=" + probeEndDate);
+                ConsoleUtils.printError(Core.LOG_NAME, "No results from updating probeEndDate in wcf1_user_options! userID=" + userID + ",probeEndDate=" + probeEndDate);
             }
         } catch (Exception e) {
-            ConsoleUtils.printException(e, Core.NAME, "Can't update probeEndDate in wcf1_user_options! userID=" + userID + ",probeEndDate=" + probeEndDate);
+            ConsoleUtils.printException(e, Core.LOG_NAME, "Can't update probeEndDate in wcf1_user_options! userID=" + userID + ",probeEndDate=" + probeEndDate);
         }
 
         return false;
@@ -888,7 +888,7 @@ public class DatabaseManager extends AbstractMySQLHandler {
                 userIDS.add(result.getInt("userID"));
             }
         } catch (Exception e) {
-            ConsoleUtils.printException(e, Core.NAME, "Can't find userIDs for playerUUID! playerUUID=" + playerUUID);
+            ConsoleUtils.printException(e, Core.LOG_NAME, "Can't find userIDs for playerUUID! playerUUID=" + playerUUID);
             return null;
         }
         return userIDS;

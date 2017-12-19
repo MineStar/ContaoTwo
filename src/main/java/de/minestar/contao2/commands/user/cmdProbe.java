@@ -42,7 +42,7 @@ public class cmdProbe extends AbstractCommand {
     private DatabaseManager databaseManager;
 
     public cmdProbe(String syntax, String arguments, String node, PlayerManager playerManager, DatabaseManager dbHandler) {
-        super(Core.NAME, syntax, arguments, node);
+        super(Core.LOG_NAME, syntax, arguments, node);
         this.description = "Probeuser hinzufügen";
         this.playerManager = playerManager;
         this.databaseManager = dbHandler;

@@ -85,7 +85,7 @@ public class Settings {
             return true;
 
         } catch (Exception e) {
-            ConsoleUtils.printException(e, Core.NAME, "Can't load the settings from " + configFile);
+            ConsoleUtils.printException(e, Core.LOG_NAME, "Can't load the settings from " + configFile);
             return false;
         }
     }
@@ -160,7 +160,7 @@ public class Settings {
         try {
             config.save(configFile);
         } catch (Exception e) {
-            ConsoleUtils.printException(e, Core.NAME, "Can't save public slots to config!");
+            ConsoleUtils.printException(e, Core.LOG_NAME, "Can't save public slots to config!");
         }
     }
 
@@ -174,7 +174,7 @@ public class Settings {
         try {
             config.save(configFile);
         } catch (Exception e) {
-            ConsoleUtils.printException(e, Core.NAME, "Can't save max slots to the config!");
+            ConsoleUtils.printException(e, Core.LOG_NAME, "Can't save max slots to the config!");
         }
     }
 

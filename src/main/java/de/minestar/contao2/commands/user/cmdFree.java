@@ -40,7 +40,7 @@ public class cmdFree extends AbstractCommand {
     private HashMap<String, String> possibleFreeUser = new HashMap<>();
 
     public cmdFree(String syntax, String arguments, String node, PlayerManager playerManager, DatabaseManager databaseManager) {
-        super(Core.NAME, syntax, arguments, node);
+        super(Core.LOG_NAME, syntax, arguments, node);
         this.description = "Freeuser hinzufügen";
         this.playerManager = playerManager;
         this.databaseManager = databaseManager;

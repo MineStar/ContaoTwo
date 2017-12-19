@@ -43,7 +43,7 @@ public class FreeLoginFailStat implements Statistic {
 
     @Override
     public String getPluginName() {
-        return Core.NAME;
+        return Core.LOG_NAME;
     }
 
     @Override

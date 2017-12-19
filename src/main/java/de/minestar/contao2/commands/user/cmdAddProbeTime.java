@@ -41,7 +41,7 @@ public class cmdAddProbeTime extends AbstractCommand {
     private DatabaseManager databaseManager;
 
     public cmdAddProbeTime(String syntax, String arguments, String node, DatabaseManager databaseManager) {
-        super(Core.NAME, syntax, arguments, node);
+        super(Core.LOG_NAME, syntax, arguments, node);
         this.databaseManager = databaseManager;
     }
 

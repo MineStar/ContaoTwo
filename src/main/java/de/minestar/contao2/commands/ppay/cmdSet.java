@@ -30,7 +30,7 @@ import de.minestar.minestarlibrary.utils.ChatUtils;
 public class cmdSet extends AbstractCommand {
 
     public cmdSet(String syntax, String arguments, String node) {
-        super(Core.NAME, syntax, arguments, node);
+        super(Core.LOG_NAME, syntax, arguments, node);
     }
 
     @Override

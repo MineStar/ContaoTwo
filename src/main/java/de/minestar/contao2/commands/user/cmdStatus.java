@@ -51,7 +51,7 @@ public class cmdStatus extends AbstractExtendedCommand {
     private StatisticManager statisticManager;
 
     public cmdStatus(String syntax, String arguments, String node, DatabaseManager databaseManager, StatisticManager statisticManager) {
-        super(Core.NAME, syntax, arguments, node);
+        super(Core.LOG_NAME, syntax, arguments, node);
         this.description = "Userstatus abfragen";
         this.databaseManager = databaseManager;
         this.statisticManager = statisticManager;
