@@ -70,20 +70,14 @@ public class cmdProbe extends AbstractCommand {
 
         UUID uuid = player.getUniqueId();
 
-        int inputUserID;
-        try {
-            inputUserID = Integer.parseInt(args[1]);
-        } catch (Exception e) {
-            ChatUtils.writeError(sender, pluginName, args[1] + " ist keine Zahl!");
-            return;
-        }
-
-        if(!checkUser(inputUserID, sender, inputPlayerName, uuid)) {
+        int forumID = checkUser(sender, inputPlayerName, uuid);
+        if(forumID == -1) {
+            ChatUtils.writeError(sender, pluginName, "User nicht im Forum gefunden. Prüfe ob er seinen UserNick korrekt eingetragen hat.");
             return;
         }
 
 
-        if(!setToProbe(sender, inputUserID, uuid)) {
+        if(!setToProbe(sender, forumID, uuid)) {
             ChatUtils.writeError(sender, pluginName, "User konnte nicht zum ProbeUser befördert werden.");
             return;
         }
@@ -99,66 +93,60 @@ public class cmdProbe extends AbstractCommand {
         this.playerManager.updateGroupManagerGroup(player.getName(), ContaoGroup.PROBE);
     }
 
-    private boolean checkUser(int userID, CommandSender sender, String mcName, UUID uuid) {
-
+    private int checkUser(CommandSender sender, String mcName, UUID uuid) {
 
         // USER IS IN X
         if (playerManager.isInGroup(mcName, ContaoGroup.X)) {
             ChatUtils.writeError(sender, pluginName, "Fehler: User ist in Gruppe X.");
             ChatUtils.writeInfo(sender, pluginName, "Er wurde bereits abgelehnt!");
-            return false;
-        }
-
-        ContaoGroup contaoGroup = databaseManager.getContaoGroup(userID);
-
-        if(!ContaoGroup.DEFAULT.equals(contaoGroup) && !ContaoGroup.FREE.equals(contaoGroup)) {
-            ChatUtils.writeError(sender, pluginName, "Spieler '" + mcName + "' ist weder Free noch Default! Aktuelle Gruppe: " + contaoGroup);
-            return false;
+            return -1;
         }
 
         HashMap<Integer, String> forumIDs = databaseManager.getForumIDs(mcName);
 
         if(forumIDs == null || forumIDs.isEmpty()) {
             ChatUtils.writeError(sender, pluginName, "Fehler: MinecraftNick nicht gefunden.");
-            return false;
+            return -1;
         }
         else if(forumIDs.size() > 1) {
             ChatUtils.writeError(sender, pluginName, "Fehler: Mehrere ForenAccounts mit gleichem MinecraftNick gefunden.");
             for(Integer i : forumIDs.keySet()) {
                 ChatUtils.writeInfo(sender, pluginName, Integer.toString(i));
             }
-            return false;
-        }
-        else if(!forumIDs.containsKey(userID)) {
-            ChatUtils.writeError(sender, pluginName, "Fehler: MCNick gefunden, aber unter anderen ForenIDs.");
-            for(Integer i : forumIDs.keySet()) {
-                ChatUtils.writeInfo(sender, pluginName, Integer.toString(i));
-            }
-            return false;
+            return -1;
         }
 
-        if (!databaseManager.isForumAccountActive(userID)) {
+        int forumID = forumIDs.keySet().iterator().next();
+
+        ContaoGroup contaoGroup = databaseManager.getContaoGroup(forumID);
+
+        if(!ContaoGroup.DEFAULT.equals(contaoGroup) && !ContaoGroup.FREE.equals(contaoGroup)) {
+            ChatUtils.writeError(sender, pluginName, "Spieler '" + mcName + "' ist weder Free noch Default! Aktuelle Gruppe: " + contaoGroup);
+            return -1;
+        }
+
+        if (!databaseManager.isForumAccountActive(forumID)) {
             ChatUtils.writeError(sender, pluginName, "Fehler: Bestätigungsemail wurde noch nicht bestätigt.");
             ChatUtils.writeInfo(sender, pluginName, "Bitte dem User bescheid sagen das er bestätigen muss.");
-            return false;
+            return -1;
         }
 
 
         List<Integer> forumIDsForUUID = databaseManager.getForumIds(uuid);
         if(forumIDsForUUID == null) {
             ChatUtils.writeError(sender, pluginName, "Fehler: Konnte nicht prüfen ob UUID bereits eingetragen ist.");
-            return false;
+            return -1;
         }
 
-        if(forumIDsForUUID.size() > 2 || !forumIDs.containsKey(userID)) {
+        if(forumIDsForUUID.size() > 2 || !forumIDs.containsKey(forumID)) {
             ChatUtils.writeError(sender, pluginName, "Fehler: UUID ist bereits für folgende ForenAccounts hinterlegt.");
             for(Integer i : forumIDsForUUID) {
                 ChatUtils.writeInfo(sender, pluginName, Integer.toString(i));
             }
-            return false;
+            return -1;
         }
 
-        return true;
+        return forumID;
     }
 
 
@@ -167,8 +155,8 @@ public class cmdProbe extends AbstractCommand {
         if (databaseManager.isMCUUIDInUser(uuid)){
             ContaoGroup oldGroup = databaseManager.getContaoGroup(forumID);
 
-            if (!ContaoGroup.DEFAULT.equals(oldGroup)) {
-                databaseManager.removeGroup(forumID, ContaoGroup.FREE);
+            if (oldGroup != null && !ContaoGroup.DEFAULT.equals(oldGroup)) {
+                databaseManager.removeGroup(forumID, oldGroup);
             }
         }
 

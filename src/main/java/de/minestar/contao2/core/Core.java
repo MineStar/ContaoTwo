@@ -133,9 +133,8 @@ public class Core extends AbstractCore {
                 new cmdStatus           ("/stats",      "",                             "",                         this.databaseManager, this.statisticManager),
 
                 new cmdUser         ("/user", "", "",
-                    new cmdDefault      ("default",     "<ingamename>",                 "contao.rights.default",    this.playerManager),
                     new cmdFree         ("free",        "<ingamename>",                 "contao.rights.free",       this.playerManager, this.databaseManager),
-                    new cmdProbe        ("probe",       "<ingamename> <contao-id>",     "contao.rights.probe",      this.playerManager, this.databaseManager),
+                    new cmdProbe        ("probe",       "<ingamename>",                 "contao.rights.probe",      this.playerManager, this.databaseManager),
                     new cmdAddProbeTime ("probeadd",    "<PlayerName> <Days>",          "contao.rights.probeadd",   this.databaseManager),
                     new cmdSearch       ("search",      "<homepagename>",               "contao.rights.search",     this.databaseManager),
                     new cmdStatus       ("status",      "",                             "",                         this.databaseManager, this.statisticManager),

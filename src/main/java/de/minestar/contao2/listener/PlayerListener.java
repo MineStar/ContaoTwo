@@ -113,6 +113,12 @@ public class PlayerListener implements Listener {
                 PlayerUtils.sendMessage(event.getPlayer(), ChatColor.RED, "Du wurdest automatisch folgender Gruppe zugewiesen: " + currentGroup.name() + " (vorherige Gruppe: " + oldGroup.name() + ")");
             }
         }
+
+        if(!databaseManager.isMCNickInUser(event.getPlayer().getName())) {
+            PlayerUtils.sendMessage(event.getPlayer(), ChatColor.GREEN, "Wir konnten dich leider im System nicht finden. Bitte registriere dich im Forum unter minestar.de und/oder tage in deinem Userprofil deinen Minecraft Nick ein.");
+        } else if(currentGroup.equals(ContaoGroup.DEFAULT)) {
+            PlayerUtils.sendMessage(event.getPlayer(), ChatColor.GREEN, "Du möchtest mitspielen? Wende dich vertrauensvoll an einen Mod oder Admin.");
+        }
         
         // Player allowed to join ?
         if (!this.playerManager.allowedToJoin(currentGroup))
@@ -236,16 +242,9 @@ public class PlayerListener implements Listener {
         int userID = databaseManager.getForumId(player.getUniqueId());
         ContaoGroup newGroup = databaseManager.getContaoGroup(userID);
         //TODO Pay User Check?
-        if(!oldGroup.equals(newGroup)) {
+        if(oldGroup != null && !oldGroup.equals(newGroup)) {
             playerManager.updateGroupManagerGroup(event.getPlayer().getName(), newGroup);
             ConsoleUtils.printWarning(Core.NAME, "Player '" + event.getPlayer().getName() + "' has a different forum( " + newGroup + " ) and groupmanager( " + oldGroup + " )-group!");
-        }
-        else if(oldGroup.equals(ContaoGroup.PROBE)) {
-            if(databaseManager.canBeFree(userID)) {
-                playerManager.updateGroupManagerGroup(event.getPlayer().getName(), ContaoGroup.FREE);
-
-                databaseManager.setUserFree(userID);
-            }
         }
     }
 

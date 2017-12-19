@@ -102,7 +102,7 @@ public class StatisticManager implements Runnable {
 
         ChatUtils.writeMessage(player, "");
         if (stats == null)
-            ChatUtils.writeColoredMessage(player, ChatColor.RED, "Wir konnten dich leider im System nicht finden. Wende dich an einen Admin oder Mod.");
+            ChatUtils.writeColoredMessage(player, ChatColor.RED, "Wir konnten leider keine Stats zu deinem Account finden.");
         else {
             ChatUtils.writeColoredMessage(player, ChatColor.BLUE, "Blöcke zerstört: " + stats.getTotalBreak());
             ChatUtils.writeColoredMessage(player, ChatColor.BLUE, "Blöcke gesetzt  : " + stats.getTotalPlaced());
