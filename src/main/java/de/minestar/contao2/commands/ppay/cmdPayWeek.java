@@ -19,7 +19,6 @@
 package de.minestar.contao2.commands.ppay;
 
 import java.text.SimpleDateFormat;
-import java.util.concurrent.TimeUnit;
 
 import org.bukkit.entity.Player;
 
@@ -49,38 +48,34 @@ public class cmdPayWeek extends AbstractExtendedCommand {
 
     @Override
     public void execute(String[] args, Player player) {
-        //TODO
-//        MinestarPlayer msPlayer = MinestarCore.getPlayer(player);
-//
-//        // ONLY FREEUSERS CAN USE THIS COMMAND
-//        if (!msPlayer.getMinestarGroup().equals(MinestarGroup.FREE)) {
-//            PlayerUtils.sendError(player, Core.LOG_NAME, "Free-User only!");
-//            return;
-//        }
-//
-//        // GET CONTAOUSER
-//        MCUser user = databaseManager.getIngameData(player.getName());
-//        if (user == null) {
-//            PlayerUtils.sendError(player, Core.LOG_NAME, "Fehler: Minecraftnick nicht gefunden");
-//            return;
-//        }
-//
-//        // GUTSCHEIN EINGEL�ST?
-//        if (this.databaseManager.hasUsedFreeWeek(player.getName())) {
-//            PlayerUtils.sendError(player, Core.LOG_NAME, "Du hast deinen Gutschein bereits eingelöst!");
-//            return;
-//        }
-//
-//        // PAYUSER-DATUM SETZEN
-//        this.databaseManager.setExpDateInMCTable(dateFormat.format((System.currentTimeMillis() + TimeUnit.DAYS.toMillis(7))), user.getUserID());
-//
-//        // CONTAO GRUPPE AUF PAY SETZEN
-//        databaseManager.updateContaoGroup(ContaoGroup.PAY, user.getUserID());
-//
-//        // GUTSCHEIN ALS EINGEL�ST SETZEN
-//        this.databaseManager.setFreeWeekUsed(player.getName());
-//
-//        // UPDATE GROUPMANAGER-GROUP
-//        this.playerManager.updateGroupManagerGroup(player.getName(), ContaoGroup.PAY);
+        MinestarPlayer msPlayer = MinestarCore.getPlayer(player);
+
+        // ONLY FREEUSERS CAN USE THIS COMMAND
+        if (!msPlayer.getMinestarGroup().equals(MinestarGroup.FREE)) {
+            PlayerUtils.sendError(player, Core.LOG_NAME, "Free-User only!");
+            return;
+        }
+
+        // GET CONTAOUSER
+        MCUser user = databaseManager.getIngameData(player.getUniqueId());
+        if (user == null) {
+            PlayerUtils.sendError(player, Core.LOG_NAME, "Fehler: Minecraftnick nicht gefunden");
+            return;
+        }
+
+        // GUTSCHEIN EINGEL�ST?
+        if (this.databaseManager.hasUsedFreeWeek(player.getUniqueId())) {
+            PlayerUtils.sendError(player, Core.LOG_NAME, "Du hast deinen Gutschein bereits eingelöst!");
+            return;
+        }
+
+        if(!databaseManager.userFreePayWeek(player.getUniqueId())) {
+            PlayerUtils.sendError(player, Core.LOG_NAME, "Leider gab es technische Probleme.");
+            return;
+        }
+
+        // UPDATE GROUPMANAGER-GROUP
+        this.playerManager.updateGroupManagerGroup(player.getName(), ContaoGroup.PAY);
+        PlayerUtils.sendSuccess(player, Core.LOG_NAME, "Viel Spaß mit deiner kostenlosen Pay-Woche!");
     }
 }

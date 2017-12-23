@@ -84,6 +84,9 @@ public class DatabaseManager extends AbstractMySQLHandler {
 
     private PreparedStatement updateOnlineGroupID;
 
+    private PreparedStatement addFreePayWeek;
+    private PreparedStatement hasGroup;
+
     private final static String minecraftNickOptionStr = "userOption7";
     private final static String minecraftUUIDOptionStr = "userOption39";
     private final static String minecraftTotalBreakOptionStr = "userOption40";
@@ -164,7 +167,7 @@ public class DatabaseManager extends AbstractMySQLHandler {
 
 //        addWarning = null; //TODO con.prepareStatement("INSERT INTO mc_warning (mc_pay_id,reason,date,adminnickname) VALUES ((SELECT id FROM mc_pay WHERE minecraft_nick = ?), ?, STR_TO_DATE(?,'%d.%m.%Y %H:%i:%s'), ?)");
 
-        selectAllWarnings = con.prepareStatement("SELECT o." + minecraftUUIDOptionStr + " as " + minecraftUUIDOptionStr + ", DATE_FORMAT(FROM_UNIXTIME(w.time), '%d.%m.%Y %H:%i:%s') AS 'startDate', w.reason as reason, u.username as adminNick FROM wcf1_user_option_value o, wcf1_user_infraction_warning w, wcf1_user u WHERE " + minecraftUUIDOptionStr + " IS NOT NULL AND o.userID = w.userID AND u.userID = w.judgeID");
+        selectAllWarnings = con.prepareStatement("SELECT o." + minecraftUUIDOptionStr + " as " + minecraftUUIDOptionStr + ", DATE_FORMAT(FROM_UNIXTIME(w.time), '%d.%m.%Y %H:%i:%s') AS 'startDate', w.reason as reason, u.username as adminNick FROM wcf1_user_option_value o, wcf1_user_infraction_warning w, wcf1_user u WHERE " + minecraftUUIDOptionStr + " IS NOT NULL AND o.userID = w.userID AND u.userID = w.judgeID AND revoked = 0");
 
         // deleteWarning = con.prepareStatement("DELETE FROM mc_warning WHERE mc_pay_id = (SELECT id FROM mc_pay WHERE minecraft_nick = ?) AND DATE_FORMAT(date,'%d.%m.%Y %H:%i:%s') = ?");
 
@@ -185,6 +188,10 @@ public class DatabaseManager extends AbstractMySQLHandler {
         selectForumName = con.prepareStatement("SELECT username FROM wcf1_user WHERE userID = ?");
 
         updateOnlineGroupID = con.prepareStatement("UPDATE wcf1_user SET userOnlineGroupID = ? WHERE userID = ?");
+
+        addFreePayWeek = con.prepareStatement("INSERT INTO wcf1_paid_subscription_user (subscriptionID, userID, startDate, endDate, isActive) VALUES (?, ?, UNIX_TIMESTAMP(NOW()), UNIX_TIMESTAMP(DATE_ADD(NOW(), INTERVAL 7 DAY)), 1)");
+
+        hasGroup = con.prepareStatement("SELECT 1 FROM wcf1_user_to_group WHERE userID = ? AND groupID = ?");
     }
 
     public boolean hasUsedFreeWeek(UUID playerUUID) {
@@ -192,7 +199,7 @@ public class DatabaseManager extends AbstractMySQLHandler {
             hasUsedFreeWeek.setString(1, playerUUID.toString());
             ResultSet result = hasUsedFreeWeek.executeQuery();
             if (result.next()) {
-                return result.getBoolean("usedFreePayWeek");
+                return result.getBoolean(hasUsedFreeWeekOptionStr);
             }
             return true;
         } catch (Exception e) {
@@ -201,13 +208,14 @@ public class DatabaseManager extends AbstractMySQLHandler {
         return true;
     }
 
-    public void setFreeWeekUsed(UUID playerUUID) {
+    public boolean setFreeWeekUsed(UUID playerUUID) {
         try {
             setFreeWeekUsed.setString(1, playerUUID.toString());
-            setFreeWeekUsed.executeUpdate();
+            return setFreeWeekUsed.executeUpdate() > 0;
         } catch (Exception e) {
             ConsoleUtils.printException(e, Core.LOG_NAME, "Can't update hasUsedFreeWeek! PlayerUUID=" + playerUUID);
         }
+        return false;
     }
 
 //    public void addProbe(String playerName, int contaoID, String expDate, String modPlayer) {
@@ -276,16 +284,20 @@ public class DatabaseManager extends AbstractMySQLHandler {
     }
 
     public boolean addGroup(ContaoGroup group, int forumID) {
+        return addGroup(group.groupID(), forumID);
+    }
+
+    public boolean addGroup(int groupID, int forumID) {
 
         try {
             addGroup.setInt(1, forumID);
-            addGroup.setInt(2, group.groupID());
+            addGroup.setInt(2, groupID);
             int res = addGroup.executeUpdate();
             if (res > 0) {
                 return true;
             }
         } catch (Exception e) {
-            ConsoleUtils.printException(e, Core.LOG_NAME, "Can't add Forum Member Group! GroupManagerGroup=" + group.getName() + ",ContaoGroupID=" + group.groupID() + ",userID=" + forumID);
+            ConsoleUtils.printException(e, Core.LOG_NAME, "Can't add Forum Member Group! ContaoGroupID=" + groupID + ",userID=" + forumID);
         }
         return false;
     }
@@ -295,7 +307,7 @@ public class DatabaseManager extends AbstractMySQLHandler {
 
         String name;
         int forumID;
-        String payEndDate;
+        String payEndDate = null;
 
         try {
             selectMCPPlayerByUUID.setString(1, playerUUID.toString());
@@ -316,8 +328,6 @@ public class DatabaseManager extends AbstractMySQLHandler {
             ResultSet result = getPayEndDateByForumId.executeQuery();
             if (result.next()) {
                 payEndDate = result.getString(1);
-            } else {
-                return null;
             }
         } catch (Exception e) {
             ConsoleUtils.printException(e, Core.LOG_NAME, "Can't select PayEndDate from wcf1_paid_subscription by forumId! forumId=" + forumID);
@@ -424,9 +434,13 @@ public class DatabaseManager extends AbstractMySQLHandler {
 
             if (result.next()) {
                 int forumGroup = result.getInt("userOnlineGroupID");
+                if(ContaoGroup.FREE.groupID() == forumGroup && hasGroup(forumId, GROUP_ID_FREEWEEK_PAY)) {
+                    return ContaoGroup.PAY;
+                }
                 return getMCGroupName(forumGroup);
             } else {
                 ConsoleUtils.printError(Core.LOG_NAME, "Can't get ContaoGroupName from user_group_final! userID=" + forumId);
+                return ContaoGroup.DEFAULT;
             }
         } catch (Exception e) {
             ConsoleUtils.printException(e, Core.LOG_NAME, "Can't get ContaoGroupName from user_group_final! userID=" + forumId);
@@ -437,7 +451,23 @@ public class DatabaseManager extends AbstractMySQLHandler {
 
     public ContaoGroup getContaoGroup(UUID uuid) {
         int forumID = getForumId(uuid);
-        return getContaoGroup(forumID);
+        ContaoGroup group = getContaoGroup(forumID);
+        return group;
+    }
+
+    private boolean hasGroup(int forumID, int groupID) {
+        try {
+            hasGroup.setInt(1, forumID);
+            hasGroup.setInt(2, groupID);
+            ResultSet result = hasGroup.executeQuery();
+            if (result.next()) {
+                return result.getBoolean(1);
+            }
+            return false;
+        } catch (Exception e) {
+            ConsoleUtils.printException(e, Core.LOG_NAME, "Can't fetch results for hasGroup! userID=" + forumID + ", groupID =" + groupID);
+        }
+        return false;
     }
 
     // GET MC GROUP FROM CONTAO-GROUPID
@@ -892,5 +922,38 @@ public class DatabaseManager extends AbstractMySQLHandler {
             return null;
         }
         return userIDS;
+    }
+
+    public boolean userFreePayWeek(UUID playerUUID) {
+        int forumID = getForumId(playerUUID);
+        if(forumID == -1)
+            return false;
+
+        if(!addFreePayWeekToPayTable(forumID))
+            return false;
+
+        if(!setFreeWeekUsed(playerUUID))
+            return false;
+
+        if(!addGroup(GROUP_ID_FREEWEEK_PAY, forumID))
+            return false;
+
+        return true;
+    }
+
+    private boolean addFreePayWeekToPayTable(int userID) {
+        try {
+            addFreePayWeek.setInt(1, FORUM_FREEWEEK_PAYUSERGROUP_ID);
+            addFreePayWeek.setInt(2, userID);
+            if(addFreePayWeek.executeUpdate() > 0){
+                return true;
+            } else {
+                ConsoleUtils.printError(Core.LOG_NAME, "No results from adding paid subscription in wcf1_paid_subscription_user! userID=" + userID);
+            }
+        } catch (Exception e) {
+            ConsoleUtils.printException(e, Core.LOG_NAME, "Can't add entry in wcf1_paid_subscription_user! userID=" + userID);
+        }
+
+        return false;
     }
 }

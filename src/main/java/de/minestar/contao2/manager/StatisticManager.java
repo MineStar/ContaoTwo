@@ -70,6 +70,7 @@ public class StatisticManager implements Runnable {
     @Override
     public void run() {
         saveAllStatistics();
+        loadAllWarnings();
     }
 
     public void saveAllStatistics() {

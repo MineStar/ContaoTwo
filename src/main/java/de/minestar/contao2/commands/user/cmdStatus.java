@@ -118,7 +118,7 @@ public class cmdStatus extends AbstractExtendedCommand {
         // We have checked whether the player exists in the database, so there
         // is no null pointer check necessary!
         printGroup(sender, user.getUserID());
-        printAccountDates(sender, uuid, user.getUserID());
+        printAccountDates(sender, uuid, user.getUserID(), user.getExpDate());
         printWarnings(sender, uuid);
         printStatistics(sender, uuid);
         printBanned(sender, targetName);
@@ -167,7 +167,7 @@ public class cmdStatus extends AbstractExtendedCommand {
         }
     }
 
-    private void printAccountDates(CommandSender sender, UUID playerUUID, int userID) {
+    private void printAccountDates(CommandSender sender, UUID playerUUID, int userID, String payEndDate) {
         String[] dates = databaseManager.getAccountDates(playerUUID);
         ContaoGroup group = databaseManager.getContaoGroup(userID);
         ChatUtils.writeColoredMessage(sender, ChatColor.BLUE, "Seit dem " + dates[0] + " auf dem Server.");
@@ -175,9 +175,8 @@ public class cmdStatus extends AbstractExtendedCommand {
         if (ContaoGroup.PROBE.equals(group) && dates[1] != null)
             ChatUtils.writeColoredMessage(sender, ChatColor.BLUE, "Probeuser bis zum " + dates[1]);
         // is pay user
-        String probeEndDate = databaseManager.getPayEndDate(playerUUID);
-        if (probeEndDate != null && !probeEndDate.isEmpty())
-            ChatUtils.writeColoredMessage(sender, ChatColor.BLUE, "Payuser bis zum " + probeEndDate);
+        if (payEndDate != null && !payEndDate.isEmpty())
+            ChatUtils.writeColoredMessage(sender, ChatColor.BLUE, "Payuser bis zum " + payEndDate);
     }
 
     private void printWarnings(CommandSender sender, UUID playerUUID) {

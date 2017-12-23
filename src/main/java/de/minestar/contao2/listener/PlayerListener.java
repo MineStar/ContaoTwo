@@ -242,7 +242,7 @@ public class PlayerListener implements Listener {
         int userID = databaseManager.getForumId(player.getUniqueId());
         ContaoGroup newGroup = databaseManager.getContaoGroup(userID);
         //TODO Pay User Check?
-        if(oldGroup != null && !oldGroup.equals(newGroup)) {
+        if(oldGroup != null && !oldGroup.equals(newGroup) && newGroup != null) {
             playerManager.updateGroupManagerGroup(event.getPlayer().getName(), newGroup);
             ConsoleUtils.printWarning(Core.LOG_NAME, "Player '" + event.getPlayer().getName() + "' has a different forum( " + newGroup + " ) and groupmanager( " + oldGroup + " )-group!");
         }
